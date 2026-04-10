@@ -15,8 +15,15 @@ class LLMClient:
         self.config = config
         self._provider = build_provider(config)
 
-    def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
-        return self._provider.generate_structured(system_prompt, payload, response_model)
+    def generate_structured(
+        self,
+        system_prompt: str,
+        payload: dict,
+        response_model: type[SchemaT],
+        role: str = "default",
+    ) -> SchemaT:
+        model_name = self.config.model_for_role(role)
+        return self._provider.generate_structured(system_prompt, payload, response_model, model_name)
 
     @property
     def provider_name(self) -> str:

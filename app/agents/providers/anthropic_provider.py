@@ -14,9 +14,15 @@ class AnthropicProvider(BaseLLMProvider):
 
         self._client = Anthropic(api_key=config.anthropic_api_key, timeout=config.llm_timeout_seconds)
 
-    def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
+    def generate_structured(
+        self,
+        system_prompt: str,
+        payload: dict,
+        response_model: type[SchemaT],
+        model_name: str,
+    ) -> SchemaT:
         response = self._client.messages.create(
-            model=self.config.llm_model,
+            model=model_name,
             max_tokens=1600,
             temperature=0,
             system=system_prompt,

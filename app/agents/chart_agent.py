@@ -18,7 +18,7 @@ def analyze_chart(ticker: str, name: str, features: ChartFeatures, llm_client: L
     payload = {"ticker": ticker, "name": name, **features.model_dump()}
     if llm_client:
         try:
-            return llm_client.generate_structured(SYSTEM_PROMPT, payload, ChartAnalysis)
+            return llm_client.generate_structured(SYSTEM_PROMPT, payload, ChartAnalysis, role="chart")
         except Exception:
             pass
     return _fallback_chart_analysis(features)

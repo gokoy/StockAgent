@@ -24,7 +24,7 @@ def analyze_news(ticker: str, name: str, news_items: list[NewsItem], llm_client:
     }
     if llm_client:
         try:
-            return llm_client.generate_structured(SYSTEM_PROMPT, payload, NewsAnalysis)
+            return llm_client.generate_structured(SYSTEM_PROMPT, payload, NewsAnalysis, role="news")
         except Exception:
             pass
     return _fallback_news_analysis(news_items)

@@ -31,7 +31,7 @@ def analyze_final_decision(
     }
     if llm_client:
         try:
-            return llm_client.generate_structured(SYSTEM_PROMPT, payload, FinalAnalysis)
+            return llm_client.generate_structured(SYSTEM_PROMPT, payload, FinalAnalysis, role="final")
         except Exception:
             pass
     return _fallback_final_analysis(chart_analysis, news_analysis)

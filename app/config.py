@@ -5,10 +5,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+LLM_ROLES = ("default", "chart", "news", "final", "macro")
+
+
 @dataclass(frozen=True)
 class AppConfig:
     llm_provider: str
-    llm_model: str
+    llm_model_default: str
+    llm_model_chart: str
+    llm_model_news: str
+    llm_model_final: str
+    llm_model_macro: str
     openai_api_key: str | None
     anthropic_api_key: str | None
     google_api_key: str | None
@@ -43,6 +50,18 @@ class AppConfig:
             return self.google_api_key
         return None
 
+    def model_for_role(self, role: str) -> str:
+        normalized = role.strip().lower()
+        if normalized == "chart":
+            return self.llm_model_chart
+        if normalized == "news":
+            return self.llm_model_news
+        if normalized == "final":
+            return self.llm_model_final
+        if normalized == "macro":
+            return self.llm_model_macro
+        return self.llm_model_default
+
 
 def _parse_universe(raw: str | None) -> list[str]:
     if raw:
@@ -63,6 +82,15 @@ def _parse_universe(raw: str | None) -> list[str]:
     ]
 
 
+def _default_model_for_provider(provider: str) -> str:
+    normalized = provider.strip().lower()
+    if normalized == "anthropic":
+        return "claude-3-5-sonnet-latest"
+    if normalized == "gemini":
+        return "gemini-2.5-flash"
+    return "gpt-4.1-mini"
+
+
 def load_config() -> AppConfig:
     root = Path(__file__).resolve().parent.parent
     output_dir = root / "data" / "outputs"
@@ -71,9 +99,18 @@ def load_config() -> AppConfig:
     output_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     performance_dir.mkdir(parents=True, exist_ok=True)
+    llm_provider = os.getenv("LLM_PROVIDER", "openai").strip().lower()
+    default_model = os.getenv(
+        "LLM_MODEL_DEFAULT",
+        os.getenv("LLM_MODEL", os.getenv("OPENAI_MODEL", _default_model_for_provider(llm_provider))),
+    )
     return AppConfig(
-        llm_provider=os.getenv("LLM_PROVIDER", "openai").strip().lower(),
-        llm_model=os.getenv("LLM_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini")),
+        llm_provider=llm_provider,
+        llm_model_default=default_model,
+        llm_model_chart=os.getenv("LLM_MODEL_CHART", default_model),
+        llm_model_news=os.getenv("LLM_MODEL_NEWS", default_model),
+        llm_model_final=os.getenv("LLM_MODEL_FINAL", default_model),
+        llm_model_macro=os.getenv("LLM_MODEL_MACRO", default_model),
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
         google_api_key=os.getenv("GOOGLE_API_KEY"),

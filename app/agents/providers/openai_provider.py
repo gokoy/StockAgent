@@ -12,9 +12,15 @@ class OpenAIProvider(BaseLLMProvider):
 
         self._client = OpenAI(api_key=config.openai_api_key, timeout=config.llm_timeout_seconds)
 
-    def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
+    def generate_structured(
+        self,
+        system_prompt: str,
+        payload: dict,
+        response_model: type[SchemaT],
+        model_name: str,
+    ) -> SchemaT:
         response = self._client.responses.create(
-            model=self.config.llm_model,
+            model=model_name,
             input=[
                 {"role": "system", "content": [{"type": "input_text", "text": system_prompt}]},
                 {"role": "user", "content": [{"type": "input_text", "text": self.payload_text(payload)}]},

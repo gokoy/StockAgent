@@ -12,9 +12,15 @@ class GeminiProvider(BaseLLMProvider):
 
         self._client = genai.Client(api_key=config.google_api_key)
 
-    def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
+    def generate_structured(
+        self,
+        system_prompt: str,
+        payload: dict,
+        response_model: type[SchemaT],
+        model_name: str,
+    ) -> SchemaT:
         response = self._client.models.generate_content(
-            model=self.config.llm_model,
+            model=model_name,
             contents=f"{system_prompt}\n\n{self.payload_text(payload)}",
             config={
                 "temperature": 0,

@@ -18,7 +18,13 @@ class BaseLLMProvider(ABC):
         self.config = config
 
     @abstractmethod
-    def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
+    def generate_structured(
+        self,
+        system_prompt: str,
+        payload: dict,
+        response_model: type[SchemaT],
+        model_name: str,
+    ) -> SchemaT:
         raise NotImplementedError
 
     @staticmethod

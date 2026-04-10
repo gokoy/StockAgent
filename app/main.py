@@ -6,7 +6,7 @@ import importlib.util
 from pydantic import BaseModel
 
 from app.agents.llm_client import LLMClient
-from app.config import load_config
+from app.config import LLM_ROLES, load_config
 from app.orchestrator import run_scan
 from app.reporting.telegram import send_telegram_test_message
 
@@ -23,6 +23,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-telegram", action="store_true", help="Skip Telegram delivery")
     parser.add_argument("--self-check", action="store_true", help="Print local configuration and dependency status")
     parser.add_argument("--llm-smoke", action="store_true", help="Run a minimal structured output smoke test")
+    parser.add_argument("--llm-role", default="default", choices=LLM_ROLES, help="Role to use for the LLM smoke test")
     parser.add_argument("--limit", type=int, default=None, help="Limit the number of symbols processed")
     parser.add_argument("--timezone", default="Asia/Seoul", help="Timezone name for run timestamps")
     return parser
@@ -39,7 +40,7 @@ def main() -> int:
         print("telegram_test_sent" if ok else "telegram_not_configured")
         return 0
     if args.llm_smoke:
-        print(run_llm_smoke(config))
+        print(run_llm_smoke(config, role=args.llm_role))
         return 0
     result, message = run_scan(
         config,
@@ -61,7 +62,11 @@ def run_self_check(config) -> str:
     package_found = importlib.util.find_spec(provider_package) is not None if provider_package != "unknown" else False
     lines = [
         f"llm_provider={config.llm_provider}",
-        f"llm_model={config.llm_model}",
+        f"llm_model_default={config.llm_model_default}",
+        f"llm_model_chart={config.llm_model_chart}",
+        f"llm_model_news={config.llm_model_news}",
+        f"llm_model_final={config.llm_model_final}",
+        f"llm_model_macro={config.llm_model_macro}",
         f"llm_enabled={config.llm_enabled}",
         f"provider_package={provider_package}",
         f"provider_package_found={package_found}",
@@ -71,14 +76,15 @@ def run_self_check(config) -> str:
     return "\n".join(lines)
 
 
-def run_llm_smoke(config) -> str:
+def run_llm_smoke(config, role: str = "default") -> str:
     if not config.llm_enabled:
         return "llm_not_configured"
     client = LLMClient(config)
     result = client.generate_structured(
         system_prompt="Return a minimal JSON object confirming the provider.",
-        payload={"provider": config.llm_provider},
+        payload={"provider": config.llm_provider, "role": role, "model": config.model_for_role(role)},
         response_model=SmokeResponse,
+        role=role,
     )
     return result.model_dump_json()
 
