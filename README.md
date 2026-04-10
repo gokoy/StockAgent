@@ -53,10 +53,13 @@ repo/
 
 ## 환경변수
 
+- `LLM_PROVIDER` 선택사항, `openai|anthropic|gemini`, 기본값 `openai`
+- `LLM_MODEL` 선택사항, provider별 모델명
 - `OPENAI_API_KEY`
+- `ANTHROPIC_API_KEY`
+- `GOOGLE_API_KEY`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
-- `OPENAI_MODEL` 선택사항, 기본값 `gpt-4.1-mini`
 - `STOCK_UNIVERSE` 선택사항, 예: `AAPL,MSFT,NVDA`
 - `MAX_NEWS_AGE_HOURS` 선택사항, 기본값 `72`
 - `TOP_N_CANDIDATES` 선택사항, 기본값 `5`
@@ -68,6 +71,24 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m app.main --no-telegram
+```
+
+설정과 의존성만 점검하려면:
+
+```bash
+python -m app.main --self-check
+```
+
+실제 스캔을 일부 종목으로 제한하려면:
+
+```bash
+python -m app.main --no-telegram --limit 2
+```
+
+선택한 provider의 structured JSON 응답을 최소 단위로 확인하려면:
+
+```bash
+python -m app.main --llm-smoke
 ```
 
 Telegram 연결만 테스트하려면:
@@ -86,8 +107,15 @@ python -m app.main --telegram-test
 GitHub Secrets에 아래 값을 설정한다.
 
 - `OPENAI_API_KEY`
+- `ANTHROPIC_API_KEY`
+- `GOOGLE_API_KEY`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
+
+GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
+
+- `LLM_PROVIDER`
+- `LLM_MODEL`
 
 ## 저장 결과
 
@@ -133,5 +161,6 @@ NVDA | NVIDIA
 
 - 시세 데이터는 `yfinance`를 사용한다.
 - 뉴스는 Google News RSS를 사용해 최신성 필터를 적용한다.
-- OpenAI structured JSON 응답을 우선 사용하고, 실패 시 deterministic fallback을 둔다.
+- LLM 호출은 provider adapter 패턴으로 추상화했고 `OpenAI`, `Anthropic`, `Gemini`를 지원한다.
+- provider structured JSON 호출 실패 시 deterministic fallback을 둔다.
 - 민감정보는 코드나 로그에 출력하지 않는다.

@@ -20,21 +20,30 @@
 - JSON 결과 저장 및 Telegram 포맷터/전송 모듈 추가 완료
 - GitHub Actions workflow 추가 완료
 - `README.md`, 샘플 결과 JSON 추가 완료
+- LLM provider adapter 구조 추가 완료
+- `OpenAI`, `Anthropic`, `Gemini` 전환 가능한 설정 추가 완료
+- `--self-check`, `--llm-smoke`, `--limit` CLI 추가 완료
+- Python 3.12 가상환경 생성 및 의존성 설치 검증 완료
+- Python 3.12 기준 self-check 실행 확인 완료
+- Python 3.12 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
 
 ## 현재 저장소 상태
 
 - `python3 -m compileall app main.py` 통과
-- 로컬 기본 Python 3.14 환경에서는 일부 의존성 설치 검증이 제한적
+- `python3.12`와 `.venv312` 기준 의존성 설치 완료
+- `python -m app.main --self-check` 실행 확인 완료
+- `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.12 기준으로 설정됨
-- 실제 OpenAI/Telegram 실연동 검증은 secrets 주입 후 수행 필요
+- 실제 provider API smoke test는 API key 미주입 상태라 미실행
+- Telegram 테스트 전송은 bot/chat secret 미주입 상태라 미실행
 
 ## 다음 작업
 
-1. 로컬 또는 CI에서 Python 3.12 기준 실행 검증
-2. LLM structured response 실연동 검증
-3. Telegram 테스트 메시지 실전송 검증
-4. 필요 시 universe/news/source 설정 보강
-5. Phase 2 설계 진입 전 score threshold 조정
+1. API key 주입 후 `--llm-smoke`로 provider별 structured response 실연동 검증
+2. Telegram secret 주입 후 `--telegram-test` 실전송 검증
+3. 필요 시 universe/news/source 설정 보강
+4. score threshold와 후보/관찰만 기준 조정
+5. provider별 오류/재시도 정책 정교화
 
 ## 메모
 
