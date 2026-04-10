@@ -1,0 +1,1 @@
+"""StockAgent application package."""
