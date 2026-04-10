@@ -1,0 +1,286 @@
+# PLAN.md
+
+## 목표 요약
+
+Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다.
+
+## 비목표
+
+- 자동매매
+- broker 연동
+- 실시간 체결/주문
+- agent 간 자율 협업
+- 과도한 예측형 설명
+
+## 아키텍처 개요
+
+```text
+GitHub Actions
+  -> app/main.py
+  -> orchestrator.py
+     -> data/universe.py
+     -> screening/screener.py
+     -> chart/features.py
+     -> agents/chart_agent.py
+     -> data/news_data.py
+     -> agents/news_agent.py
+     -> agents/final_agent.py
+     -> reporting/storage.py
+     -> reporting/formatter.py
+     -> reporting/telegram.py
+```
+
+## Phase 1 구현 범위
+
+### 1. 실행/설정 계층
+
+- `app/main.py`: 엔트리포인트
+- `app/config.py`: 환경변수 로딩 및 검증
+- `.github/workflows/stock_scan.yml`: `workflow_dispatch` + `schedule`
+
+완료 기준:
+
+- 로컬 실행 가능
+- GitHub Actions에서 환경변수 기반 실행 가능
+- Telegram 테스트 메시지 전송 가능
+
+### 2. 데이터 수집 계층
+
+- `app/data/universe.py`: Universe 수집
+- `app/data/market_data.py`: OHLCV 로딩
+- `app/data/news_data.py`: 최신 뉴스 fetch
+- `app/data/sector_data.py`: Phase 2 placeholder
+
+완료 기준:
+
+- Universe를 리스트 형태로 반환
+- 종목별 가격/거래량 데이터 확보
+- 뉴스는 최신성 필터 적용
+
+### 3. 스크리닝/피처 계산
+
+- `app/screening/filters.py`
+- `app/screening/screener.py`
+- `app/chart/indicators.py`
+- `app/chart/patterns.py`
+- `app/chart/features.py`
+
+필수 feature:
+
+- `ma20`
+- `ma60`
+- `ma120`
+- `above_ma20`
+- `above_ma60`
+- `above_ma120`
+- `distance_from_20d_high_pct`
+- `distance_from_60d_high_pct`
+- `volume_ratio_20d`
+- `atr_pct`
+- `volatility_contracting`
+- `breakout_setup`
+- `pullback_setup`
+- `range_bound`
+- `overextended_pct`
+- `recent_sharp_runup`
+- `support_level_hint`
+
+완료 기준:
+
+- 모든 후보 종목에 동일 feature 세트 생성
+- feature 누락 시 구조화된 오류 처리
+
+### 4. Agent 계층
+
+- `app/agents/llm_client.py`
+- `app/agents/chart_agent.py`
+- `app/agents/news_agent.py`
+- `app/agents/final_agent.py`
+- `app/agents/macro_agent.py` placeholder
+
+완료 기준:
+
+- structured JSON 응답 강제
+- chart/news/final agent 순차 호출
+- agent 간 직접 통신 금지
+
+### 5. 모델/스키마 계층
+
+- `app/models/enums.py`
+- `app/models/schemas.py`
+
+완료 기준:
+
+- 입력/출력 schema를 코드로 검증
+- Telegram과 저장 포맷이 동일 schema를 사용
+
+### 6. 리포팅/저장 계층
+
+- `app/reporting/storage.py`
+- `app/reporting/formatter.py`
+- `app/reporting/telegram.py`
+
+완료 기준:
+
+- 실행 결과 JSON 저장
+- Telegram 리포트 포맷 고정
+- 후보 없음 메시지 지원
+
+### 7. 평가/확장 placeholder
+
+- `app/evaluation/tracker.py`
+- `app/evaluation/performance.py`
+- `app/evaluation/backtest_stub.py`
+- `app/portfolio/sizing_stub.py`
+
+완료 기준:
+
+- import 가능한 placeholder 제공
+- Phase 2 구현 진입점 명확화
+
+## 권장 디렉터리 생성 순서
+
+1. 루트 디렉터리와 `app/` 하위 구조 생성
+2. `models/`와 `config.py` 먼저 작성
+3. `data/`, `screening/`, `chart/` 구현
+4. `agents/` 구현
+5. `reporting/` 구현
+6. `main.py`, `orchestrator.py` 연결
+7. workflow, README, 샘플 결과 추가
+
+## Orchestrator 상세 플로우
+
+1. 설정 로드
+2. 실행 시각 `run_at` 생성
+3. Universe 수집
+4. 시장 데이터 조회
+5. Screening 수행
+6. 후보별 chart feature 계산
+7. Chart Agent 호출
+8. 최신 뉴스 조회
+9. News Agent 호출
+10. Final Agent 호출
+11. 최종 후보 정렬 및 3~5개 선택
+12. JSON 저장
+13. Telegram 메시지 생성 및 전송
+
+## 출력 스키마 고정 방침
+
+모든 종목은 아래 상위 구조를 따른다.
+
+```json
+{
+  "ticker": "",
+  "name": "",
+  "chart_features": {},
+  "chart_analysis": {},
+  "news_analysis": {},
+  "final_analysis": {}
+}
+```
+
+전체 실행 결과는 아래를 포함한다.
+
+```json
+{
+  "run_at": "",
+  "candidate_count": 0,
+  "candidates": [],
+  "non_candidates": []
+}
+```
+
+## 후보 선정 규칙 초안
+
+- 1차: Universe에서 유동성/가격/거래량 기준 필터링
+- 2차: 차트 setup 존재 여부 확인
+- 3차: 최신 뉴스 해석 반영
+- 4차: final score 기반 정렬
+- 5차: 상위 3~5개만 Telegram에 노출
+
+예외:
+
+- 기준 충족 종목이 없으면 `후보 없음`
+- 일부 신호만 있으면 `관찰만`
+
+## GitHub Actions 요구사항
+
+- 트리거: `workflow_dispatch`, `schedule`
+- Secrets:
+  - `OPENAI_API_KEY`
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_CHAT_ID`
+- 로그에 secret 값 출력 금지
+- 실행 후 JSON artifact 또는 저장 파일 유지 고려
+
+## README 포함 항목
+
+- 프로젝트 목적
+- 디렉터리 구조
+- 환경변수 설정 방법
+- 로컬 실행 방법
+- GitHub Actions 설정 방법
+- 샘플 JSON 결과
+- 샘플 Telegram 메시지
+- 후보 없음 예시
+
+## 샘플 산출물 계획
+
+- `data/outputs/sample_result.json`
+- `README.md` 내 sample Telegram message
+
+## 리스크와 대응
+
+- 뉴스 최신성 판단 실패
+  - 대응: fetch 시각 및 게시 시각 기준 필터 명시
+- LLM 응답 형식 이탈
+  - 대응: schema validation + retry + fallback
+- 데이터 소스 장애
+  - 대응: 부분 실패 허용, uncertainty 기록
+- 후보 과다/과소
+  - 대응: score threshold와 상위 N 제한 분리
+
+## Phase 2 Placeholder 범위
+
+### Macro Agent
+
+예정 출력:
+
+- `market_regime`
+- `macro_score`
+- `market_summary`
+- `risk_flags`
+- `recommended_posture`
+
+### Sector Strength
+
+예정 필드:
+
+- `sector_name`
+- `sector_relative_strength`
+- `sector_trend_label`
+
+### Performance Tracking
+
+예정 필드:
+
+- 추천일
+- 추천 종가
+- 5/10/20일 후 수익률
+- 최대 상승폭
+- 최대 낙폭
+
+### 기타
+
+- 조건별 성과 비교 기본 구조
+- 포트폴리오 비중 제안 placeholder
+
+## Definition Of Done
+
+- 필수 디렉터리 구조가 생성되어 있다.
+- Phase 1 모듈이 import 가능하고 실행 가능하다.
+- workflow 수동/스케줄 트리거가 정의되어 있다.
+- Telegram 테스트 메시지가 전송된다.
+- JSON 결과가 저장된다.
+- 후보 없음 시나리오가 정상 출력된다.
+- README와 샘플 결과가 포함된다.
