@@ -7,8 +7,13 @@ from app.models.schemas import EvaluatedStock, RunResult
 def format_telegram_message(run_result: RunResult) -> str:
     date_str = run_result.run_at.strftime("%Y-%m-%d %H:%M %Z")
     if run_result.candidate_count == 0:
-        if run_result.non_candidates:
-            return f"[{date_str}] 관찰만\n\n조건을 강하게 통과한 후보는 없습니다. 관찰 대상으로만 유지합니다."
+        observe_stocks = [stock for stock in run_result.non_candidates if stock.final_analysis.action_label == ActionLabel.OBSERVE]
+        if observe_stocks:
+            lines = [f"[{date_str}] 관찰만", "", "조건을 강하게 통과한 후보는 없지만 관찰 대상은 있습니다.", ""]
+            for stock in observe_stocks[:3]:
+                lines.extend(_format_stock_block(stock))
+                lines.append("")
+            return "\n".join(lines).strip()
         return f"[{date_str}] 후보 없음\n\n스크리닝과 최종 판단을 통과한 종목이 없습니다."
 
     lines = [f"[{date_str}] Swing Scan", ""]

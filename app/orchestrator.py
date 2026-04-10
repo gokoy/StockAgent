@@ -54,6 +54,7 @@ def run_scan(
                 chart_analysis,
                 news_analysis,
                 llm_client,
+                config,
             )
             evaluated = EvaluatedStock(
                 ticker=stock.ticker,
