@@ -22,6 +22,7 @@
 - `README.md`, 샘플 결과 JSON 추가 완료
 - LLM provider adapter 구조 추가 완료
 - `OpenAI`, `Anthropic`, `Gemini` 전환 가능한 설정 추가 완료
+- 역할별 LLM 모델 선택 구조 추가 완료
 - `--self-check`, `--llm-smoke`, `--limit` CLI 추가 완료
 - Python 3.14 기준 문법 검증 완료
 - Python 3.14 기준 self-check 실행 확인 완료
@@ -37,6 +38,7 @@
 - 프로젝트 Python 기준 버전은 3.14로 통일
 - `.venv`는 Python 3.14 환경으로 사용
 - `python -m app.main --self-check` 실행 확인 완료
+- provider별 역할 모델 self-check 확인 완료
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - 실제 provider API smoke test는 API key 미주입 상태라 미실행
@@ -45,9 +47,10 @@
 ## 다음 작업
 
 1. API key 주입 후 `--llm-smoke`로 provider별 structured response 실연동 검증
-2. 필요 시 universe/news/source 설정 보강
-3. score threshold와 후보/관찰만 기준 조정
-4. provider별 오류/재시도 정책 정교화
+2. 역할별 모델 조합별 smoke test 검증
+3. 필요 시 universe/news/source 설정 보강
+4. score threshold와 후보/관찰만 기준 조정
+5. provider별 오류/재시도 정책 정교화
 
 ## 메모
 
@@ -59,3 +62,4 @@
 - LLM orchestration은 현재 순수 Python으로 유지한다.
 - `LangChain`, `LangGraph`는 Phase 2에서 실제 복잡도가 커질 때 재검토한다.
 - provider 교체 요구는 adapter 패턴으로 수용하고, 초기 대상은 OpenAI/Anthropic/Gemini다.
+- 역할별 모델 구조는 provider와 분리된 공통 설정 이름으로 유지한다.

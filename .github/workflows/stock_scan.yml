@@ -27,7 +27,11 @@ jobs:
       - name: Run swing scan
         env:
           LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'openai' }}
-          LLM_MODEL: ${{ vars.LLM_MODEL || 'gpt-4.1-mini' }}
+          LLM_MODEL_DEFAULT: ${{ vars.LLM_MODEL_DEFAULT || vars.LLM_MODEL || 'gpt-4.1-mini' }}
+          LLM_MODEL_CHART: ${{ vars.LLM_MODEL_CHART }}
+          LLM_MODEL_NEWS: ${{ vars.LLM_MODEL_NEWS }}
+          LLM_MODEL_FINAL: ${{ vars.LLM_MODEL_FINAL }}
+          LLM_MODEL_MACRO: ${{ vars.LLM_MODEL_MACRO }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

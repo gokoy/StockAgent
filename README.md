@@ -54,7 +54,11 @@ repo/
 ## 환경변수
 
 - `LLM_PROVIDER` 선택사항, `openai|anthropic|gemini`, 기본값 `openai`
-- `LLM_MODEL` 선택사항, provider별 모델명
+- `LLM_MODEL_DEFAULT` 선택사항, 공통 기본 모델
+- `LLM_MODEL_CHART` 선택사항, Chart Agent 모델
+- `LLM_MODEL_NEWS` 선택사항, News Agent 모델
+- `LLM_MODEL_FINAL` 선택사항, Final Agent 모델
+- `LLM_MODEL_MACRO` 선택사항, Macro Agent 모델 placeholder
 - `OPENAI_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `GOOGLE_API_KEY`
@@ -91,6 +95,12 @@ python -m app.main --no-telegram --limit 2
 python -m app.main --llm-smoke
 ```
 
+역할별 모델 smoke test를 보려면:
+
+```bash
+python -m app.main --llm-smoke --llm-role final
+```
+
 Telegram 연결만 테스트하려면:
 
 ```bash
@@ -115,7 +125,11 @@ GitHub Secrets에 아래 값을 설정한다.
 GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 
 - `LLM_PROVIDER`
-- `LLM_MODEL`
+- `LLM_MODEL_DEFAULT`
+- `LLM_MODEL_CHART`
+- `LLM_MODEL_NEWS`
+- `LLM_MODEL_FINAL`
+- `LLM_MODEL_MACRO`
 
 ## 저장 결과
 
@@ -162,5 +176,6 @@ NVDA | NVIDIA
 - 시세 데이터는 `yfinance`를 사용한다.
 - 뉴스는 Google News RSS를 사용해 최신성 필터를 적용한다.
 - LLM 호출은 provider adapter 패턴으로 추상화했고 `OpenAI`, `Anthropic`, `Gemini`를 지원한다.
+- 모델 선택은 provider 공통 구조를 사용하고, `default/chart/news/final/macro` 역할별 모델 오버라이드를 지원한다.
 - provider structured JSON 호출 실패 시 deterministic fallback을 둔다.
 - 민감정보는 코드나 로그에 출력하지 않는다.
