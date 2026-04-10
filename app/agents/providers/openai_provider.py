@@ -19,6 +19,7 @@ class OpenAIProvider(BaseLLMProvider):
         response_model: type[SchemaT],
         model_name: str,
     ) -> SchemaT:
+        schema = self.strict_json_schema(response_model)
         response = self._client.responses.create(
             model=model_name,
             input=[
@@ -30,7 +31,7 @@ class OpenAIProvider(BaseLLMProvider):
                 "format": {
                     "type": "json_schema",
                     "name": response_model.__name__,
-                    "schema": response_model.model_json_schema(),
+                    "schema": schema,
                     "strict": True,
                 }
             },

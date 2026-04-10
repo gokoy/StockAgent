@@ -24,6 +24,8 @@
 - `OpenAI`, `Anthropic`, `Gemini` 전환 가능한 설정 추가 완료
 - 역할별 LLM 모델 선택 구조 추가 완료
 - `--self-check`, `--llm-smoke`, `--limit` CLI 추가 완료
+- OpenAI `--llm-smoke --llm-role final` 성공 확인 완료
+- structured JSON schema 정규화 로직 추가 완료
 - Python 3.14 기준 문법 검증 완료
 - Python 3.14 기준 self-check 실행 확인 완료
 - Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
@@ -39,15 +41,16 @@
 - `.venv`는 Python 3.14 환경으로 사용
 - `python -m app.main --self-check` 실행 확인 완료
 - provider별 역할 모델 self-check 확인 완료
+- OpenAI provider의 structured output smoke test 통과
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
-- 실제 provider API smoke test는 API key 미주입 상태라 미실행
+- Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 
 ## 다음 작업
 
-1. API key 주입 후 `--llm-smoke`로 provider별 structured response 실연동 검증
-2. 역할별 모델 조합별 smoke test 검증
+1. Anthropic/Gemini API key 주입 후 provider별 structured response smoke test 검증
+2. 역할별 모델 조합별 smoke test 검증 확장
 3. 필요 시 universe/news/source 설정 보강
 4. score threshold와 후보/관찰만 기준 조정
 5. provider별 오류/재시도 정책 정교화

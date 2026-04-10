@@ -21,6 +21,7 @@ class AnthropicProvider(BaseLLMProvider):
         response_model: type[SchemaT],
         model_name: str,
     ) -> SchemaT:
+        schema = self.strict_json_schema(response_model)
         response = self._client.messages.create(
             model=model_name,
             max_tokens=1600,
@@ -32,7 +33,7 @@ class AnthropicProvider(BaseLLMProvider):
                     "content": self.payload_text(
                         {
                             "task_payload": payload,
-                            "json_schema": response_model.model_json_schema(),
+                            "json_schema": schema,
                             "instruction": "Return only valid JSON that matches the schema exactly.",
                         }
                     ),
@@ -41,7 +42,7 @@ class AnthropicProvider(BaseLLMProvider):
             output_config={
                 "format": {
                     "type": "json_schema",
-                    "schema": response_model.model_json_schema(),
+                    "schema": schema,
                 }
             },
         )

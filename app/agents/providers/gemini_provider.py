@@ -19,13 +19,14 @@ class GeminiProvider(BaseLLMProvider):
         response_model: type[SchemaT],
         model_name: str,
     ) -> SchemaT:
+        schema = self.strict_json_schema(response_model)
         response = self._client.models.generate_content(
             model=model_name,
             contents=f"{system_prompt}\n\n{self.payload_text(payload)}",
             config={
                 "temperature": 0,
                 "response_mime_type": "application/json",
-                "response_json_schema": response_model.model_json_schema(),
+                "response_json_schema": schema,
             },
         )
         response_text = getattr(response, "text", None)
