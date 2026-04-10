@@ -177,5 +177,7 @@ NVDA | NVIDIA
 - 뉴스는 Google News RSS를 사용해 최신성 필터를 적용한다.
 - LLM 호출은 provider adapter 패턴으로 추상화했고 `OpenAI`, `Anthropic`, `Gemini`를 지원한다.
 - 모델 선택은 provider 공통 구조를 사용하고, `default/chart/news/final/macro` 역할별 모델 오버라이드를 지원한다.
+- OpenAI 기본 조합은 `chart/news/default = gpt-4.1-mini`, `final = gpt-4.1`이다.
 - provider structured JSON 호출 실패 시 deterministic fallback을 둔다.
+- fallback이 발생하면 결과 필드 안에 fallback 사용 흔적을 남긴다.
 - 민감정보는 코드나 로그에 출력하지 않는다.

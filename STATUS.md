@@ -23,9 +23,11 @@
 - LLM provider adapter 구조 추가 완료
 - `OpenAI`, `Anthropic`, `Gemini` 전환 가능한 설정 추가 완료
 - 역할별 LLM 모델 선택 구조 추가 완료
+- OpenAI 역할별 기본 모델 조합 적용 완료
 - `--self-check`, `--llm-smoke`, `--limit` CLI 추가 완료
 - OpenAI `--llm-smoke --llm-role final` 성공 확인 완료
 - structured JSON schema 정규화 로직 추가 완료
+- LLM fallback 사용 시 결과 내 근거 문구로 표시되도록 개선 완료
 - Python 3.14 기준 문법 검증 완료
 - Python 3.14 기준 self-check 실행 확인 완료
 - Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
@@ -42,6 +44,7 @@
 - `python -m app.main --self-check` 실행 확인 완료
 - provider별 역할 모델 self-check 확인 완료
 - OpenAI provider의 structured output smoke test 통과
+- OpenAI 기본 역할 모델이 `final=gpt-4.1`로 분리된 것 확인 완료
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
@@ -54,6 +57,7 @@
 3. 필요 시 universe/news/source 설정 보강
 4. score threshold와 후보/관찰만 기준 조정
 5. provider별 오류/재시도 정책 정교화
+6. OpenAI 실제 full scan에서 role별 모델 비용/품질 확인
 
 ## 메모
 
