@@ -220,6 +220,14 @@ GitHub Actions
 - 진행 상태가 바뀌면 `STATUS.md`를 먼저 갱신하고 커밋 범위에 포함한다.
 - 커밋 메시지는 변경 의도가 드러나게 짧고 명확하게 작성한다.
 
+## LLM 아키텍처 원칙
+
+- Phase 1과 초기 Phase 2에서는 `LangChain`, `LangGraph`를 도입하지 않는다.
+- 현재 워크플로는 순차 orchestrator와 고정 JSON schema가 핵심이므로 순수 Python 구조를 유지한다.
+- LLM 제공자 전환은 공통 interface와 provider adapter 패턴으로 구현한다.
+- 우선 대상 제공자는 `OpenAI`, `Anthropic`, `Google Gemini`다.
+- Phase 2에서 분기, 상태관리, 재시도, 다단계 의존성이 실제로 복잡해지면 그 시점에 `LangGraph` 도입 여부를 재평가한다.
+
 ## README 포함 항목
 
 - 프로젝트 목적

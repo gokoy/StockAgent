@@ -43,3 +43,6 @@
 - 민감정보는 기록하지 않는다.
 - 작업은 가능한 한 기능/문서/인프라 단위로 나누어 커밋한다.
 - 커밋이 필요한 변경을 했으면 이 파일에 반영 후 커밋 여부도 함께 관리한다.
+- LLM orchestration은 현재 순수 Python으로 유지한다.
+- `LangChain`, `LangGraph`는 Phase 2에서 실제 복잡도가 커질 때 재검토한다.
+- provider 교체 요구는 adapter 패턴으로 수용하고, 초기 대상은 OpenAI/Anthropic/Gemini다.
