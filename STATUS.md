@@ -23,17 +23,21 @@
 - LLM provider adapter 구조 추가 완료
 - `OpenAI`, `Anthropic`, `Gemini` 전환 가능한 설정 추가 완료
 - `--self-check`, `--llm-smoke`, `--limit` CLI 추가 완료
-- Python 3.12 가상환경 생성 및 의존성 설치 검증 완료
-- Python 3.12 기준 self-check 실행 확인 완료
-- Python 3.12 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
+- Python 3.14 기준 문법 검증 완료
+- Python 3.14 기준 self-check 실행 확인 완료
+- Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
+- Python 기준 버전 3.14로 통일 완료
+- `pydantic`를 3.14 호환 버전으로 상향 완료
+- 임시 검증용 `.venv312` 제거 완료
 
 ## 현재 저장소 상태
 
 - `python3 -m compileall app main.py` 통과
-- `python3.12`와 `.venv312` 기준 의존성 설치 완료
+- 프로젝트 Python 기준 버전은 3.14로 통일
+- `.venv`는 Python 3.14 환경으로 사용
 - `python -m app.main --self-check` 실행 확인 완료
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
-- GitHub Actions는 Python 3.12 기준으로 설정됨
+- GitHub Actions는 Python 3.14 기준으로 설정됨
 - 실제 provider API smoke test는 API key 미주입 상태라 미실행
 - Telegram 테스트 전송은 bot/chat secret 미주입 상태라 미실행
 
