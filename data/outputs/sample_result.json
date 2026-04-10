@@ -1,0 +1,72 @@
+{
+  "run_at": "2026-04-10T23:30:00+09:00",
+  "candidate_count": 1,
+  "candidates": [
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "chart_features": {
+        "ma20": 875.42,
+        "ma60": 812.9,
+        "ma120": 760.12,
+        "above_ma20": true,
+        "above_ma60": true,
+        "above_ma120": true,
+        "distance_from_20d_high_pct": -1.4,
+        "distance_from_60d_high_pct": -2.2,
+        "volume_ratio_20d": 1.18,
+        "atr_pct": 3.7,
+        "volatility_contracting": true,
+        "breakout_setup": true,
+        "pullback_setup": false,
+        "range_bound": false,
+        "overextended_pct": 4.1,
+        "recent_sharp_runup": true,
+        "support_level_hint": "20d low 842.15, MA20 875.42, MA60 812.90"
+      },
+      "chart_analysis": {
+        "chart_score": 76,
+        "label": "breakout",
+        "positive_signals": [
+          "Price is holding above MA20 and MA60.",
+          "Price is within reach of the 20-day high with supportive volume.",
+          "Recent volatility has tightened versus the prior month."
+        ],
+        "negative_signals": [
+          "Recent price run-up raises chase risk."
+        ],
+        "why_now": "The setup is near a breakout zone while trend alignment remains intact.",
+        "why_not_now": "The stock has already had a sharp run and could need digestion.",
+        "invalid_if": "Setup weakens if price loses the nearby support zone. Hint: 20d low 842.15, MA20 875.42, MA60 812.90.",
+        "confidence": "medium"
+      },
+      "news_analysis": {
+        "news_score": 72,
+        "bullish_points": [
+          "Recent coverage mentions growth-type positive catalysts."
+        ],
+        "bearish_points": [],
+        "uncertainties": [
+          "Headline flow is concentrated in one theme."
+        ],
+        "headline_summary": "NVIDIA headlines show continued AI demand focus",
+        "event_risk": "Headline risk is moderate because expectations are already elevated."
+      },
+      "final_analysis": {
+        "final_score": 78,
+        "action_label": "candidate",
+        "summary_reason": "Trend, setup proximity, and recent headline tone align well enough for a swing candidate.",
+        "main_risks": [
+          "Recent price run-up raises chase risk.",
+          "Headline risk is moderate because expectations are already elevated."
+        ],
+        "what_to_confirm_next": [
+          "Confirm the breakout attempt holds on volume.",
+          "Check whether fresh headlines change the AI demand narrative."
+        ]
+      }
+    }
+  ],
+  "non_candidates": [],
+  "screened_out": []
+}
