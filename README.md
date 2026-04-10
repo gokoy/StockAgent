@@ -53,34 +53,9 @@ repo/
 
 ## 시스템 다이어그램
 
-```mermaid
-flowchart TD
-    A[GitHub Actions / Local Run] --> B[Orchestrator]
+![System Diagram](docs/system-diagram.svg)
 
-    B --> C[Universe Collection]
-    B --> D[Market Data]
-    B --> E[Screening Engine]
-    B --> F[Chart Feature Engine]
-    B --> G[Chart Analysis Agent]
-    B --> H[Latest News Fetcher]
-    B --> I[News Agent]
-    B --> J[Final Decision Agent]
-    B --> K[JSON Storage]
-    B --> L[Telegram Formatter]
-    B --> M[Telegram Delivery]
-
-    G --> N[LLM Provider Layer]
-    I --> N
-    J --> N
-
-    N --> O[OpenAI]
-    N --> P[Anthropic]
-    N --> Q[Gemini]
-
-    R[Config / Secrets / Thresholds] --> B
-    R --> N
-    R --> M
-```
+Mermaid 원본: [docs/system-diagram.mmd](/Users/young/PycharmProjects/StockAgent/docs/system-diagram.mmd)
 
 ## 환경변수
 
