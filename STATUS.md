@@ -4,7 +4,7 @@
 
 - 프로젝트명: StockAgent
 - 현재 단계: Phase 1 기본 구현 완료, 검증 및 정리 진행중
-- 마지막 업데이트: 2026-04-10
+- 마지막 업데이트: 2026-04-11
 
 ## 완료된 작업
 
@@ -29,6 +29,7 @@
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
+- Telegram 테스트 메시지 실전송 검증 완료
 
 ## 현재 저장소 상태
 
@@ -39,15 +40,14 @@
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - 실제 provider API smoke test는 API key 미주입 상태라 미실행
-- Telegram 테스트 전송은 bot/chat secret 미주입 상태라 미실행
+- Telegram bot/chat 설정과 테스트 전송은 검증 완료
 
 ## 다음 작업
 
 1. API key 주입 후 `--llm-smoke`로 provider별 structured response 실연동 검증
-2. Telegram secret 주입 후 `--telegram-test` 실전송 검증
-3. 필요 시 universe/news/source 설정 보강
-4. score threshold와 후보/관찰만 기준 조정
-5. provider별 오류/재시도 정책 정교화
+2. 필요 시 universe/news/source 설정 보강
+3. score threshold와 후보/관찰만 기준 조정
+4. provider별 오류/재시도 정책 정교화
 
 ## 메모
 
