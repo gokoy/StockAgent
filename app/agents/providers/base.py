@@ -1,23 +1,26 @@
 from __future__ import annotations
 
+import json
+from abc import ABC, abstractmethod
 from typing import TypeVar
 
 from pydantic import BaseModel
 
-from app.agents.provider_factory import build_provider
 from app.config import AppConfig
 
 SchemaT = TypeVar("SchemaT", bound=BaseModel)
 
 
-class LLMClient:
+class BaseLLMProvider(ABC):
+    provider_name: str
+
     def __init__(self, config: AppConfig):
         self.config = config
-        self._provider = build_provider(config)
 
+    @abstractmethod
     def generate_structured(self, system_prompt: str, payload: dict, response_model: type[SchemaT]) -> SchemaT:
-        return self._provider.generate_structured(system_prompt, payload, response_model)
+        raise NotImplementedError
 
-    @property
-    def provider_name(self) -> str:
-        return self._provider.provider_name
+    @staticmethod
+    def payload_text(payload: dict) -> str:
+        return json.dumps(payload, ensure_ascii=True)

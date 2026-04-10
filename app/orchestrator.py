@@ -20,10 +20,17 @@ from app.reporting.telegram import send_telegram_message
 from app.screening.screener import screen_stock
 
 
-def run_scan(config: AppConfig, timezone_name: str = "Asia/Seoul", send_telegram: bool = True) -> tuple[RunResult, str]:
-    llm_client = LLMClient(config) if config.llm_enabled else None
+def run_scan(
+    config: AppConfig,
+    timezone_name: str = "Asia/Seoul",
+    send_telegram: bool = True,
+    max_stocks: int | None = None,
+) -> tuple[RunResult, str]:
+    llm_client = _build_llm_client(config)
     run_at = datetime.now(ZoneInfo(timezone_name))
     stocks = load_universe(config.universe_symbols)
+    if max_stocks is not None:
+        stocks = stocks[:max_stocks]
     candidates: list[EvaluatedStock] = []
     non_candidates: list[EvaluatedStock] = []
     screened_out: list[RejectedStock] = []
@@ -80,3 +87,12 @@ def run_scan(config: AppConfig, timezone_name: str = "Asia/Seoul", send_telegram
         except Exception:
             pass
     return result, message
+
+
+def _build_llm_client(config: AppConfig) -> LLMClient | None:
+    if not config.llm_enabled:
+        return None
+    try:
+        return LLMClient(config)
+    except Exception:
+        return None

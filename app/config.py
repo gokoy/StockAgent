@@ -7,10 +7,13 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class AppConfig:
+    llm_provider: str
+    llm_model: str
     openai_api_key: str | None
+    anthropic_api_key: str | None
+    google_api_key: str | None
     telegram_bot_token: str | None
     telegram_chat_id: str | None
-    openai_model: str
     output_dir: Path
     log_dir: Path
     performance_dir: Path
@@ -23,11 +26,22 @@ class AppConfig:
 
     @property
     def llm_enabled(self) -> bool:
-        return bool(self.openai_api_key)
+        return bool(self.provider_api_key)
 
     @property
     def telegram_enabled(self) -> bool:
         return bool(self.telegram_bot_token and self.telegram_chat_id)
+
+    @property
+    def provider_api_key(self) -> str | None:
+        provider = self.llm_provider.lower()
+        if provider == "openai":
+            return self.openai_api_key
+        if provider == "anthropic":
+            return self.anthropic_api_key
+        if provider == "gemini":
+            return self.google_api_key
+        return None
 
 
 def _parse_universe(raw: str | None) -> list[str]:
@@ -58,10 +72,13 @@ def load_config() -> AppConfig:
     log_dir.mkdir(parents=True, exist_ok=True)
     performance_dir.mkdir(parents=True, exist_ok=True)
     return AppConfig(
+        llm_provider=os.getenv("LLM_PROVIDER", "openai").strip().lower(),
+        llm_model=os.getenv("LLM_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini")),
         openai_api_key=os.getenv("OPENAI_API_KEY"),
+        anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN"),
         telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID"),
-        openai_model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
         output_dir=output_dir,
         log_dir=log_dir,
         performance_dir=performance_dir,
