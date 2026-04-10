@@ -25,18 +25,21 @@ def analyze_news(ticker: str, name: str, news_items: list[NewsItem], llm_client:
     if llm_client:
         try:
             return llm_client.generate_structured(SYSTEM_PROMPT, payload, NewsAnalysis, role="news")
-        except Exception:
-            pass
+        except Exception as exc:
+            return _fallback_news_analysis(news_items, fallback_reason=_fallback_reason(exc))
     return _fallback_news_analysis(news_items)
 
 
-def _fallback_news_analysis(news_items: list[NewsItem]) -> NewsAnalysis:
+def _fallback_news_analysis(news_items: list[NewsItem], fallback_reason: str | None = None) -> NewsAnalysis:
     if not news_items:
+        uncertainties = ["Recent news coverage is limited or unavailable."]
+        if fallback_reason:
+            uncertainties.append(f"LLM news analysis unavailable; deterministic fallback used ({fallback_reason}).")
         return NewsAnalysis(
             news_score=45,
             bullish_points=[],
             bearish_points=[],
-            uncertainties=["Recent news coverage is limited or unavailable."],
+            uncertainties=uncertainties[:2],
             headline_summary="No qualifying recent headlines were found.",
             event_risk="Event risk is unclear because recent coverage is sparse.",
         )
@@ -64,6 +67,8 @@ def _fallback_news_analysis(news_items: list[NewsItem]) -> NewsAnalysis:
     if len(news_items) < 2:
         uncertainties.append("Signal quality is limited because only one recent article qualified.")
         score -= 4
+    if fallback_reason:
+        uncertainties.append(f"LLM news analysis unavailable; deterministic fallback used ({fallback_reason}).")
 
     score = max(0, min(100, score))
     summary = "; ".join(item.headline for item in news_items[:2])
@@ -76,3 +81,7 @@ def _fallback_news_analysis(news_items: list[NewsItem]) -> NewsAnalysis:
         headline_summary=summary,
         event_risk=risk,
     )
+
+
+def _fallback_reason(exc: Exception) -> str:
+    return exc.__class__.__name__.replace("_", " ").lower()

@@ -91,6 +91,37 @@ def _default_model_for_provider(provider: str) -> str:
     return "gpt-4.1-mini"
 
 
+def _default_role_models(provider: str, default_model: str) -> dict[str, str]:
+    normalized = provider.strip().lower()
+    if normalized == "openai":
+        return {
+            "chart": default_model,
+            "news": default_model,
+            "final": "gpt-4.1",
+            "macro": default_model,
+        }
+    if normalized == "anthropic":
+        return {
+            "chart": default_model,
+            "news": default_model,
+            "final": default_model,
+            "macro": default_model,
+        }
+    if normalized == "gemini":
+        return {
+            "chart": default_model,
+            "news": default_model,
+            "final": default_model,
+            "macro": default_model,
+        }
+    return {
+        "chart": default_model,
+        "news": default_model,
+        "final": default_model,
+        "macro": default_model,
+    }
+
+
 def load_config() -> AppConfig:
     root = Path(__file__).resolve().parent.parent
     output_dir = root / "data" / "outputs"
@@ -104,13 +135,14 @@ def load_config() -> AppConfig:
         "LLM_MODEL_DEFAULT",
         os.getenv("LLM_MODEL", os.getenv("OPENAI_MODEL", _default_model_for_provider(llm_provider))),
     )
+    role_defaults = _default_role_models(llm_provider, default_model)
     return AppConfig(
         llm_provider=llm_provider,
         llm_model_default=default_model,
-        llm_model_chart=os.getenv("LLM_MODEL_CHART", default_model),
-        llm_model_news=os.getenv("LLM_MODEL_NEWS", default_model),
-        llm_model_final=os.getenv("LLM_MODEL_FINAL", default_model),
-        llm_model_macro=os.getenv("LLM_MODEL_MACRO", default_model),
+        llm_model_chart=os.getenv("LLM_MODEL_CHART", role_defaults["chart"]),
+        llm_model_news=os.getenv("LLM_MODEL_NEWS", role_defaults["news"]),
+        llm_model_final=os.getenv("LLM_MODEL_FINAL", role_defaults["final"]),
+        llm_model_macro=os.getenv("LLM_MODEL_MACRO", role_defaults["macro"]),
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
         google_api_key=os.getenv("GOOGLE_API_KEY"),

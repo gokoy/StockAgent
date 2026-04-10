@@ -19,12 +19,12 @@ def analyze_chart(ticker: str, name: str, features: ChartFeatures, llm_client: L
     if llm_client:
         try:
             return llm_client.generate_structured(SYSTEM_PROMPT, payload, ChartAnalysis, role="chart")
-        except Exception:
-            pass
+        except Exception as exc:
+            return _fallback_chart_analysis(features, fallback_reason=_fallback_reason(exc))
     return _fallback_chart_analysis(features)
 
 
-def _fallback_chart_analysis(features: ChartFeatures) -> ChartAnalysis:
+def _fallback_chart_analysis(features: ChartFeatures, fallback_reason: str | None = None) -> ChartAnalysis:
     score = 50
     positives: list[str] = []
     negatives: list[str] = []
@@ -66,6 +66,8 @@ def _fallback_chart_analysis(features: ChartFeatures) -> ChartAnalysis:
         score -= 8
         negatives.append("ATR percentage is elevated for a controlled swing entry.")
         confidence = ConfidenceLabel.LOW
+    if fallback_reason:
+        negatives.append(f"LLM chart analysis unavailable; deterministic fallback used ({fallback_reason}).")
 
     score = max(0, min(100, score))
     why_now = positives[0] if positives else "No strong timing edge is visible from current chart features."
@@ -81,3 +83,7 @@ def _fallback_chart_analysis(features: ChartFeatures) -> ChartAnalysis:
         invalid_if=invalid_if,
         confidence=confidence,
     )
+
+
+def _fallback_reason(exc: Exception) -> str:
+    return exc.__class__.__name__.replace("_", " ").lower()

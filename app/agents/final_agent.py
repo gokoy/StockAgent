@@ -32,12 +32,16 @@ def analyze_final_decision(
     if llm_client:
         try:
             return llm_client.generate_structured(SYSTEM_PROMPT, payload, FinalAnalysis, role="final")
-        except Exception:
-            pass
+        except Exception as exc:
+            return _fallback_final_analysis(chart_analysis, news_analysis, fallback_reason=_fallback_reason(exc))
     return _fallback_final_analysis(chart_analysis, news_analysis)
 
 
-def _fallback_final_analysis(chart_analysis: ChartAnalysis, news_analysis: NewsAnalysis) -> FinalAnalysis:
+def _fallback_final_analysis(
+    chart_analysis: ChartAnalysis,
+    news_analysis: NewsAnalysis,
+    fallback_reason: str | None = None,
+) -> FinalAnalysis:
     final_score = int(round(chart_analysis.chart_score * 0.65 + news_analysis.news_score * 0.35))
     action = ActionLabel.OBSERVE
     if final_score >= 70 and chart_analysis.chart_score >= 65:
@@ -52,6 +56,8 @@ def _fallback_final_analysis(chart_analysis: ChartAnalysis, news_analysis: NewsA
     confirmations.append("Check whether fresh news changes the near-term thesis.")
     if not risks:
         risks = ["No single dominant risk was detected, but execution timing still matters."]
+    if fallback_reason:
+        risks = risks[:2] + [f"LLM final analysis unavailable; deterministic fallback used ({fallback_reason})."]
 
     return FinalAnalysis(
         final_score=max(0, min(100, final_score)),
@@ -60,3 +66,7 @@ def _fallback_final_analysis(chart_analysis: ChartAnalysis, news_analysis: NewsA
         main_risks=risks,
         what_to_confirm_next=confirmations[:3],
     )
+
+
+def _fallback_reason(exc: Exception) -> str:
+    return exc.__class__.__name__.replace("_", " ").lower()
