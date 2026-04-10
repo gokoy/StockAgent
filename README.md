@@ -67,6 +67,10 @@ repo/
 - `STOCK_UNIVERSE` 선택사항, 예: `AAPL,MSFT,NVDA`
 - `MAX_NEWS_AGE_HOURS` 선택사항, 기본값 `72`
 - `TOP_N_CANDIDATES` 선택사항, 기본값 `5`
+- `CANDIDATE_MIN_FINAL_SCORE` 선택사항, 기본값 `72`
+- `OBSERVE_MIN_FINAL_SCORE` 선택사항, 기본값 `55`
+- `CANDIDATE_MIN_CHART_SCORE` 선택사항, 기본값 `68`
+- `CANDIDATE_MIN_NEWS_SCORE` 선택사항, 기본값 `45`
 
 ## 로컬 실행
 
@@ -180,4 +184,5 @@ NVDA | NVIDIA
 - OpenAI 기본 조합은 `chart/news/default = gpt-4.1-mini`, `final = gpt-4.1`이다.
 - provider structured JSON 호출 실패 시 deterministic fallback을 둔다.
 - fallback이 발생하면 결과 필드 안에 fallback 사용 흔적을 남긴다.
+- 후보 없음과 관찰만은 실제 `action_label` 기준으로 분리하며, 관찰 종목이 있으면 Telegram에 상위 관찰 종목 요약을 함께 보낸다.
 - 민감정보는 코드나 로그에 출력하지 않는다.

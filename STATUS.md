@@ -28,6 +28,9 @@
 - OpenAI `--llm-smoke --llm-role final` 성공 확인 완료
 - structured JSON schema 정규화 로직 추가 완료
 - LLM fallback 사용 시 결과 내 근거 문구로 표시되도록 개선 완료
+- candidate/observe threshold 설정값 분리 완료
+- 후보 없음과 관찰만 메시지 분기 로직 수정 완료
+- 관찰만일 때 상위 관찰 종목 요약 출력 추가 완료
 - Python 3.14 기준 문법 검증 완료
 - Python 3.14 기준 self-check 실행 확인 완료
 - Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
@@ -45,6 +48,7 @@
 - provider별 역할 모델 self-check 확인 완료
 - OpenAI provider의 structured output smoke test 통과
 - OpenAI 기본 역할 모델이 `final=gpt-4.1`로 분리된 것 확인 완료
+- 제한 스캔에서 `observe_min_final_score=55` 기준으로 관찰 종목 출력 확인 완료
 - `run_scan(..., max_stocks=1)` 실행 시 `관찰만` 메시지와 `latest.json` 저장 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
