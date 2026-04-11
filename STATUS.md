@@ -37,6 +37,7 @@
 - 3종목 제한 실제 스캔에서 `관찰만` 결과와 `watchlist.json` 자동 갱신 확인 완료
 - 5종목 제한 실제 스캔에서 `NVDA observe`, `AMZN/AAPL/MSFT/META avoid` 분포 확인 완료
 - OpenAI 활성 환경의 5종목 제한 실제 스캔에서 `NVDA observe(70)` 결과 확인 완료
+- OpenAI 활성 환경의 5종목 제한 재검증에서 `NVDA 75`, `AMZN 70`이 `candidate`로 승격되는 것 확인 완료
 - 사용자 노출 문구와 fallback 문구의 한국어화 반영 완료
 - 기본 `candidate_min_final_score`를 `72 -> 70`으로 조정 완료
 - `yfinance` 내부 pandas chained assignment `FutureWarning` 억제 처리 완료
@@ -67,6 +68,7 @@
 - 현재 Codex 실행 셸에서는 `OPENAI_API_KEY`가 비주입 상태라 제한 스캔은 fallback 경로로만 검증됨
 - 최근 fallback 제한 스캔 결과에서 `watchlist.json`은 `NVDA keep` 상태로 정상 갱신됨
 - 사용자 로컬 셸에서 OpenAI 실제 응답 기반 제한 스캔이 확인되었고, 현재 기본 threshold에서는 `candidate` 없이 `observe`만 출력됨
+- `candidate_min_final_score=70` 조정 후 사용자 로컬 OpenAI 실행에서 `candidate_count=2`가 확인됨
 - 현재 로컬 fallback 검증에서는 출력 헤더, 상태값, 차트/리스크 문구가 한국어로 노출되는 것 확인 완료
 - `yfinance` 경고 필터 적용 후 제한 스캔에서 불필요한 FutureWarning 없이 실행되는 것 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
@@ -75,11 +77,10 @@
 
 ## 다음 작업
 
-1. OpenAI 실제 제한 스캔으로 `70` threshold 재검증
-2. 실행 결과와 `watchlist.json` 품질 점검 고도화
-3. `support_level_hint` 등 잔여 영어 feature 문구 한국어화
-4. GitHub Actions 실제 1회 검증
-5. Anthropic/Gemini smoke test는 후순위로 보류
+1. 실행 결과와 `watchlist.json` 품질 점검 고도화
+2. `support_level_hint` 등 잔여 영어 feature 문구 한국어화
+3. GitHub Actions 실제 1회 검증
+4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 
