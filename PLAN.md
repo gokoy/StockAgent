@@ -2,7 +2,7 @@
 
 ## 목표 요약
 
-Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다.
+Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다. 이후 Phase 1.5에서는 고정 관심 종목 스캔에서 `discovery universe + dynamic watchlist` 구조로 확장한다.
 
 ## 비목표
 
@@ -28,7 +28,16 @@ GitHub Actions
      -> reporting/storage.py
      -> reporting/formatter.py
      -> reporting/telegram.py
+     -> data/watchlist.py
 ```
+
+## 운영 방향 업데이트
+
+- 사용자가 직접 종목을 전부 고르지 않아도 되도록 서비스가 시장 universe에서 종목을 발굴한다.
+- universe는 `discovery pool`과 `watchlist`로 분리한다.
+- discovery pool은 미장/국장 후보군에서 신규 종목을 찾는다.
+- watchlist는 과거에 유효했던 종목을 계속 추적하고, 반복적으로 약해지면 제거한다.
+- 초기 구현은 `US/KR curated symbols + watchlist merge` 구조로 시작하고, 이후 외부 지수/시장 소스로 확장한다.
 
 ## Phase 1 구현 범위
 
@@ -49,11 +58,13 @@ GitHub Actions
 - `app/data/universe.py`: Universe 수집
 - `app/data/market_data.py`: OHLCV 로딩
 - `app/data/news_data.py`: 최신 뉴스 fetch
+- `app/data/watchlist.py`: watchlist 저장/갱신
 - `app/data/sector_data.py`: Phase 2 placeholder
 
 완료 기준:
 
 - Universe를 리스트 형태로 반환
+- 미장/국장 discovery pool과 watchlist를 병합할 수 있음
 - 종목별 가격/거래량 데이터 확보
 - 뉴스는 최신성 필터 적용
 
@@ -152,17 +163,19 @@ GitHub Actions
 
 1. 설정 로드
 2. 실행 시각 `run_at` 생성
-3. Universe 수집
-4. 시장 데이터 조회
-5. Screening 수행
-6. 후보별 chart feature 계산
-7. Chart Agent 호출
-8. 최신 뉴스 조회
-9. News Agent 호출
-10. Final Agent 호출
-11. 최종 후보 정렬 및 3~5개 선택
-12. JSON 저장
-13. Telegram 메시지 생성 및 전송
+3. Discovery universe 수집
+4. Watchlist 로드 및 병합
+5. 시장 데이터 조회
+6. Screening 수행
+7. 후보별 chart feature 계산
+8. Chart Agent 호출
+9. 최신 뉴스 조회
+10. News Agent 호출
+11. Final Agent 호출
+12. watchlist add/keep/remove 상태 갱신
+13. 최종 후보 정렬 및 3~5개 선택
+14. JSON 저장
+15. Telegram 메시지 생성 및 전송
 
 ## 출력 스키마 고정 방침
 
@@ -192,7 +205,8 @@ GitHub Actions
 
 ## 후보 선정 규칙 초안
 
-- 1차: Universe에서 유동성/가격/거래량 기준 필터링
+- 1차: Discovery universe와 watchlist 병합
+- 2차: 유동성/가격/거래량 기준 필터링
 - 2차: 차트 setup 존재 여부 확인
 - 3차: 최신 뉴스 해석 반영
 - 4차: final score 기반 정렬
@@ -202,6 +216,12 @@ GitHub Actions
 
 - 기준 충족 종목이 없으면 `후보 없음`
 - 일부 신호만 있으면 `관찰만`
+
+watchlist 운영 예외:
+
+- `candidate` 또는 `observe`는 watchlist 유지 또는 신규 편입 대상이다.
+- `avoid`가 반복되면 watchlist에서 제거한다.
+- 신규 discovery 편입 기준과 기존 watchlist 유지 기준은 분리 가능해야 한다.
 
 ## GitHub Actions 요구사항
 
@@ -254,6 +274,25 @@ GitHub Actions
   - 대응: 부분 실패 허용, uncertainty 기록
 - 후보 과다/과소
   - 대응: score threshold와 상위 N 제한 분리
+- universe 품질 부족
+  - 대응: 초기에는 curated US/KR 풀로 시작하고 이후 index/market source로 교체
+
+## Phase 1.5 추가 목표
+
+- `UNIVERSE_MODE=discovery_plus_watchlist|watchlist|manual` 지원
+- `US_STOCK_UNIVERSE`, `KR_STOCK_UNIVERSE` 분리
+- `WATCHLIST_PATH`와 `watchlist.json` 저장 지원
+- watchlist entry에 `added_at`, `last_seen_at`, `last_action`, `consecutive_weak_runs`, `active` 저장
+- `WATCHLIST_MAX_WEAK_RUNS` 기준 제거 정책 지원
+- 실제 뉴스/시장 데이터 소스는 단계적으로 개선하되, 현재는 `yfinance + Google News RSS`를 유지
+
+## 새 우선순위
+
+1. universe/source와 dynamic watchlist 구조 반영
+2. 실행 결과와 watchlist 상태 저장 품질 점검
+3. OpenAI 실제 제한 스캔 품질 검증
+4. threshold 조정
+5. GitHub Actions 실제 1회 검증
 
 ## Phase 2 Placeholder 범위
 

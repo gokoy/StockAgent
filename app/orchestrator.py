@@ -11,7 +11,8 @@ from app.chart.features import build_chart_features
 from app.config import AppConfig
 from app.data.market_data import fetch_price_history
 from app.data.news_data import fetch_latest_news
-from app.data.universe import load_universe
+from app.data.universe import resolve_scan_universe
+from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
 from app.models.enums import ActionLabel
 from app.models.schemas import EvaluatedStock, RejectedStock, RunResult
 from app.reporting.formatter import format_telegram_message
@@ -28,7 +29,7 @@ def run_scan(
 ) -> tuple[RunResult, str]:
     llm_client = _build_llm_client(config)
     run_at = datetime.now(ZoneInfo(timezone_name))
-    stocks = load_universe(config.universe_symbols)
+    stocks = resolve_scan_universe(config)
     if max_stocks is not None:
         stocks = stocks[:max_stocks]
     candidates: list[EvaluatedStock] = []
@@ -81,6 +82,10 @@ def run_scan(
         screened_out=screened_out,
     )
     save_run_result(result, config.output_dir)
+    if config.include_watchlist:
+        watchlist_state = load_watchlist(config.watchlist_path)
+        updated_watchlist = update_watchlist_from_run(watchlist_state, result, config.watchlist_max_weak_runs)
+        save_watchlist(updated_watchlist, config.watchlist_path)
     message = format_telegram_message(result)
     if send_telegram:
         try:

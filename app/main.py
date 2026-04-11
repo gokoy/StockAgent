@@ -76,6 +76,12 @@ def run_self_check(config) -> str:
         f"provider_package_found={package_found}",
         f"telegram_enabled={config.telegram_enabled}",
         f"universe_size={len(config.universe_symbols)}",
+        f"universe_mode={config.universe_mode}",
+        f"us_universe_size={len(config.us_universe_symbols)}",
+        f"kr_universe_size={len(config.kr_universe_symbols)}",
+        f"include_watchlist={config.include_watchlist}",
+        f"watchlist_path={config.watchlist_path}",
+        f"watchlist_max_weak_runs={config.watchlist_max_weak_runs}",
     ]
     return "\n".join(lines)
 

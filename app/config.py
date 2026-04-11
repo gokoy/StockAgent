@@ -33,6 +33,12 @@ class AppConfig:
     candidate_min_news_score: int
     max_news_age_hours: int
     universe_symbols: list[str]
+    us_universe_symbols: list[str]
+    kr_universe_symbols: list[str]
+    universe_mode: str
+    watchlist_path: Path
+    include_watchlist: bool
+    watchlist_max_weak_runs: int
     llm_timeout_seconds: int
 
     @property
@@ -86,6 +92,19 @@ def _parse_universe(raw: str | None) -> list[str]:
     ]
 
 
+def _parse_kr_universe(raw: str | None) -> list[str]:
+    if raw:
+        return [symbol.strip().upper() for symbol in raw.split(",") if symbol.strip()]
+    return [
+        "005930.KS",
+        "000660.KS",
+        "035420.KS",
+        "051910.KS",
+        "005380.KS",
+        "035720.KS",
+    ]
+
+
 def _default_model_for_provider(provider: str) -> str:
     normalized = provider.strip().lower()
     if normalized == "anthropic":
@@ -131,6 +150,7 @@ def load_config() -> AppConfig:
     output_dir = root / "data" / "outputs"
     log_dir = root / "data" / "logs"
     performance_dir = root / "data" / "performance"
+    watchlist_path = output_dir / "watchlist.json"
     output_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     performance_dir.mkdir(parents=True, exist_ok=True)
@@ -164,5 +184,11 @@ def load_config() -> AppConfig:
         candidate_min_news_score=int(os.getenv("CANDIDATE_MIN_NEWS_SCORE", "45")),
         max_news_age_hours=int(os.getenv("MAX_NEWS_AGE_HOURS", "72")),
         universe_symbols=_parse_universe(os.getenv("STOCK_UNIVERSE")),
+        us_universe_symbols=_parse_universe(os.getenv("US_STOCK_UNIVERSE", os.getenv("STOCK_UNIVERSE"))),
+        kr_universe_symbols=_parse_kr_universe(os.getenv("KR_STOCK_UNIVERSE")),
+        universe_mode=os.getenv("UNIVERSE_MODE", "discovery_plus_watchlist").strip().lower(),
+        watchlist_path=Path(os.getenv("WATCHLIST_PATH", str(watchlist_path))),
+        include_watchlist=os.getenv("INCLUDE_WATCHLIST", "true").strip().lower() in {"1", "true", "yes", "on"},
+        watchlist_max_weak_runs=int(os.getenv("WATCHLIST_MAX_WEAK_RUNS", "3")),
         llm_timeout_seconds=int(os.getenv("LLM_TIMEOUT_SECONDS", "60")),
     )

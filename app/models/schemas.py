@@ -11,6 +11,9 @@ from app.models.enums import ActionLabel, ChartLabel, ConfidenceLabel
 class UniverseStock(BaseModel):
     ticker: str
     name: str
+    market: str = "US"
+    source: str = "manual"
+    in_watchlist: bool = False
 
 
 class PriceHistory(BaseModel):
@@ -96,6 +99,24 @@ class RunResult(BaseModel):
     candidates: list[EvaluatedStock]
     non_candidates: list[EvaluatedStock]
     screened_out: list[RejectedStock] = Field(default_factory=list)
+
+
+class WatchlistEntry(BaseModel):
+    ticker: str
+    name: str
+    market: str = "US"
+    source: str = "watchlist"
+    added_at: datetime
+    last_seen_at: datetime
+    last_action: str = "observe"
+    active: bool = True
+    consecutive_weak_runs: int = 0
+    note: str = ""
+
+
+class WatchlistState(BaseModel):
+    updated_at: datetime
+    entries: list[WatchlistEntry] = Field(default_factory=list)
 
 
 class MarketRegimeAnalysis(BaseModel):
