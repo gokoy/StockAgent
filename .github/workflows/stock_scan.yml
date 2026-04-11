@@ -32,6 +32,17 @@ jobs:
           LLM_MODEL_NEWS: ${{ vars.LLM_MODEL_NEWS }}
           LLM_MODEL_FINAL: ${{ vars.LLM_MODEL_FINAL }}
           LLM_MODEL_MACRO: ${{ vars.LLM_MODEL_MACRO }}
+          UNIVERSE_MODE: ${{ vars.UNIVERSE_MODE || 'discovery_plus_watchlist' }}
+          US_STOCK_UNIVERSE: ${{ vars.US_STOCK_UNIVERSE }}
+          KR_STOCK_UNIVERSE: ${{ vars.KR_STOCK_UNIVERSE }}
+          INCLUDE_WATCHLIST: ${{ vars.INCLUDE_WATCHLIST || 'true' }}
+          WATCHLIST_MAX_WEAK_RUNS: ${{ vars.WATCHLIST_MAX_WEAK_RUNS || '3' }}
+          MAX_NEWS_AGE_HOURS: ${{ vars.MAX_NEWS_AGE_HOURS || '72' }}
+          TOP_N_CANDIDATES: ${{ vars.TOP_N_CANDIDATES || '5' }}
+          CANDIDATE_MIN_FINAL_SCORE: ${{ vars.CANDIDATE_MIN_FINAL_SCORE || '70' }}
+          OBSERVE_MIN_FINAL_SCORE: ${{ vars.OBSERVE_MIN_FINAL_SCORE || '55' }}
+          CANDIDATE_MIN_CHART_SCORE: ${{ vars.CANDIDATE_MIN_CHART_SCORE || '68' }}
+          CANDIDATE_MIN_NEWS_SCORE: ${{ vars.CANDIDATE_MIN_NEWS_SCORE || '45' }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

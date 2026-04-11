@@ -148,10 +148,32 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `LLM_MODEL_NEWS`
 - `LLM_MODEL_FINAL`
 - `LLM_MODEL_MACRO`
+- `UNIVERSE_MODE`
+- `US_STOCK_UNIVERSE`
+- `KR_STOCK_UNIVERSE`
+- `INCLUDE_WATCHLIST`
+- `WATCHLIST_MAX_WEAK_RUNS`
+- `MAX_NEWS_AGE_HOURS`
+- `TOP_N_CANDIDATES`
+- `CANDIDATE_MIN_FINAL_SCORE`
+- `OBSERVE_MIN_FINAL_SCORE`
+- `CANDIDATE_MIN_CHART_SCORE`
+- `CANDIDATE_MIN_NEWS_SCORE`
 
 ## 저장 결과
 
 매 실행마다 `data/outputs/scan_YYYYMMDD_HHMMSS.json`과 `data/outputs/latest.json`을 저장한다. watchlist를 켜면 `data/outputs/watchlist.json`도 함께 갱신한다.
+
+`watchlist.json`에는 최소한 아래 상태가 저장된다.
+
+- `ticker`
+- `name`
+- `market`
+- `last_action`
+- `last_final_score`
+- `active`
+- `consecutive_weak_runs`
+- `note`
 
 필수 필드:
 

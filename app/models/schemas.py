@@ -109,6 +109,7 @@ class WatchlistEntry(BaseModel):
     added_at: datetime
     last_seen_at: datetime
     last_action: str = "observe"
+    last_final_score: int | None = None
     active: bool = True
     consecutive_weak_runs: int = 0
     note: str = ""
