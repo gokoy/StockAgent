@@ -36,6 +36,7 @@
 - Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
 - 3종목 제한 실제 스캔에서 `관찰만` 결과와 `watchlist.json` 자동 갱신 확인 완료
 - 5종목 제한 실제 스캔에서 `NVDA observe`, `AMZN/AAPL/MSFT/META avoid` 분포 확인 완료
+- OpenAI 활성 환경의 5종목 제한 실제 스캔에서 `NVDA observe(70)` 결과 확인 완료
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
@@ -62,17 +63,17 @@
 - 현재 셸 self-check 기준 `llm_enabled=False`라 실제 OpenAI 제한 스캔은 다음 단계에서 별도 검증 예정
 - 현재 Codex 실행 셸에서는 `OPENAI_API_KEY`가 비주입 상태라 제한 스캔은 fallback 경로로만 검증됨
 - 최근 fallback 제한 스캔 결과에서 `watchlist.json`은 `NVDA keep` 상태로 정상 갱신됨
+- 사용자 로컬 셸에서 OpenAI 실제 응답 기반 제한 스캔이 확인되었고, 현재 기본 threshold에서는 `candidate` 없이 `observe`만 출력됨
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 
 ## 다음 작업
 
-1. OpenAI 실제 제한 스캔에서 role별 모델 결과 품질 확인
+1. OpenAI 실제 제한 스캔 결과를 기준으로 threshold 조정
 2. 실행 결과와 `watchlist.json` 품질 점검 고도화
-3. discovery/watchlist 기준 분리를 고려한 threshold 조정
-4. GitHub Actions 실제 1회 검증
-5. Anthropic/Gemini smoke test는 후순위로 보류
+3. GitHub Actions 실제 1회 검증
+4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 
