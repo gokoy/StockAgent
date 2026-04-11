@@ -6,11 +6,12 @@ from app.models.schemas import ChartAnalysis, ChartFeatures
 
 
 SYSTEM_PROMPT = """
-You are a swing trading chart analysis agent.
-Use only the provided chart features.
-Do not invent facts, prices, patterns, or catalysts.
-If evidence is mixed, state uncertainty clearly.
-Return valid JSON only.
+당신은 스윙 투자용 차트 해석 에이전트다.
+반드시 제공된 차트 feature만 사용한다.
+주어지지 않은 사실, 가격, 패턴, 재료를 만들어내지 않는다.
+근거가 엇갈리면 불확실성을 분명히 적는다.
+설명 문구는 모두 한국어로 작성한다.
+유효한 JSON만 반환한다.
 """.strip()
 
 
@@ -33,46 +34,46 @@ def _fallback_chart_analysis(features: ChartFeatures, fallback_reason: str | Non
 
     if features.above_ma20 and features.above_ma60:
         score += 12
-        positives.append("Price is holding above MA20 and MA60.")
+        positives.append("주가가 MA20과 MA60 위에서 유지되고 있다.")
     if features.breakout_setup:
         score += 15
-        positives.append("Price is within reach of the 20-day high with supportive volume.")
+        positives.append("거래량이 뒷받침되며 20일 고점 돌파 구간에 근접해 있다.")
         label = ChartLabel.BREAKOUT
     if features.pullback_setup:
         score += 10
-        positives.append("Trend is intact and price is near MA20 support.")
+        positives.append("추세가 유지된 상태에서 MA20 지지 구간에 가깝다.")
         label = ChartLabel.PULLBACK if label == ChartLabel.MIXED else label
     if features.volatility_contracting:
         score += 8
-        positives.append("Recent volatility has tightened versus the prior month.")
+        positives.append("최근 변동성이 이전 구간 대비 축소되고 있다.")
     if features.range_bound:
-        positives.append("Price is trading in a relatively tight 30-day range.")
+        positives.append("최근 30일 동안 비교적 좁은 박스권에서 움직이고 있다.")
         label = ChartLabel.RANGE if label == ChartLabel.MIXED else label
 
     if not features.above_ma120:
         score -= 12
-        negatives.append("Price is still below MA120.")
+        negatives.append("주가가 아직 MA120 아래에 있다.")
     if features.overextended_pct >= 8:
         score -= 14
-        negatives.append("Price is extended materially above MA20.")
+        negatives.append("주가가 MA20 대비 과하게 이격돼 있다.")
         label = ChartLabel.EXTENDED
     if features.recent_sharp_runup:
         score -= 8
-        negatives.append("Recent price run-up raises chase risk.")
+        negatives.append("최근 급등으로 추격 매수 위험이 커졌다.")
     if features.volume_ratio_20d < 0.8:
         score -= 10
-        negatives.append("Latest volume is soft versus the 20-day average.")
+        negatives.append("최근 거래량이 20일 평균 대비 약하다.")
     if features.atr_pct >= 5.5:
         score -= 8
-        negatives.append("ATR percentage is elevated for a controlled swing entry.")
+        negatives.append("ATR 비율이 높아 스윙 진입 기준으로는 변동성이 크다.")
         confidence = ConfidenceLabel.LOW
     if fallback_reason:
-        negatives.append(f"LLM chart analysis unavailable; deterministic fallback used ({fallback_reason}).")
+        negatives.append(f"LLM 차트 해석을 사용할 수 없어 규칙 기반 대체 결과를 사용했다 ({fallback_reason}).")
 
     score = max(0, min(100, score))
-    why_now = positives[0] if positives else "No strong timing edge is visible from current chart features."
-    why_not_now = negatives[0] if negatives else "No major chart-based objection stands out."
-    invalid_if = f"Setup weakens if price loses the nearby support zone. Hint: {features.support_level_hint}."
+    why_now = positives[0] if positives else "현재 차트 feature만으로는 뚜렷한 진입 타이밍 우위가 보이지 않는다."
+    why_not_now = negatives[0] if negatives else "차트상 치명적인 반대 근거는 아직 두드러지지 않는다."
+    invalid_if = f"주가가 인접 지지 구간을 이탈하면 setup이 약해진다. 힌트: {features.support_level_hint}."
     return ChartAnalysis(
         chart_score=score,
         label=label,

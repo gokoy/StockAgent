@@ -81,7 +81,7 @@ Mermaid 원본: [docs/system-diagram.mmd](/Users/young/PycharmProjects/StockAgen
 - `WATCHLIST_MAX_WEAK_RUNS` 선택사항, 기본값 `3`
 - `MAX_NEWS_AGE_HOURS` 선택사항, 기본값 `72`
 - `TOP_N_CANDIDATES` 선택사항, 기본값 `5`
-- `CANDIDATE_MIN_FINAL_SCORE` 선택사항, 기본값 `72`
+- `CANDIDATE_MIN_FINAL_SCORE` 선택사항, 기본값 `70`
 - `OBSERVE_MIN_FINAL_SCORE` 선택사항, 기본값 `55`
 - `CANDIDATE_MIN_CHART_SCORE` 선택사항, 기본값 `68`
 - `CANDIDATE_MIN_NEWS_SCORE` 선택사항, 기본값 `45`
@@ -171,7 +171,7 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 ## 샘플 Telegram 메시지
 
 ```text
-[2026-04-10 23:30 KST] Swing Scan
+[2026-04-10 23:30 KST] 스윙 스캔
 
 NVDA | NVIDIA
 - 종합 점수: 78 | 상태: candidate
@@ -199,6 +199,7 @@ NVDA | NVIDIA
 - LLM 호출은 provider adapter 패턴으로 추상화했고 `OpenAI`, `Anthropic`, `Gemini`를 지원한다.
 - 모델 선택은 provider 공통 구조를 사용하고, `default/chart/news/final/macro` 역할별 모델 오버라이드를 지원한다.
 - OpenAI 기본 조합은 `chart/news/default = gpt-4.1-mini`, `final = gpt-4.1`이다.
+- 사용자 노출 설명과 fallback 문구는 한국어를 기본으로 사용한다.
 - provider structured JSON 호출 실패 시 deterministic fallback을 둔다.
 - fallback이 발생하면 결과 필드 안에 fallback 사용 흔적을 남긴다.
 - 후보 없음과 관찰만은 실제 `action_label` 기준으로 분리하며, 관찰 종목이 있으면 Telegram에 상위 관찰 종목 요약을 함께 보낸다.

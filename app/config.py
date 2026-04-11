@@ -178,7 +178,7 @@ def load_config() -> AppConfig:
         min_price=float(os.getenv("MIN_PRICE", "10")),
         min_avg_volume=int(os.getenv("MIN_AVG_VOLUME", "1000000")),
         top_n_candidates=int(os.getenv("TOP_N_CANDIDATES", "5")),
-        candidate_min_final_score=int(os.getenv("CANDIDATE_MIN_FINAL_SCORE", "72")),
+        candidate_min_final_score=int(os.getenv("CANDIDATE_MIN_FINAL_SCORE", "70")),
         observe_min_final_score=int(os.getenv("OBSERVE_MIN_FINAL_SCORE", "55")),
         candidate_min_chart_score=int(os.getenv("CANDIDATE_MIN_CHART_SCORE", "68")),
         candidate_min_news_score=int(os.getenv("CANDIDATE_MIN_NEWS_SCORE", "45")),

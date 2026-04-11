@@ -7,11 +7,12 @@ from app.models.schemas import ChartAnalysis, ChartFeatures, FinalAnalysis, News
 
 
 SYSTEM_PROMPT = """
-You are the final decision agent for a swing trading assistant.
-Combine only the supplied chart features, chart analysis, and news analysis.
-Do not invent new evidence.
-If conviction is weak, prefer observe or avoid over candidate.
-Return valid JSON only.
+당신은 스윙 투자 보조 도구의 최종 판단 에이전트다.
+반드시 제공된 차트 feature, 차트 해석, 뉴스 해석만 결합한다.
+새로운 근거나 사실을 만들어내지 않는다.
+확신이 약하면 candidate보다 observe 또는 avoid를 우선한다.
+설명 문구는 모두 한국어로 작성한다.
+유효한 JSON만 반환한다.
 """.strip()
 
 
@@ -50,17 +51,17 @@ def _fallback_final_analysis(
     risks = list(dict.fromkeys((chart_analysis.negative_signals + news_analysis.bearish_points + news_analysis.uncertainties)))[:3]
     confirmations = []
     if chart_analysis.label.value in {"breakout", "pullback"}:
-        confirmations.append("Confirm price respects the described setup on the next session.")
-    confirmations.append("Check whether fresh news changes the near-term thesis.")
+        confirmations.append("다음 거래일에도 설명한 setup이 유지되는지 확인한다.")
+    confirmations.append("최신 뉴스가 단기 투자 논리를 바꾸는지 다시 확인한다.")
     if not risks:
-        risks = ["No single dominant risk was detected, but execution timing still matters."]
+        risks = ["지배적인 단일 리스크는 없지만 진입 시점 관리가 여전히 중요하다."]
     if fallback_reason:
-        risks = risks[:2] + [f"LLM final analysis unavailable; deterministic fallback used ({fallback_reason})."]
+        risks = risks[:2] + [f"LLM 최종 판단을 사용할 수 없어 규칙 기반 대체 결과를 사용했다 ({fallback_reason})."]
 
     result = FinalAnalysis(
         final_score=max(0, min(100, final_score)),
         action_label=ActionLabel.OBSERVE,
-        summary_reason=f"Chart score {chart_analysis.chart_score} and news score {news_analysis.news_score} were combined under a chart-first weighting.",
+        summary_reason=f"차트 점수 {chart_analysis.chart_score}와 뉴스 점수 {news_analysis.news_score}를 차트 비중 우선 방식으로 합산했다.",
         main_risks=risks,
         what_to_confirm_next=confirmations[:3],
     )

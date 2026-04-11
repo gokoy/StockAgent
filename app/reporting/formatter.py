@@ -16,7 +16,7 @@ def format_telegram_message(run_result: RunResult) -> str:
             return "\n".join(lines).strip()
         return f"[{date_str}] 후보 없음\n\n스크리닝과 최종 판단을 통과한 종목이 없습니다."
 
-    lines = [f"[{date_str}] Swing Scan", ""]
+    lines = [f"[{date_str}] 스윙 스캔", ""]
     for stock in run_result.candidates:
         lines.extend(_format_stock_block(stock))
         lines.append("")
@@ -31,9 +31,14 @@ def _format_stock_block(stock: EvaluatedStock) -> list[str]:
     news_points.extend(stock.news_analysis.bullish_points[:1])
     risks = stock.final_analysis.main_risks[:2] or [stock.chart_analysis.why_not_now]
     invalid_line = stock.chart_analysis.invalid_if
+    action_label = {
+        ActionLabel.CANDIDATE: "후보",
+        ActionLabel.OBSERVE: "관찰",
+        ActionLabel.AVOID: "제외",
+    }.get(stock.final_analysis.action_label, stock.final_analysis.action_label.value)
     return [
         f"{stock.ticker} | {stock.name}",
-        f"- 종합 점수: {stock.final_analysis.final_score} | 상태: {stock.final_analysis.action_label.value}",
+        f"- 종합 점수: {stock.final_analysis.final_score} | 상태: {action_label}",
         f"- 차트 근거: {' / '.join(chart_points[:3])}",
         f"- 뉴스 요약: {' / '.join(news_points[:2]) if news_points else '최근 뉴스 해석 근거 부족'}",
         f"- 주요 리스크: {' / '.join(risks)}",
