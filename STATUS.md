@@ -39,6 +39,7 @@
 - OpenAI 활성 환경의 5종목 제한 실제 스캔에서 `NVDA observe(70)` 결과 확인 완료
 - 사용자 노출 문구와 fallback 문구의 한국어화 반영 완료
 - 기본 `candidate_min_final_score`를 `72 -> 70`으로 조정 완료
+- `yfinance` 내부 pandas chained assignment `FutureWarning` 억제 처리 완료
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
@@ -67,6 +68,7 @@
 - 최근 fallback 제한 스캔 결과에서 `watchlist.json`은 `NVDA keep` 상태로 정상 갱신됨
 - 사용자 로컬 셸에서 OpenAI 실제 응답 기반 제한 스캔이 확인되었고, 현재 기본 threshold에서는 `candidate` 없이 `observe`만 출력됨
 - 현재 로컬 fallback 검증에서는 출력 헤더, 상태값, 차트/리스크 문구가 한국어로 노출되는 것 확인 완료
+- `yfinance` 경고 필터 적용 후 제한 스캔에서 불필요한 FutureWarning 없이 실행되는 것 확인 완료
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
