@@ -35,6 +35,7 @@
 - Python 3.14 기준 self-check 실행 확인 완료
 - Python 3.14 기준 1종목 제한 실제 스캔 및 JSON 저장 확인 완료
 - 3종목 제한 실제 스캔에서 `관찰만` 결과와 `watchlist.json` 자동 갱신 확인 완료
+- 5종목 제한 실제 스캔에서 `NVDA observe`, `AMZN/AAPL/MSFT/META avoid` 분포 확인 완료
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
@@ -59,6 +60,8 @@
 - `watchlist.json`은 실행 결과에 따라 자동 갱신되도록 연결됨
 - 최근 로컬 검증에서는 `NVDA observe`가 watchlist에 자동 편입되는 것 확인 완료
 - 현재 셸 self-check 기준 `llm_enabled=False`라 실제 OpenAI 제한 스캔은 다음 단계에서 별도 검증 예정
+- 현재 Codex 실행 셸에서는 `OPENAI_API_KEY`가 비주입 상태라 제한 스캔은 fallback 경로로만 검증됨
+- 최근 fallback 제한 스캔 결과에서 `watchlist.json`은 `NVDA keep` 상태로 정상 갱신됨
 - GitHub Actions는 Python 3.14 기준으로 설정됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
