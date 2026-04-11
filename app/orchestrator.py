@@ -9,7 +9,7 @@ from app.agents.llm_client import LLMClient
 from app.agents.news_agent import analyze_news
 from app.chart.features import build_chart_features
 from app.config import AppConfig
-from app.data.market_data import fetch_price_history
+from app.data.market_data import fetch_company_names, fetch_price_history
 from app.data.news_data import fetch_latest_news
 from app.data.universe import resolve_scan_universe
 from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
@@ -32,6 +32,8 @@ def run_scan(
     stocks = resolve_scan_universe(config)
     if max_stocks is not None:
         stocks = stocks[:max_stocks]
+    company_names = fetch_company_names(stocks)
+    stocks = [stock.model_copy(update={"name": company_names.get(stock.ticker, stock.name)}) for stock in stocks]
     candidates: list[EvaluatedStock] = []
     non_candidates: list[EvaluatedStock] = []
     screened_out: list[RejectedStock] = []

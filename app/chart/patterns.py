@@ -30,4 +30,4 @@ def is_range_bound(history: pd.DataFrame) -> bool:
 
 def support_level_hint(history: pd.DataFrame, ma20: float, ma60: float) -> str:
     recent_low = float(history["low"].tail(20).min())
-    return f"20d low {recent_low:.2f}, MA20 {ma20:.2f}, MA60 {ma60:.2f}"
+    return f"최근 20일 저점 {recent_low:.2f}, MA20 {ma20:.2f}, MA60 {ma60:.2f}"

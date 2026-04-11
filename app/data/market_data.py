@@ -29,8 +29,11 @@ def fetch_company_names(stocks: Iterable[UniverseStock]) -> dict[str, str]:
     names: dict[str, str] = {}
     for stock in stocks:
         try:
-            info = yf.Ticker(stock.ticker).fast_info
-            short_name = info.get("shortName") if isinstance(info, dict) else None
+            ticker = yf.Ticker(stock.ticker)
+            short_name = ""
+            info = getattr(ticker, "info", {}) or {}
+            if isinstance(info, dict):
+                short_name = str(info.get("shortName") or info.get("longName") or "").strip()
             names[stock.ticker] = short_name or stock.name
         except Exception:
             names[stock.ticker] = stock.name
