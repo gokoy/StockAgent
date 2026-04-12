@@ -1,6 +1,6 @@
 # StockAgent
 
-개인용 스윙 투자 의사결정 보조 도구다. 자동매매가 아니라 Python 기반 정량 스크리닝과 LLM 기반 차트/뉴스 해석을 결합해 근거 중심 후보를 정리한다. 현재는 `discovery universe + dynamic watchlist` 방향으로 확장 중이다.
+개인용 스윙 투자 의사결정 보조 도구다. 자동매매가 아니라 Python 기반 정량 스크리닝과 LLM 기반 차트/뉴스 해석을 결합해 근거 중심 후보를 정리한다. 현재는 `시장 브리핑 → 보유 종목 → 신규 후보` 구조와 `discovery universe + dynamic watchlist`를 함께 운영하는 방향으로 확장 중이다.
 
 ## 핵심 원칙
 
@@ -12,6 +12,8 @@
 - 최신 뉴스만 사용
 - 매 실행 결과 JSON 저장
 - 서비스가 종목을 발굴하고 watchlist를 유지/제거할 수 있게 확장
+- 한국/미국 시장을 분리하고 동일한 브리핑 구조 유지
+- 보유 종목과 신규 후보를 분리해 출력
 
 ## 디렉터리 구조
 
@@ -23,7 +25,9 @@ repo/
     orchestrator.py
     models/schemas.py
     models/enums.py
+    data/holdings.py
     data/universe.py
+    data/market_briefing.py
     data/market_data.py
     data/news_data.py
     data/watchlist.py
@@ -46,6 +50,7 @@ repo/
     reporting/storage.py
     portfolio/sizing_stub.py
   data/outputs/
+  data/inputs/
   data/logs/
   data/performance/
   requirements.txt
@@ -76,6 +81,7 @@ Mermaid 원본: [docs/system-diagram.mmd](/Users/young/PycharmProjects/StockAgen
 - `US_STOCK_UNIVERSE` 선택사항, 미장 discovery pool
 - `KR_STOCK_UNIVERSE` 선택사항, 국장 discovery pool
 - `UNIVERSE_MODE` 선택사항, `discovery_plus_watchlist|watchlist|manual`, 기본값 `discovery_plus_watchlist`
+- `HOLDINGS_PATH` 선택사항, 기본값 `data/inputs/holdings.json`
 - `INCLUDE_WATCHLIST` 선택사항, 기본값 `true`
 - `WATCHLIST_PATH` 선택사항, 기본값 `data/outputs/watchlist.json`
 - `WATCHLIST_MAX_WEAK_RUNS` 선택사항, 기본값 `3`
@@ -93,6 +99,19 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m app.main --no-telegram
+```
+
+보유 종목은 `data/inputs/holdings.json`에 넣는다.
+
+```json
+{
+  "kr": [
+    { "ticker": "005930.KS" }
+  ],
+  "us": [
+    { "ticker": "NVDA" }
+  ]
+}
 ```
 
 설정과 의존성만 점검하려면:
@@ -150,6 +169,7 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `LLM_MODEL_NEWS`
 - `LLM_MODEL_FINAL`
 - `LLM_MODEL_MACRO`
+- `HOLDINGS_PATH`
 - `UNIVERSE_MODE`
 - `US_STOCK_UNIVERSE`
 - `KR_STOCK_UNIVERSE`
@@ -188,6 +208,16 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `news_analysis`
 - `final_analysis`
 
+추가로 브리핑 구조를 위해 아래 섹션이 저장된다.
+
+- `market_sections`
+- `market_briefing`
+- `holdings`
+- `candidate_briefs`
+- `observe_briefs`
+- `rejection_summary`
+- `no_candidate_reason`
+
 ## 샘플 결과 JSON
 
 샘플 파일: [data/outputs/sample_result.json](/Users/young/PycharmProjects/StockAgent/data/outputs/sample_result.json)
@@ -195,14 +225,39 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 ## 샘플 Telegram 메시지
 
 ```text
-[2026-04-10 23:30 KST] 스윙 스캔
+[2026-04-12 데일리 브리핑]
 
-NVDA | NVIDIA
-- 종합 점수: 78 | 상태: candidate
-- 차트 근거: Price is holding above MA20 and MA60. / Price is within reach of the 20-day high with supportive volume. / Recent volatility has tightened versus the prior month.
-- 뉴스 요약: NVIDIA headlines show continued AI demand focus / Recent coverage mentions growth-type positive catalysts.
-- 주요 리스크: Recent price run-up raises chase risk. / Check whether fresh news changes the near-term thesis.
-- 무효화 기준: Setup weakens if price loses the nearby support zone. Hint: 20d low 842.15, MA20 875.42, MA60 812.90.
+🇰🇷 한국 시장
+[1] 시장 상황
+- 요약: 지수 방향이 혼조라 종목 선별이 더 중요하다.
+- 지수 흐름: KOSPI +0.22% / KOSDAQ -0.35%
+- 수급/체크: KOSPI 외국인 +420억, 기관 -180억, 개인 -210억
+
+[2] 보유 종목 브리핑
+- 삼성전자 | 005930.KS
+  상태: 보유 유지
+  요약: 중기 추세는 유지되지만 외국인 수급 둔화는 점검 필요
+
+[3] 추가 매수 후보
+- SK하이닉스 | 000660.KS
+  상태: 매수 후보
+  왜 지금 보는가: 반도체 강세와 추세 재정렬이 동시에 확인된다.
+
+🇺🇸 미국 시장
+[1] 시장 상황
+- 요약: 주요 지수가 전반적으로 강세이며 기술주 상대강도가 유지된다.
+- 지수 흐름: S&P 500 +0.62% / Nasdaq +1.14%
+- 거시 흐름: 달러인덱스 -0.31% / 미국 10년물 -0.18%
+
+[2] 보유 종목 브리핑
+- Amazon.com, Inc. | AMZN
+  상태: 긍정적 관찰
+  요약: 추세는 살아 있지만 단기 과열 구간 여부를 확인해야 한다.
+
+[3] 추가 매수 후보
+- NVIDIA Corporation | NVDA
+  상태: 매수 후보
+  왜 지금 보는가: 차트 추세와 뉴스 분위기가 모두 우호적이라 신규 후보로 볼 수 있다.
 ```
 
 ## 후보 없음 예시
@@ -216,8 +271,11 @@ NVDA | NVIDIA
 ## 구현 메모
 
 - 시세 데이터는 `yfinance`를 사용한다.
+- 한국 시장 수급 데이터는 `pykrx`가 설치된 환경에서 실제 데이터를 사용한다.
 - 뉴스는 Google News RSS를 사용해 최신성 필터를 적용한다.
 - discovery universe는 현재 `US/KR curated symbol pool`로 시작하며, 실행 중 유효한 종목은 watchlist에 자동 편입/유지될 수 있다.
+- 시장 브리핑은 실제 지수/거시/섹터/뉴스 데이터를 사용하고, 이벤트는 최신 시장 뉴스 기반으로 요약한다.
+- 보유 종목은 `data/inputs/holdings.json`에서 읽는다.
 - watchlist는 `candidate/observe/avoid` 결과를 바탕으로 자동 갱신되며, 약한 결과가 누적되면 비활성화된다.
 - 국장 지원은 ticker와 watchlist 구조까지 먼저 열어둔 상태이며, 시장 커버리지와 뉴스 품질은 이후 보강 대상이다.
 - LLM 호출은 provider adapter 패턴으로 추상화했고 `OpenAI`, `Anthropic`, `Gemini`를 지원한다.
@@ -231,6 +289,7 @@ NVDA | NVIDIA
 
 ## 현재 한계
 
-- 미장/국장 universe는 아직 외부 지수 소스에서 자동 동기화하지 않고 curated symbol list 기반이다.
-- 뉴스는 ticker 중심 Google News RSS라 국장 종목에서 정밀도가 떨어질 수 있다.
-- watchlist 운영은 기본 상태 관리까지만 구현되어 있고, discovery와 tracking 기준의 세밀한 분리는 다음 단계다.
+- 미장/국장 discovery universe는 아직 curated symbol list 중심이며, S&P500/Nasdaq100 및 KOSPI/KOSDAQ 전체 동기화는 다음 단계다.
+- 시장 이벤트는 경제 캘린더 API가 아니라 최신 이벤트성 뉴스 기반 요약이다.
+- 한국 시장 수급은 `pykrx` 설치 환경에서만 실제 집계가 제공된다.
+- 뉴스는 ticker 중심 Google News RSS라 국장 종목과 시장 이벤트에서 정밀도가 떨어질 수 있다.

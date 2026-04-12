@@ -2,7 +2,7 @@
 
 ## 목표 요약
 
-Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다. 이후 Phase 1.5에서는 고정 관심 종목 스캔에서 `discovery universe + dynamic watchlist` 구조로 확장한다.
+Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다. 이후 Phase 1.5에서는 고정 관심 종목 스캔에서 `discovery universe + dynamic watchlist` 구조와 `시장 브리핑 -> 보유 종목 -> 신규 후보` 출력 구조로 확장한다.
 
 ## 비목표
 
@@ -35,9 +35,11 @@ GitHub Actions
 
 - 사용자가 직접 종목을 전부 고르지 않아도 되도록 서비스가 시장 universe에서 종목을 발굴한다.
 - universe는 `discovery pool`과 `watchlist`로 분리한다.
+- 보유 종목은 `data/inputs/holdings.json`으로 별도 관리한다.
 - discovery pool은 미장/국장 후보군에서 신규 종목을 찾는다.
 - watchlist는 과거에 유효했던 종목을 계속 추적하고, 반복적으로 약해지면 제거한다.
 - 초기 구현은 `US/KR curated symbols + watchlist merge` 구조로 시작하고, 이후 외부 지수/시장 소스로 확장한다.
+- 최종 출력은 `한국 시장/미국 시장 -> 시장 상황 -> 보유 종목 -> 추가 매수 후보` 순서를 따른다.
 
 ## Phase 1 구현 범위
 
@@ -59,14 +61,18 @@ GitHub Actions
 - `app/data/market_data.py`: OHLCV 로딩
 - `app/data/news_data.py`: 최신 뉴스 fetch
 - `app/data/watchlist.py`: watchlist 저장/갱신
+- `app/data/holdings.py`: 보유 종목 입력 로딩
+- `app/data/market_briefing.py`: 시장 브리핑 데이터 수집
 - `app/data/sector_data.py`: Phase 2 placeholder
 
 완료 기준:
 
 - Universe를 리스트 형태로 반환
 - 미장/국장 discovery pool과 watchlist를 병합할 수 있음
+- 보유 종목 JSON을 읽어 universe에 합칠 수 있음
 - 종목별 가격/거래량 데이터 확보
 - 뉴스는 최신성 필터 적용
+- 시장 브리핑용 지수/거시/섹터/이벤트/핵심 뉴스 수집 가능
 
 ### 3. 스크리닝/피처 계산
 
@@ -173,9 +179,10 @@ GitHub Actions
 10. News Agent 호출
 11. Final Agent 호출
 12. watchlist add/keep/remove 상태 갱신
-13. 최종 후보 정렬 및 3~5개 선택
-14. JSON 저장
-15. Telegram 메시지 생성 및 전송
+13. 시장별 브리핑 생성
+14. 최종 후보 정렬 및 3~5개 선택
+15. JSON 저장
+16. Telegram 메시지 생성 및 전송
 
 ## 출력 스키마 고정 방침
 
@@ -199,7 +206,8 @@ GitHub Actions
   "run_at": "",
   "candidate_count": 0,
   "candidates": [],
-  "non_candidates": []
+  "non_candidates": [],
+  "market_sections": []
 }
 ```
 
@@ -227,9 +235,10 @@ watchlist 운영 예외:
 
 - 트리거: `workflow_dispatch`, `schedule`
 - Secrets:
-  - `OPENAI_API_KEY`
-  - `TELEGRAM_BOT_TOKEN`
-  - `TELEGRAM_CHAT_ID`
+- `OPENAI_API_KEY`
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_CHAT_ID`
+- `data/inputs/holdings.json`은 저장소 파일로 관리한다.
 - 로그에 secret 값 출력 금지
 - 실행 후 JSON artifact 또는 저장 파일 유지 고려
 
