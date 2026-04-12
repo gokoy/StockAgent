@@ -73,6 +73,14 @@ class AppConfig:
         return self.llm_model_default
 
 
+def _env_value(name: str) -> str | None:
+    value = os.getenv(name)
+    if value is None:
+        return None
+    stripped = value.strip()
+    return stripped or None
+
+
 def _parse_universe(raw: str | None) -> list[str]:
     if raw:
         return [symbol.strip().upper() for symbol in raw.split(",") if symbol.strip()]
@@ -154,24 +162,26 @@ def load_config() -> AppConfig:
     output_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     performance_dir.mkdir(parents=True, exist_ok=True)
-    llm_provider = os.getenv("LLM_PROVIDER", "openai").strip().lower()
-    default_model = os.getenv(
-        "LLM_MODEL_DEFAULT",
-        os.getenv("LLM_MODEL", os.getenv("OPENAI_MODEL", _default_model_for_provider(llm_provider))),
+    llm_provider = (_env_value("LLM_PROVIDER") or "openai").lower()
+    default_model = (
+        _env_value("LLM_MODEL_DEFAULT")
+        or _env_value("LLM_MODEL")
+        or _env_value("OPENAI_MODEL")
+        or _default_model_for_provider(llm_provider)
     )
     role_defaults = _default_role_models(llm_provider, default_model)
     return AppConfig(
         llm_provider=llm_provider,
         llm_model_default=default_model,
-        llm_model_chart=os.getenv("LLM_MODEL_CHART", role_defaults["chart"]),
-        llm_model_news=os.getenv("LLM_MODEL_NEWS", role_defaults["news"]),
-        llm_model_final=os.getenv("LLM_MODEL_FINAL", role_defaults["final"]),
-        llm_model_macro=os.getenv("LLM_MODEL_MACRO", role_defaults["macro"]),
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
-        google_api_key=os.getenv("GOOGLE_API_KEY"),
-        telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN"),
-        telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID"),
+        llm_model_chart=_env_value("LLM_MODEL_CHART") or role_defaults["chart"],
+        llm_model_news=_env_value("LLM_MODEL_NEWS") or role_defaults["news"],
+        llm_model_final=_env_value("LLM_MODEL_FINAL") or role_defaults["final"],
+        llm_model_macro=_env_value("LLM_MODEL_MACRO") or role_defaults["macro"],
+        openai_api_key=_env_value("OPENAI_API_KEY"),
+        anthropic_api_key=_env_value("ANTHROPIC_API_KEY"),
+        google_api_key=_env_value("GOOGLE_API_KEY"),
+        telegram_bot_token=_env_value("TELEGRAM_BOT_TOKEN"),
+        telegram_chat_id=_env_value("TELEGRAM_CHAT_ID"),
         output_dir=output_dir,
         log_dir=log_dir,
         performance_dir=performance_dir,
@@ -183,12 +193,12 @@ def load_config() -> AppConfig:
         candidate_min_chart_score=int(os.getenv("CANDIDATE_MIN_CHART_SCORE", "68")),
         candidate_min_news_score=int(os.getenv("CANDIDATE_MIN_NEWS_SCORE", "45")),
         max_news_age_hours=int(os.getenv("MAX_NEWS_AGE_HOURS", "72")),
-        universe_symbols=_parse_universe(os.getenv("STOCK_UNIVERSE")),
-        us_universe_symbols=_parse_universe(os.getenv("US_STOCK_UNIVERSE", os.getenv("STOCK_UNIVERSE"))),
-        kr_universe_symbols=_parse_kr_universe(os.getenv("KR_STOCK_UNIVERSE")),
-        universe_mode=os.getenv("UNIVERSE_MODE", "discovery_plus_watchlist").strip().lower(),
-        watchlist_path=Path(os.getenv("WATCHLIST_PATH", str(watchlist_path))),
-        include_watchlist=os.getenv("INCLUDE_WATCHLIST", "true").strip().lower() in {"1", "true", "yes", "on"},
+        universe_symbols=_parse_universe(_env_value("STOCK_UNIVERSE")),
+        us_universe_symbols=_parse_universe(_env_value("US_STOCK_UNIVERSE") or _env_value("STOCK_UNIVERSE")),
+        kr_universe_symbols=_parse_kr_universe(_env_value("KR_STOCK_UNIVERSE")),
+        universe_mode=(_env_value("UNIVERSE_MODE") or "discovery_plus_watchlist").lower(),
+        watchlist_path=Path(_env_value("WATCHLIST_PATH") or str(watchlist_path)),
+        include_watchlist=(os.getenv("INCLUDE_WATCHLIST", "true").strip().lower() in {"1", "true", "yes", "on"}),
         watchlist_max_weak_runs=int(os.getenv("WATCHLIST_MAX_WEAK_RUNS", "3")),
         llm_timeout_seconds=int(os.getenv("LLM_TIMEOUT_SECONDS", "60")),
     )

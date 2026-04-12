@@ -90,6 +90,8 @@
 - 최신 run `24301728363`에서 `cache: pip` 적용과 cache save 확인 완료
 - 최신 run `24301728363` 로그에서 `yfinance` chained assignment 경고 미출력 확인 완료
 - 최신 run `24301728363`은 성공했지만 LLM 호출은 `badrequesterror`로 fallback 경로 사용됨
+- GitHub Actions에서 빈 `LLM_MODEL_*` 환경변수가 기본 모델을 덮어써 `badrequesterror`를 유발한 원인 확인 완료
+- 빈 문자열 환경변수는 무시하고 role 기본 모델로 fallback하도록 config 수정 완료
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 - `gh` 설치 및 GitHub 인증 완료
@@ -97,7 +99,7 @@
 
 ## 다음 작업
 
-1. GitHub Actions 환경의 OpenAI `badrequesterror` 원인 확인 및 수정
+1. 수정된 config 기준으로 GitHub Actions 재실행 및 OpenAI fallback 해소 확인
 2. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
