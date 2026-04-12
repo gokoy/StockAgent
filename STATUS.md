@@ -49,6 +49,7 @@
 - `gh` CLI 설치 완료
 - GitHub Actions 실제 1회 검증 성공 완료
 - `yfinance.utils` 경고까지 포함하도록 FutureWarning 필터 범위 확장 완료
+- 최신 원격 커밋 기준 GitHub Actions 재실행 성공 완료
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
@@ -86,6 +87,9 @@
 - 성공한 GitHub Actions run `24301434435`에서 `latest.json`, `watchlist.json` artifact 업로드 확인 완료
 - 성공 run 산출물 기준 `candidate_count=0`, `NVDA/AVGO observe`, watchlist 2건 저장 확인 완료
 - 로컬 재검증에서 `yfinance` chained assignment 경고 없이 제한 스캔이 완료되는 것 확인 완료
+- 최신 run `24301728363`에서 `cache: pip` 적용과 cache save 확인 완료
+- 최신 run `24301728363` 로그에서 `yfinance` chained assignment 경고 미출력 확인 완료
+- 최신 run `24301728363`은 성공했지만 LLM 호출은 `badrequesterror`로 fallback 경로 사용됨
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 - `gh` 설치 및 GitHub 인증 완료
@@ -93,7 +97,7 @@
 
 ## 다음 작업
 
-1. 최신 로컬 커밋을 push한 뒤 GitHub Actions 재실행
+1. GitHub Actions 환경의 OpenAI `badrequesterror` 원인 확인 및 수정
 2. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
