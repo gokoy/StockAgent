@@ -118,12 +118,14 @@
 - Telegram 실전송 포함 전체 실행 재검증 완료
 - 시장 뉴스 source 편향 완화와 동일 source 과다 노출 제한 로직 추가 완료
 - 짧은 제한 스캔 재검증에서 미국 시장 핵심 뉴스 중복도가 낮아진 것 확인 완료
+- Telegram 전송 포맷을 시장별 핵심 요약 중심으로 추가 압축 완료
+- 콘솔 출력은 상세형 유지, Telegram 출력은 압축형 유지로 역할 분리 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
-2. GitHub Actions 결과와 Telegram 메시지 길이/가독성 최종 튜닝
-3. 미국 시장 핵심 뉴스 source/중복 필터 추가 개선
+2. GitHub Actions 기준 새 Telegram 압축 포맷 실전 확인
+3. 미국 시장 핵심 뉴스 source 품질 필터 추가 개선
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
