@@ -35,6 +35,7 @@ jobs:
           LLM_MODEL_FINAL: ${{ vars.LLM_MODEL_FINAL }}
           LLM_MODEL_MACRO: ${{ vars.LLM_MODEL_MACRO }}
           UNIVERSE_MODE: ${{ vars.UNIVERSE_MODE || 'discovery_plus_watchlist' }}
+          HOLDINGS_PATH: ${{ vars.HOLDINGS_PATH }}
           US_STOCK_UNIVERSE: ${{ vars.US_STOCK_UNIVERSE }}
           KR_STOCK_UNIVERSE: ${{ vars.KR_STOCK_UNIVERSE }}
           INCLUDE_WATCHLIST: ${{ vars.INCLUDE_WATCHLIST || 'true' }}

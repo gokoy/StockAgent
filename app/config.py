@@ -36,6 +36,7 @@ class AppConfig:
     us_universe_symbols: list[str]
     kr_universe_symbols: list[str]
     universe_mode: str
+    holdings_path: Path
     watchlist_path: Path
     include_watchlist: bool
     watchlist_max_weak_runs: int
@@ -156,10 +157,13 @@ def _default_role_models(provider: str, default_model: str) -> dict[str, str]:
 def load_config() -> AppConfig:
     root = Path(__file__).resolve().parent.parent
     output_dir = root / "data" / "outputs"
+    input_dir = root / "data" / "inputs"
     log_dir = root / "data" / "logs"
     performance_dir = root / "data" / "performance"
     watchlist_path = output_dir / "watchlist.json"
+    holdings_path = input_dir / "holdings.json"
     output_dir.mkdir(parents=True, exist_ok=True)
+    input_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     performance_dir.mkdir(parents=True, exist_ok=True)
     llm_provider = (_env_value("LLM_PROVIDER") or "openai").lower()
@@ -197,6 +201,7 @@ def load_config() -> AppConfig:
         us_universe_symbols=_parse_universe(_env_value("US_STOCK_UNIVERSE") or _env_value("STOCK_UNIVERSE")),
         kr_universe_symbols=_parse_kr_universe(_env_value("KR_STOCK_UNIVERSE")),
         universe_mode=(_env_value("UNIVERSE_MODE") or "discovery_plus_watchlist").lower(),
+        holdings_path=Path(_env_value("HOLDINGS_PATH") or str(holdings_path)),
         watchlist_path=Path(_env_value("WATCHLIST_PATH") or str(watchlist_path)),
         include_watchlist=(os.getenv("INCLUDE_WATCHLIST", "true").strip().lower() in {"1", "true", "yes", "on"}),
         watchlist_max_weak_runs=int(os.getenv("WATCHLIST_MAX_WEAK_RUNS", "3")),

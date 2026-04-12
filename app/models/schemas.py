@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from app.models.enums import ActionLabel, ChartLabel, ConfidenceLabel
+from app.models.enums import ActionLabel, CandidateStatus, ChartLabel, ConfidenceLabel, HoldingStatus
 
 
 class UniverseStock(BaseModel):
@@ -14,6 +14,7 @@ class UniverseStock(BaseModel):
     market: str = "US"
     source: str = "manual"
     in_watchlist: bool = False
+    in_holdings: bool = False
 
 
 class PriceHistory(BaseModel):
@@ -81,6 +82,10 @@ class FinalAnalysis(BaseModel):
 class EvaluatedStock(BaseModel):
     ticker: str
     name: str
+    market: str = "US"
+    source: str = "manual"
+    in_watchlist: bool = False
+    in_holdings: bool = False
     chart_features: ChartFeatures
     chart_analysis: ChartAnalysis
     news_analysis: NewsAnalysis
@@ -90,7 +95,93 @@ class EvaluatedStock(BaseModel):
 class RejectedStock(BaseModel):
     ticker: str
     name: str
+    market: str = "US"
+    source: str = "manual"
+    in_holdings: bool = False
     reason: str
+
+
+class HoldingInput(BaseModel):
+    ticker: str
+    market: str = "US"
+
+
+class HoldingsInput(BaseModel):
+    kr: list[HoldingInput] = Field(default_factory=list)
+    us: list[HoldingInput] = Field(default_factory=list)
+
+
+class MarketIndexSnapshot(BaseModel):
+    label: str
+    symbol: str
+    close: float
+    change_pct: float
+
+
+class MacroSnapshot(BaseModel):
+    label: str
+    symbol: str
+    value: float
+    change_pct: float
+
+
+class MarketHeadline(BaseModel):
+    headline: str
+    summary: str
+    why_it_matters: str
+    source: str
+    published_at: datetime
+
+
+class MarketBriefing(BaseModel):
+    market: str
+    title: str
+    market_summary: str
+    index_snapshots: list[MarketIndexSnapshot] = Field(default_factory=list)
+    macro_snapshots: list[MacroSnapshot] = Field(default_factory=list)
+    flow_summary: list[str] = Field(default_factory=list)
+    strong_sectors: list[str] = Field(default_factory=list)
+    weak_sectors: list[str] = Field(default_factory=list)
+    key_events: list[str] = Field(default_factory=list)
+    key_headlines: list[MarketHeadline] = Field(default_factory=list)
+
+
+class HoldingBrief(BaseModel):
+    ticker: str
+    name: str
+    market: str
+    status_label: HoldingStatus
+    one_line_summary: str
+    key_points: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    check_points: list[str] = Field(default_factory=list)
+
+
+class CandidateBrief(BaseModel):
+    ticker: str
+    name: str
+    market: str
+    status_label: CandidateStatus
+    why_now: str
+    entry_logic: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    confirm_conditions: list[str] = Field(default_factory=list)
+
+
+class RejectionSummary(BaseModel):
+    reason: str
+    count: int
+
+
+class MarketRunSection(BaseModel):
+    market: str
+    title: str
+    market_briefing: MarketBriefing
+    holdings: list[HoldingBrief] = Field(default_factory=list)
+    candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
+    observe_briefs: list[CandidateBrief] = Field(default_factory=list)
+    rejection_summary: list[RejectionSummary] = Field(default_factory=list)
+    no_candidate_reason: list[str] = Field(default_factory=list)
 
 
 class RunResult(BaseModel):
@@ -99,6 +190,7 @@ class RunResult(BaseModel):
     candidates: list[EvaluatedStock]
     non_candidates: list[EvaluatedStock]
     screened_out: list[RejectedStock] = Field(default_factory=list)
+    market_sections: list[MarketRunSection] = Field(default_factory=list)
 
 
 class WatchlistEntry(BaseModel):

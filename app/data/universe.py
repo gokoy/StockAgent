@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 
 from app.config import AppConfig
+from app.data.holdings import load_holding_stocks
 from app.data.watchlist import load_watchlist
 from app.models.schemas import UniverseStock
 
@@ -14,6 +15,8 @@ def load_universe(symbols: list[str]) -> list[UniverseStock]:
 def resolve_scan_universe(config: AppConfig) -> list[UniverseStock]:
     stocks: list[UniverseStock] = []
     mode = config.universe_mode
+
+    stocks.extend(load_holding_stocks(config.holdings_path))
 
     if mode in {"manual", "discovery", "discovery_plus_watchlist"}:
         stocks.extend(_build_market_universe(config.us_universe_symbols, market="US", source="us_discovery"))
@@ -51,6 +54,9 @@ def _dedupe_universe(stocks: list[UniverseStock]) -> list[UniverseStock]:
             deduped[key] = stock
             continue
         existing = deduped[key]
-        if stock.in_watchlist and not existing.in_watchlist:
+        if stock.in_holdings and not existing.in_holdings:
+            deduped[key] = stock
+            continue
+        if stock.in_watchlist and not existing.in_watchlist and not existing.in_holdings:
             deduped[key] = stock
     return list(deduped.values())

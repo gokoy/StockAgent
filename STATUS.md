@@ -3,7 +3,7 @@
 ## 프로젝트 상태
 
 - 프로젝트명: StockAgent
-- 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist 구조 확장 진행중
+- 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist + 시장 브리핑 구조 확장 진행중
 - 마지막 업데이트: 2026-04-12
 
 ## 완료된 작업
@@ -58,6 +58,15 @@
 - US/KR discovery pool과 watchlist 병합 스캐폴딩 추가 완료
 - `watchlist.json` 저장/갱신 모듈 추가 완료
 - orchestrator의 watchlist 연동 기본 연결 완료
+- `data/inputs/holdings.json` 기반 보유 종목 입력 구조 추가 완료
+- 보유 종목을 universe에 자동 병합하는 로직 추가 완료
+- 한국/미국 시장 브리핑용 스키마와 리포트 구조 추가 완료
+- 실제 지수/거시/섹터/이벤트/핵심 뉴스 수집용 시장 브리핑 모듈 추가 완료
+- `pykrx` 설치 환경에서 한국 시장 수급 데이터를 사용하도록 확장 완료
+- Telegram 메시지를 시장 브리핑 -> 보유 종목 -> 신규 후보 구조로 전면 재구성 완료
+- Telegram 장문 메시지 자동 분할 전송 지원 추가 완료
+- `sample_result.json`을 새 브리핑 구조로 갱신 완료
+- workflow에 `HOLDINGS_PATH` 변수 경로 지원 추가 완료
 
 ## 현재 저장소 상태
 
@@ -95,12 +104,16 @@
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 - `gh` 설치 및 GitHub 인증 완료
-- 로컬 브랜치는 현재 `origin/master`보다 1커밋 앞서 있어 `pip cache` 변경은 아직 원격 workflow에 미반영 상태
+- 새 브리핑 구조 기준 `python3 -m compileall app main.py` 통과
+- 새 브리핑 구조 기준 `python -m app.main --self-check` 실행 확인 완료
+- 네트워크 미연결 로컬 환경에서도 시장 브리핑 기본 구조가 깨지지 않고 출력되는 것 확인 완료
 
 ## 다음 작업
 
-1. 수정된 config 기준으로 GitHub Actions 재실행 및 OpenAI fallback 해소 확인
-2. Anthropic/Gemini smoke test는 후순위로 보류
+1. 실제 네트워크/Secrets 환경에서 새 시장 브리핑 구조 1회 실행 검증
+2. `pykrx` 설치 환경 기준 한국 시장 수급 브리핑 실데이터 확인
+3. GitHub Actions 결과와 Telegram 메시지 길이/가독성 최종 튜닝
+4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 

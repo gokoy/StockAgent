@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from app.agents.llm_client import LLMClient
 from app.config import LLM_ROLES, load_config
-from app.orchestrator import run_scan
+from app.orchestrator import build_console_output, run_scan
 from app.reporting.telegram import send_telegram_test_message
 
 
@@ -48,7 +48,7 @@ def main() -> int:
         send_telegram=not args.no_telegram,
         max_stocks=args.limit,
     )
-    print(message)
+    print(build_console_output(result))
     print(f"candidate_count={result.candidate_count}")
     return 0
 
@@ -80,6 +80,7 @@ def run_self_check(config) -> str:
         f"us_universe_size={len(config.us_universe_symbols)}",
         f"kr_universe_size={len(config.kr_universe_symbols)}",
         f"include_watchlist={config.include_watchlist}",
+        f"holdings_path={config.holdings_path}",
         f"watchlist_path={config.watchlist_path}",
         f"watchlist_max_weak_runs={config.watchlist_max_weak_runs}",
     ]
