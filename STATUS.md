@@ -48,6 +48,7 @@
 - GitHub Actions `pip` cache 설정 추가 완료
 - `gh` CLI 설치 완료
 - GitHub Actions 실제 1회 검증 성공 완료
+- `yfinance.utils` 경고까지 포함하도록 FutureWarning 필터 범위 확장 완료
 - Python 기준 버전 3.14로 통일 완료
 - `pydantic`를 3.14 호환 버전으로 상향 완료
 - 임시 검증용 `.venv312` 제거 완료
@@ -84,6 +85,7 @@
 - GitHub Actions는 `actions/setup-python`의 `pip` cache를 사용하도록 설정됨
 - 성공한 GitHub Actions run `24301434435`에서 `latest.json`, `watchlist.json` artifact 업로드 확인 완료
 - 성공 run 산출물 기준 `candidate_count=0`, `NVDA/AVGO observe`, watchlist 2건 저장 확인 완료
+- 로컬 재검증에서 `yfinance` chained assignment 경고 없이 제한 스캔이 완료되는 것 확인 완료
 - Anthropic/Gemini smoke test는 API key 미주입 상태라 미실행
 - Telegram bot/chat 설정과 테스트 전송은 검증 완료
 - `gh` 설치 및 GitHub 인증 완료

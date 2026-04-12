@@ -15,7 +15,7 @@ def fetch_price_history(stock: UniverseStock, period: str = "9mo", interval: str
             "ignore",
             message=r".*ChainedAssignmentError: behaviour will change in pandas 3\.0!.*",
             category=FutureWarning,
-            module=r"yfinance\.scrapers\.history",
+            module=r"yfinance\.(scrapers\.history|utils)",
         )
         history = yf.Ticker(stock.ticker).history(period=period, interval=interval, auto_adjust=False)
     if history.empty:
