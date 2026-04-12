@@ -58,6 +58,11 @@ KR_NOISE_KEYWORDS = (
     "테마주",
 )
 
+LOW_SIGNAL_SOURCES = {
+    "ad hoc news",
+    "finimize",
+}
+
 
 def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
     query = f"{ticker} stock"
@@ -164,6 +169,7 @@ def _rank_event_news(items: list[NewsItem], market: str, limit: int) -> list[New
 
 def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[NewsItem]:
     seen: set[str] = set()
+    source_counts: dict[str, int] = {}
     scored: list[tuple[int, NewsItem]] = []
     for item in items:
         dedupe_key = _headline_dedupe_key(item.headline)
@@ -173,6 +179,12 @@ def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[New
         score = _score_market_news_item(item, market=market, event_mode=event_mode)
         if score <= 0:
             continue
+        source_key = item.source.strip().lower()
+        if source_key:
+            max_per_source = 1 if event_mode else 2
+            if source_counts.get(source_key, 0) >= max_per_source:
+                continue
+            source_counts[source_key] = source_counts.get(source_key, 0) + 1
         scored.append((score, item))
     scored.sort(key=lambda pair: (pair[0], pair[1].published_at), reverse=True)
     return [item for _, item in scored]
@@ -196,10 +208,14 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
         score += 2
     if item.source:
         score += 1
+        if item.source.strip().lower() in LOW_SIGNAL_SOURCES:
+            score -= 2
     return score
 
 
 def _headline_dedupe_key(headline: str) -> str:
     normalized = re.sub(r"[^a-z0-9가-힣 ]+", " ", headline.lower())
     tokens = [token for token in normalized.split() if token]
-    return " ".join(tokens[:12])
+    stopwords = {"the", "a", "an", "after", "ahead", "with", "and", "as", "in", "on", "of"}
+    tokens = [token for token in tokens if token not in stopwords]
+    return " ".join(tokens[:8])
