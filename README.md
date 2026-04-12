@@ -132,6 +132,8 @@ python -m app.main --telegram-test
 - `workflow_dispatch`
 - `schedule`
 
+이 workflow는 `actions/setup-python`의 `pip` 캐시를 사용하므로, 실행할 때마다 `pip install`은 수행하지만 패키지 다운로드는 재사용될 수 있다.
+
 GitHub Secrets에 아래 값을 설정한다.
 
 - `OPENAI_API_KEY`
