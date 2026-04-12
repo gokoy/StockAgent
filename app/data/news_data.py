@@ -2,11 +2,61 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
+import re
 from urllib.parse import quote_plus
 
 import feedparser
 
 from app.models.schemas import NewsItem
+
+US_MARKET_KEYWORDS = (
+    "s&p 500",
+    "nasdaq",
+    "dow",
+    "russell",
+    "treasury",
+    "yield",
+    "federal reserve",
+    "fed",
+    "cpi",
+    "ppi",
+    "payroll",
+    "inflation",
+    "earnings",
+    "oil",
+    "dollar",
+)
+
+KR_MARKET_KEYWORDS = (
+    "kospi",
+    "kosdaq",
+    "한국 증시",
+    "외국인",
+    "기관",
+    "개인",
+    "환율",
+    "원달러",
+    "반도체",
+    "수출",
+    "금리",
+    "정책",
+    "공시",
+    "실적",
+)
+
+US_NOISE_KEYWORDS = (
+    "etf",
+    "dividend etf",
+    "covered call",
+    "penny stock",
+    "top stocks to buy",
+)
+
+KR_NOISE_KEYWORDS = (
+    "추천주",
+    "급등주",
+    "테마주",
+)
 
 
 def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
@@ -59,40 +109,97 @@ def fetch_news_by_query(
 def fetch_market_news(market: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
     normalized = market.upper()
     if normalized == "KR":
-        return fetch_news_by_query(
+        items = fetch_news_by_query(
             query="KOSPI OR KOSDAQ OR 한국 증시 OR 원달러 환율 OR 반도체 업황",
             max_age_hours=max_age_hours,
-            limit=limit,
+            limit=max(limit * 3, 10),
             hl="ko",
             gl="KR",
             ceid="KR:ko",
         )
-    return fetch_news_by_query(
+        return _rank_market_news(items, market=normalized, limit=limit)
+    items = fetch_news_by_query(
         query="S&P 500 OR Nasdaq OR Treasury yield OR Federal Reserve OR US stocks",
         max_age_hours=max_age_hours,
-        limit=limit,
+        limit=max(limit * 3, 10),
         hl="en-US",
         gl="US",
         ceid="US:en",
     )
+    return _rank_market_news(items, market=normalized, limit=limit)
 
 
 def fetch_market_event_news(market: str, max_age_hours: int, limit: int = 3) -> list[NewsItem]:
     normalized = market.upper()
     if normalized == "KR":
-        return fetch_news_by_query(
+        items = fetch_news_by_query(
             query="한국 증시 일정 OR 한국은행 OR 환율 OR 정부 정책 OR 실적 발표",
             max_age_hours=max_age_hours,
-            limit=limit,
+            limit=max(limit * 3, 9),
             hl="ko",
             gl="KR",
             ceid="KR:ko",
         )
-    return fetch_news_by_query(
+        return _rank_event_news(items, market=normalized, limit=limit)
+    items = fetch_news_by_query(
         query="CPI OR FOMC OR payrolls OR earnings OR options expiration OR Treasury yield",
         max_age_hours=max_age_hours,
-        limit=limit,
+        limit=max(limit * 3, 9),
         hl="en-US",
         gl="US",
         ceid="US:en",
     )
+    return _rank_event_news(items, market=normalized, limit=limit)
+
+
+def _rank_market_news(items: list[NewsItem], market: str, limit: int) -> list[NewsItem]:
+    ranked = _rank_news(items, market=market, event_mode=False)
+    return ranked[:limit]
+
+
+def _rank_event_news(items: list[NewsItem], market: str, limit: int) -> list[NewsItem]:
+    ranked = _rank_news(items, market=market, event_mode=True)
+    return ranked[:limit]
+
+
+def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[NewsItem]:
+    seen: set[str] = set()
+    scored: list[tuple[int, NewsItem]] = []
+    for item in items:
+        dedupe_key = _headline_dedupe_key(item.headline)
+        if not dedupe_key or dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        score = _score_market_news_item(item, market=market, event_mode=event_mode)
+        if score <= 0:
+            continue
+        scored.append((score, item))
+    scored.sort(key=lambda pair: (pair[0], pair[1].published_at), reverse=True)
+    return [item for _, item in scored]
+
+
+def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> int:
+    text = f"{item.headline} {item.summary}".lower()
+    keywords = KR_MARKET_KEYWORDS if market == "KR" else US_MARKET_KEYWORDS
+    noise_keywords = KR_NOISE_KEYWORDS if market == "KR" else US_NOISE_KEYWORDS
+    score = 0
+
+    for keyword in keywords:
+        if keyword in text:
+            score += 3 if event_mode else 2
+
+    for keyword in noise_keywords:
+        if keyword in text:
+            score -= 3
+
+    if "cpi" in text or "fomc" in text or "yield" in text or "실적" in text or "환율" in text:
+        score += 2
+    if item.source:
+        score += 1
+    return score
+
+
+def _headline_dedupe_key(headline: str) -> str:
+    normalized = re.sub(r"[^a-z0-9가-힣 ]+", " ", headline.lower())
+    tokens = [token for token in normalized.split() if token]
+    return " ".join(tokens[:12])
