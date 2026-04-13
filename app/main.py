@@ -90,6 +90,7 @@ def run_self_check(config) -> str:
         f"telegram_enabled={config.telegram_enabled}",
         f"universe_size={len(config.universe_symbols)}",
         f"universe_mode={config.universe_mode}",
+        f"us_universe_source={config.us_universe_source}",
         f"us_universe_size={len(config.us_universe_symbols)}",
         f"kr_universe_size={len(config.kr_universe_symbols)}",
         f"include_watchlist={config.include_watchlist}",

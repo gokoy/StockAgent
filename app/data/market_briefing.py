@@ -9,7 +9,7 @@ from app.agents.macro_agent import analyze_market_regime
 from app.config import load_config
 from app.data.market_data import fetch_latest_close_change
 from app.data.news_data import fetch_market_event_news, fetch_market_news
-from app.data.sector_data import get_sector_snapshot
+from app.data.sector_data import get_sector_snapshot, get_sector_strength_details
 from app.models.schemas import MacroSnapshot, MarketBriefing, MarketHeadline, MarketIndexSnapshot
 
 try:
@@ -53,6 +53,7 @@ def build_market_briefing(market: str, run_at: datetime, max_news_age_hours: int
         weak_sectors=sector_snapshot["weak"],
         key_events=_build_key_events(event_items),
         key_headlines=[_to_market_headline(item, normalized) for item in news_items],
+        sector_strength_details=get_sector_strength_details(normalized),
     )
     regime = analyze_market_regime(market_briefing)
     return market_briefing.model_copy(update={"market_summary": regime.market_summary or _compose_market_summary(market_briefing)})

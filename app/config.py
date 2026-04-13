@@ -40,6 +40,7 @@ class AppConfig:
     universe_symbols: list[str]
     us_universe_symbols: list[str]
     kr_universe_symbols: list[str]
+    us_universe_source: str
     universe_mode: str
     holdings_path: Path
     kr_flow_path: Path
@@ -215,6 +216,7 @@ def load_config() -> AppConfig:
         universe_symbols=_parse_universe(_env_value("STOCK_UNIVERSE")),
         us_universe_symbols=_parse_universe(_env_value("US_STOCK_UNIVERSE") or _env_value("STOCK_UNIVERSE")),
         kr_universe_symbols=_parse_kr_universe(_env_value("KR_STOCK_UNIVERSE")),
+        us_universe_source=(_env_value("US_UNIVERSE_SOURCE") or "curated").lower(),
         universe_mode=(_env_value("UNIVERSE_MODE") or "discovery_plus_watchlist").lower(),
         holdings_path=Path(_env_value("HOLDINGS_PATH") or str(holdings_path)),
         kr_flow_path=Path(_env_value("KR_FLOW_PATH") or str(kr_flow_path)),

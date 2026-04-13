@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import datetime
 import warnings
 
 import pandas as pd
@@ -63,3 +64,57 @@ def fetch_company_names(stocks: Iterable[UniverseStock]) -> dict[str, str]:
         except Exception:
             names[stock.ticker] = stock.name
     return names
+
+
+def fetch_upcoming_earnings_date(symbol: str) -> str | None:
+    try:
+        ticker = yf.Ticker(symbol)
+        calendar = getattr(ticker, "calendar", None)
+        if calendar is None:
+            return None
+        if hasattr(calendar, "empty") and calendar.empty:
+            return None
+
+        value = None
+        if hasattr(calendar, "index") and "Earnings Date" in getattr(calendar, "index", []):
+            raw = calendar.loc["Earnings Date"]
+            if hasattr(raw, "iloc"):
+                value = raw.iloc[0]
+            else:
+                value = raw
+        elif isinstance(calendar, dict):
+            value = calendar.get("Earnings Date")
+
+        if value is None:
+            return None
+        if isinstance(value, (list, tuple)) and value:
+            value = value[0]
+        if hasattr(value, "to_pydatetime"):
+            value = value.to_pydatetime()
+        if isinstance(value, datetime):
+            return value.strftime("%Y-%m-%d")
+        value_str = str(value).strip()
+        return value_str[:10] if value_str else None
+    except Exception:
+        return None
+
+
+def fetch_forward_return(symbol: str, start_date: str, trading_days: int) -> float | None:
+    try:
+        history = fetch_symbol_history(symbol, period="18mo", interval="1d").copy()
+        history = history.dropna(subset=["date", "close"]).reset_index(drop=True)
+        date_only = pd.to_datetime(history["date"]).dt.strftime("%Y-%m-%d")
+        matches = history.index[date_only >= start_date].tolist()
+        if not matches:
+            return None
+        start_idx = matches[0]
+        end_idx = start_idx + trading_days
+        if end_idx >= len(history):
+            return None
+        start_close = float(history.loc[start_idx, "close"])
+        end_close = float(history.loc[end_idx, "close"])
+        if not start_close:
+            return None
+        return ((end_close / start_close) - 1.0) * 100
+    except Exception:
+        return None

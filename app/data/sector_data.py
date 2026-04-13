@@ -47,3 +47,39 @@ def get_sector_snapshot(market: str, top_n: int = 2) -> dict[str, list[str]]:
         "strong": strong,
         "weak": weak,
     }
+
+
+def get_sector_strength_details(market: str) -> list[dict]:
+    sector_map = KR_SECTOR_SYMBOLS if market.upper() == "KR" else US_SECTOR_SYMBOLS
+    scores: list[tuple[str, float]] = []
+    for sector_name, symbols in sector_map.items():
+        returns = []
+        for symbol in symbols:
+            try:
+                returns.append(fetch_trailing_return(symbol, lookback_days=20))
+            except Exception:
+                continue
+        if not returns:
+            continue
+        scores.append((sector_name, sum(returns) / len(returns)))
+
+    if not scores:
+        return []
+
+    benchmark = sum(score for _, score in scores) / len(scores)
+    details = []
+    for name, score in sorted(scores, key=lambda item: item[1], reverse=True):
+        if score >= benchmark + 2:
+            label = "strong"
+        elif score <= benchmark - 2:
+            label = "weak"
+        else:
+            label = "mixed"
+        details.append(
+            {
+                "sector_name": name,
+                "sector_relative_strength": round(score - benchmark, 2),
+                "sector_trend_label": label,
+            }
+        )
+    return details

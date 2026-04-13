@@ -3,7 +3,7 @@
 ## 프로젝트 상태
 
 - 프로젝트명: StockAgent
-- 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist + 시장 브리핑 구조 운영 정리 완료
+- 현재 단계: Phase 1.5 운영형 브리핑 도구 완료, Phase 2 핵심 기능 구현 진행중
 - 마지막 업데이트: 2026-04-14
 
 ## 완료된 작업
@@ -183,10 +183,16 @@
 - Telegram 메시지 길이 초과 시 자동 분할 전송 경로 재검증 완료
 - README를 단기/중기 추천 구조와 이벤트 중심 리포트 기준으로 다시 갱신 완료
 - 뉴스 소스 전략에 `Google News RSS + Reuters 우선순위`를 추가하고 시장/종목/이벤트 뉴스 랭킹에 반영 완료
+- `US_UNIVERSE_SOURCE` 설정과 Wikipedia 기반 `S&P 500`, `Nasdaq-100`, 결합 universe 자동 확장 지원 추가 완료
+- 보유/추천 종목 체크 포인트에 `예상 실적 발표일` 기반 기업 이벤트 보강 완료
+- `data/performance/recommendations.jsonl` 추천 기록 저장과 `performance_summary.json` 성과 요약 생성 추가 완료
+- `macro_agent`, `sector_data`, `evaluation`, `portfolio` placeholder를 실제 동작하는 최소 기능으로 확장 완료
+- 시장 브리핑 결과 JSON과 리포트에 `추천 자세`, `리스크 플래그`, `섹터 강도` 노출 추가 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
+2. Phase 2 세부 정교화: 성과 지표 확장, 조건별 성과 비교, backtest 심화, sizing 고도화
 
 ## 메모
 

@@ -39,7 +39,7 @@ def _format_market_section_html(section: MarketRunSection) -> list[str]:
         f"<b>{escape(_flag_for_market(section.market))} {escape(section.title)}</b>",
         "",
         "<b>🧭 시장 메모</b>",
-        *[escape(line) for line in _market_lines_telegram(section.market_briefing)],
+        *[escape(line) for line in _market_lines_telegram(section)],
         "",
         "<b>📦 보유 종목</b>",
     ]
@@ -81,7 +81,7 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
         "========================",
         "",
         "🧭 시장 메모",
-        *_market_lines(section.market_briefing),
+        *_market_lines(section),
         "",
         "📦 보유 종목",
     ]
@@ -116,8 +116,14 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
     return lines
 
 
-def _market_lines(briefing: MarketBriefing) -> list[str]:
+def _market_lines(section: MarketRunSection) -> list[str]:
+    briefing = section.market_briefing
     lines = [f"- 요약: {briefing.market_summary}"]
+    if section.macro_analysis:
+        lines.append(f"- 추천 자세: {section.macro_analysis.recommended_posture}")
+        if section.macro_analysis.risk_flags:
+            lines.append("- 리스크 플래그:")
+            lines.extend(f"  • {flag}" for flag in section.macro_analysis.risk_flags[:4])
     special_lines = _special_market_lines(briefing)
     if special_lines:
         lines.append("- 특이 흐름:")
@@ -135,11 +141,23 @@ def _market_lines(briefing: MarketBriefing) -> list[str]:
         for item in briefing.key_headlines[:3]:
             lines.append(f"  • {item.headline}")
             lines.append(f"    - 왜 중요한가: {item.why_it_matters}")
+    if briefing.sector_strength_details:
+        lines.append("- 섹터 강도:")
+        for item in briefing.sector_strength_details[:3]:
+            lines.append(
+                f"  • {item['sector_name']}: 상대강도 {item['sector_relative_strength']:+.2f}, 추세 {item['sector_trend_label']}"
+            )
     return lines
 
 
-def _market_lines_telegram(briefing: MarketBriefing) -> list[str]:
+def _market_lines_telegram(section: MarketRunSection) -> list[str]:
+    briefing = section.market_briefing
     lines = [f"• 요약: {_truncate(briefing.market_summary, 100)}"]
+    if section.macro_analysis:
+        lines.append(f"• 추천 자세: {_truncate(section.macro_analysis.recommended_posture, 90)}")
+        if section.macro_analysis.risk_flags:
+            lines.append("• 리스크 플래그")
+            lines.extend(f"  - {_truncate(flag, 100)}" for flag in section.macro_analysis.risk_flags[:3])
     special_lines = _special_market_lines(briefing)
     if special_lines:
         lines.append("• 특이 흐름")
@@ -156,6 +174,12 @@ def _market_lines_telegram(briefing: MarketBriefing) -> list[str]:
         for item in briefing.key_headlines[:2]:
             lines.append(f"  - {_truncate(item.headline, 100)}")
             lines.append(f"    · {_truncate(item.why_it_matters, 100)}")
+    if briefing.sector_strength_details:
+        lines.append("• 섹터 강도")
+        for item in briefing.sector_strength_details[:2]:
+            lines.append(
+                f"  - {item['sector_name']} | 상대강도 {item['sector_relative_strength']:+.2f} | {item['sector_trend_label']}"
+            )
     return lines
 
 

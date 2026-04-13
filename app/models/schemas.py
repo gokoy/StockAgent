@@ -144,6 +144,7 @@ class MarketBriefing(BaseModel):
     weak_sectors: list[str] = Field(default_factory=list)
     key_events: list[str] = Field(default_factory=list)
     key_headlines: list[MarketHeadline] = Field(default_factory=list)
+    sector_strength_details: list[dict] = Field(default_factory=list)
 
 
 class HoldingBrief(BaseModel):
@@ -181,6 +182,7 @@ class MarketRunSection(BaseModel):
     market: str
     title: str
     market_briefing: MarketBriefing
+    macro_analysis: MarketRegimeAnalysis | None = None
     holdings: list[HoldingBrief] = Field(default_factory=list)
     short_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     mid_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)

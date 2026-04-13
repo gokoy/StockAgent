@@ -44,6 +44,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 ### 시장/종목 가격 데이터
 
 - 미국/한국 종목 가격, 거래량, 지수: `yfinance`
+- 미국 discovery universe는 `US_UNIVERSE_SOURCE=curated|sp500|nasdaq100|sp500_plus_nasdaq100`로 확장할 수 있다.
 
 ### 뉴스 데이터
 
@@ -315,6 +316,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 
 - `market_sections`
 - `market_briefing`
+- `macro_analysis`
 - `holdings`
 - `candidate_briefs`
 - `observe_briefs`
@@ -322,6 +324,11 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 - `no_candidate_reason`
 
 샘플 파일: [data/outputs/sample_result.json](/Users/young/PycharmProjects/StockAgent/data/outputs/sample_result.json)
+
+추가로 Phase 2 준비용 평가 파일도 저장된다.
+
+- [data/performance/recommendations.jsonl](/Users/young/PycharmProjects/StockAgent/data/performance/recommendations.jsonl)
+- [data/performance/performance_summary.json](/Users/young/PycharmProjects/StockAgent/data/performance/performance_summary.json)
 
 ## 어떻게 실행하나
 
@@ -391,6 +398,7 @@ workflow 파일: [.github/workflows/stock_scan.yml](/Users/young/PycharmProjects
 - `LLM_MODEL_FINAL`
 - `HOLDINGS_PATH`
 - `KR_FLOW_PATH`
+- `US_UNIVERSE_SOURCE`
 - `MIN_PRICE_US`
 - `MIN_PRICE_KR`
 - `MIN_AVG_VOLUME`

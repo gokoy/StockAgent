@@ -304,7 +304,7 @@ watchlist 운영 예외:
 4. threshold 조정
 5. GitHub Actions 실제 1회 검증
 
-## Phase 2 Placeholder 범위
+## Phase 2 구현 범위
 
 ### Macro Agent
 
@@ -338,6 +338,15 @@ watchlist 운영 예외:
 
 - 조건별 성과 비교 기본 구조
 - 포트폴리오 비중 제안 placeholder
+
+현재 구현 방향:
+
+- `macro_agent.py`는 시장 국면, 추천 자세, 리스크 플래그를 실제 브리핑과 저장 JSON에 반영한다.
+- `sector_data.py`는 상대강도와 추세 라벨을 가진 섹터 강도 상세 데이터를 생성한다.
+- `evaluation/tracker.py`는 실행 결과를 `recommendations.jsonl`로 누적 저장한다.
+- `evaluation/performance.py`는 5/10/20일 후 수익률 요약 파일을 생성한다.
+- `evaluation/backtest_stub.py`는 저장된 추천 기록을 기준으로 기본 성과 집계를 반환한다.
+- `portfolio/sizing_stub.py`는 점수와 시장 국면을 반영한 기본 비중 제안을 반환한다.
 
 ## Definition Of Done
 

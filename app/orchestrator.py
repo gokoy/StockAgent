@@ -6,14 +6,17 @@ from zoneinfo import ZoneInfo
 from app.agents.chart_agent import analyze_chart
 from app.agents.final_agent import analyze_final_decision
 from app.agents.llm_client import LLMClient
+from app.agents.macro_agent import analyze_market_regime
 from app.agents.news_agent import analyze_news
 from app.chart.features import build_chart_features
 from app.config import AppConfig
 from app.data.market_briefing import build_market_briefing
-from app.data.market_data import fetch_company_names, fetch_price_history
+from app.data.market_data import fetch_company_names, fetch_price_history, fetch_upcoming_earnings_date
 from app.data.news_data import fetch_latest_news
 from app.data.universe import resolve_scan_universe
 from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
+from app.evaluation.performance import summarize_performance
+from app.evaluation.tracker import record_recommendation
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
 from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunResult
 from app.reporting.formatter import format_console_report, format_telegram_message, format_telegram_messages_by_market
@@ -108,6 +111,8 @@ def run_scan(
         market_sections=_build_market_sections(run_at, candidates, non_candidates, screened_out, config),
     )
     save_run_result(result, config.output_dir)
+    record_recommendation(result, config.performance_dir)
+    summarize_performance(config.performance_dir)
     if config.include_watchlist:
         watchlist_state = load_watchlist(config.watchlist_path)
         updated_watchlist = update_watchlist_from_run(watchlist_state, result, config.watchlist_max_weak_runs)
@@ -165,11 +170,15 @@ def _build_market_sections(
         rejection_summary = _summarize_rejections(rejected)
         no_candidate_reason = _build_no_candidate_reason(market_candidates, observe_candidates, rejection_summary)
 
+        market_briefing = build_market_briefing(market, run_at, config.max_news_age_hours)
+        macro_analysis = analyze_market_regime(market_briefing)
+
         sections.append(
             MarketRunSection(
                 market=market,
                 title=title,
-                market_briefing=build_market_briefing(market, run_at, config.max_news_age_hours),
+                market_briefing=market_briefing,
+                macro_analysis=macro_analysis,
                 holdings=[_to_holding_brief(stock) for stock in holdings],
                 short_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "short", config),
                 mid_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "mid", config),
@@ -187,6 +196,7 @@ def _to_holding_brief(stock: EvaluatedStock) -> HoldingBrief:
     mid_score = _mid_term_score(stock)
     short_status = _holding_status_for_score(short_score)
     mid_status = _holding_status_for_score(mid_score)
+    earnings_note = _earnings_event_note(stock.ticker)
     return HoldingBrief(
         ticker=stock.ticker,
         name=stock.name,
@@ -197,11 +207,12 @@ def _to_holding_brief(stock: EvaluatedStock) -> HoldingBrief:
         mid_term_summary=_holding_summary_for_horizon(stock, "mid", mid_score),
         key_points=_limit_points(stock.chart_analysis.positive_signals + [stock.news_analysis.headline_summary], 4),
         risks=_limit_points(stock.final_analysis.main_risks, 3),
-        check_points=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if], 3),
+        check_points=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if, earnings_note], 4),
     )
 
 
 def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus, horizon: str = "swing", score: int | None = None) -> CandidateBrief:
+    earnings_note = _earnings_event_note(stock.ticker)
     return CandidateBrief(
         ticker=stock.ticker,
         name=stock.name,
@@ -215,7 +226,7 @@ def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus, horizon:
         ),
         entry_logic=_limit_points(stock.chart_analysis.positive_signals + [stock.chart_analysis.why_now], 3),
         risks=_limit_points(stock.final_analysis.main_risks, 3),
-        confirm_conditions=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if], 3),
+        confirm_conditions=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if, earnings_note], 4),
     )
 
 
@@ -382,3 +393,10 @@ def _holding_summary_for_horizon(stock: EvaluatedStock, horizon: str, score: int
     if not features.above_ma120:
         return "중기 기준 장기 이동평균 아래에 머물러 재점검이 필요하다."
     return "중기 기준 보유 논리가 약해져 다시 점검해야 한다."
+
+
+def _earnings_event_note(ticker: str) -> str:
+    earnings_date = fetch_upcoming_earnings_date(ticker)
+    if not earnings_date:
+        return ""
+    return f"예상 실적 발표일 {earnings_date} 전후 변동성 확대 가능성을 확인한다."
