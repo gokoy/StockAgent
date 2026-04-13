@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 from app.agents.llm_client import LLMClient
 from app.config import LLM_ROLES, load_config
-from app.data.holdings import count_holdings
+from app.data.holdings import count_holdings, holdings_summary, load_holding_stocks
+from app.data.market_data import fetch_company_names
 from app.orchestrator import build_console_output, run_scan
 from app.reporting.telegram import send_telegram_test_message
 
@@ -23,6 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--telegram-test", action="store_true", help="Send a Telegram connectivity test message")
     parser.add_argument("--no-telegram", action="store_true", help="Skip Telegram delivery")
     parser.add_argument("--self-check", action="store_true", help="Print local configuration and dependency status")
+    parser.add_argument("--holdings-preview", action="store_true", help="Preview holdings tickers and resolved names")
     parser.add_argument("--llm-smoke", action="store_true", help="Run a minimal structured output smoke test")
     parser.add_argument("--llm-role", default="default", choices=LLM_ROLES, help="Role to use for the LLM smoke test")
     parser.add_argument("--limit", type=int, default=None, help="Limit the number of symbols processed")
@@ -35,6 +37,9 @@ def main() -> int:
     config = load_config()
     if args.self_check:
         print(run_self_check(config))
+        return 0
+    if args.holdings_preview:
+        print(run_holdings_preview(config))
         return 0
     if args.telegram_test:
         ok = send_telegram_test_message(config)
@@ -104,6 +109,26 @@ def run_llm_smoke(config, role: str = "default") -> str:
         role=role,
     )
     return result.model_dump_json()
+
+
+def run_holdings_preview(config) -> str:
+    items = holdings_summary(config.holdings_path)
+    if not items:
+        return f"holdings_path={config.holdings_path}\nholdings_total=0\n보유 종목 없음"
+
+    stocks = load_holding_stocks(config.holdings_path)
+    resolved_names = fetch_company_names(stocks)
+    lines = [
+        f"holdings_path={config.holdings_path}",
+        f"holdings_total={len(items)}",
+    ]
+    for item in items:
+        ticker = item["ticker"]
+        market = item["market"]
+        name = resolved_names.get(ticker, ticker).strip() or ticker
+        resolved = "yes" if name != ticker else "no"
+        lines.append(f"{market} {ticker} | name={name} | resolved_name={resolved}")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

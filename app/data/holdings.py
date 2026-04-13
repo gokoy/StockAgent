@@ -32,6 +32,16 @@ def count_holdings(path: Path) -> dict[str, int]:
     }
 
 
+def holdings_summary(path: Path) -> list[dict[str, str]]:
+    holdings = load_holdings(path)
+    summary: list[dict[str, str]] = []
+    for item in holdings.kr:
+        summary.append({"ticker": item.ticker.upper(), "market": (item.market or "KR").upper()})
+    for item in holdings.us:
+        summary.append({"ticker": item.ticker.upper(), "market": (item.market or "US").upper()})
+    return summary
+
+
 def _to_universe_stock(item: HoldingInput, default_market: str) -> UniverseStock:
     market = (item.market or default_market).upper()
     return UniverseStock(
