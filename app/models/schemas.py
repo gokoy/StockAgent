@@ -164,6 +164,7 @@ class CandidateBrief(BaseModel):
     ticker: str
     name: str
     market: str
+    sector_name: str = ""
     horizon: str
     score: int
     status_label: CandidateStatus
@@ -171,6 +172,8 @@ class CandidateBrief(BaseModel):
     entry_logic: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     confirm_conditions: list[str] = Field(default_factory=list)
+    suggested_weight_pct: int | None = None
+    sizing_reason: str = ""
 
 
 class RejectionSummary(BaseModel):

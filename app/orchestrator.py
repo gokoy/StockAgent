@@ -13,12 +13,14 @@ from app.config import AppConfig
 from app.data.market_briefing import build_market_briefing
 from app.data.market_data import fetch_company_names, fetch_price_history, fetch_upcoming_earnings_date
 from app.data.news_data import fetch_latest_news
+from app.data.sector_data import infer_sector_name
 from app.data.universe import resolve_scan_universe
 from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
 from app.evaluation.performance import summarize_performance
 from app.evaluation.tracker import record_recommendation
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
 from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunResult
+from app.portfolio.sizing_stub import suggest_position_size
 from app.reporting.formatter import format_console_report, format_telegram_message, format_telegram_messages_by_market
 from app.reporting.storage import save_run_result
 from app.reporting.telegram import send_telegram_messages
@@ -172,6 +174,7 @@ def _build_market_sections(
 
         market_briefing = build_market_briefing(market, run_at, config.max_news_age_hours)
         macro_analysis = analyze_market_regime(market_briefing)
+        sector_biases = _sector_bias_map(market_briefing.sector_strength_details)
 
         sections.append(
             MarketRunSection(
@@ -179,11 +182,46 @@ def _build_market_sections(
                 title=title,
                 market_briefing=market_briefing,
                 macro_analysis=macro_analysis,
-                holdings=[_to_holding_brief(stock) for stock in holdings],
-                short_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "short", config),
-                mid_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "mid", config),
-                candidate_briefs=[_to_candidate_brief(stock, CandidateStatus.BUY) for stock in new_candidates],
-                observe_briefs=[_to_candidate_brief(stock, CandidateStatus.WATCH) for stock in observe_candidates[:3]],
+                holdings=[
+                    _to_holding_brief(
+                        stock,
+                        macro_score=macro_analysis.macro_score,
+                        sector_biases=sector_biases,
+                    )
+                    for stock in holdings
+                ],
+                short_term_candidate_briefs=_build_horizon_candidate_briefs(
+                    recommendation_pool,
+                    "short",
+                    config,
+                    macro_analysis.macro_score,
+                    sector_biases,
+                ),
+                mid_term_candidate_briefs=_build_horizon_candidate_briefs(
+                    recommendation_pool,
+                    "mid",
+                    config,
+                    macro_analysis.macro_score,
+                    sector_biases,
+                ),
+                candidate_briefs=[
+                    _to_candidate_brief(
+                        stock,
+                        CandidateStatus.BUY,
+                        macro_score=macro_analysis.macro_score,
+                        sector_biases=sector_biases,
+                    )
+                    for stock in new_candidates
+                ],
+                observe_briefs=[
+                    _to_candidate_brief(
+                        stock,
+                        CandidateStatus.WATCH,
+                        macro_score=macro_analysis.macro_score,
+                        sector_biases=sector_biases,
+                    )
+                    for stock in observe_candidates[:3]
+                ],
                 rejection_summary=rejection_summary,
                 no_candidate_reason=no_candidate_reason,
             )
@@ -191,9 +229,14 @@ def _build_market_sections(
     return sections
 
 
-def _to_holding_brief(stock: EvaluatedStock) -> HoldingBrief:
-    short_score = _short_term_score(stock)
-    mid_score = _mid_term_score(stock)
+def _to_holding_brief(
+    stock: EvaluatedStock,
+    macro_score: int = 50,
+    sector_biases: dict[str, int] | None = None,
+) -> HoldingBrief:
+    biases = sector_biases or {}
+    short_score = _short_term_score(stock, macro_score, biases)
+    mid_score = _mid_term_score(stock, macro_score, biases)
     short_status = _holding_status_for_score(short_score)
     mid_status = _holding_status_for_score(mid_score)
     earnings_note = _earnings_event_note(stock.ticker)
@@ -211,22 +254,51 @@ def _to_holding_brief(stock: EvaluatedStock) -> HoldingBrief:
     )
 
 
-def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus, horizon: str = "swing", score: int | None = None) -> CandidateBrief:
+def _to_candidate_brief(
+    stock: EvaluatedStock,
+    status: CandidateStatus,
+    horizon: str = "swing",
+    score: int | None = None,
+    macro_score: int = 50,
+    sector_biases: dict[str, int] | None = None,
+) -> CandidateBrief:
     earnings_note = _earnings_event_note(stock.ticker)
+    sector_name, sector_score_adjustment, sector_note = _sector_adjustment(stock, sector_biases or {})
+    effective_score = score if score is not None else stock.final_analysis.final_score
+    sizing = suggest_position_size(
+        final_score=effective_score,
+        macro_score=macro_score,
+        action_label=stock.final_analysis.action_label.value,
+        horizon=horizon,
+    )
     return CandidateBrief(
         ticker=stock.ticker,
         name=stock.name,
         market=stock.market,
+        sector_name=sector_name,
         horizon=horizon,
-        score=score if score is not None else stock.final_analysis.final_score,
+        score=effective_score,
         status_label=status,
         rationale_points=_limit_points(
-            [stock.final_analysis.summary_reason, stock.chart_analysis.why_now, stock.news_analysis.headline_summary],
+            [
+                stock.final_analysis.summary_reason,
+                stock.chart_analysis.why_now,
+                stock.news_analysis.headline_summary,
+                sector_note,
+                _macro_note(macro_score),
+            ],
             3,
         ),
-        entry_logic=_limit_points(stock.chart_analysis.positive_signals + [stock.chart_analysis.why_now], 3),
+        entry_logic=_limit_points(stock.chart_analysis.positive_signals + [stock.chart_analysis.why_now, sector_note], 3),
         risks=_limit_points(stock.final_analysis.main_risks, 3),
         confirm_conditions=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if, earnings_note], 4),
+        suggested_weight_pct=sizing.get("suggested_weight_pct"),
+        sizing_reason=_join_non_empty(
+            [
+                sizing.get("reason", ""),
+                f"섹터 보정 {sector_score_adjustment:+d}점 반영" if sector_name and sector_score_adjustment else "",
+            ]
+        ),
     )
 
 
@@ -234,10 +306,16 @@ def _build_horizon_candidate_briefs(
     stocks: list[EvaluatedStock],
     horizon: str,
     config: AppConfig,
+    macro_score: int,
+    sector_biases: dict[str, int],
 ) -> list[CandidateBrief]:
     scored: list[tuple[int, CandidateBrief]] = []
     for stock in stocks:
-        score = _short_term_score(stock) if horizon == "short" else _mid_term_score(stock)
+        score = (
+            _short_term_score(stock, macro_score, sector_biases)
+            if horizon == "short"
+            else _mid_term_score(stock, macro_score, sector_biases)
+        )
         status = _candidate_status_for_score(
             score,
             config.short_term_buy_score if horizon == "short" else config.mid_term_buy_score,
@@ -247,7 +325,19 @@ def _build_horizon_candidate_briefs(
             status = CandidateStatus.WATCH
         if status == CandidateStatus.NONE:
             continue
-        scored.append((score, _to_candidate_brief(stock, status, horizon=horizon, score=score)))
+        scored.append(
+            (
+                score,
+                _to_candidate_brief(
+                    stock,
+                    status,
+                    horizon=horizon,
+                    score=score,
+                    macro_score=macro_score,
+                    sector_biases=sector_biases,
+                ),
+            )
+        )
     scored.sort(key=lambda item: item[0], reverse=True)
     return [item for _, item in scored[: config.top_n_candidates]]
 
@@ -304,7 +394,7 @@ def _normalize_rejection_reason(reason: str) -> str:
     }
     return mapping.get(reason, reason)
 
-def _short_term_score(stock: EvaluatedStock) -> int:
+def _short_term_score(stock: EvaluatedStock, macro_score: int, sector_biases: dict[str, int]) -> int:
     features = stock.chart_features
     score = stock.chart_analysis.chart_score * 0.45 + stock.news_analysis.news_score * 0.2 + stock.final_analysis.final_score * 0.35
     if features.above_ma20:
@@ -325,10 +415,12 @@ def _short_term_score(stock: EvaluatedStock) -> int:
         score -= 8
     if features.recent_sharp_runup:
         score -= 6
+    score += _macro_score_adjustment(macro_score, horizon="short")
+    score += _sector_adjustment(stock, sector_biases)[1]
     return max(0, min(100, int(round(score))))
 
 
-def _mid_term_score(stock: EvaluatedStock) -> int:
+def _mid_term_score(stock: EvaluatedStock, macro_score: int, sector_biases: dict[str, int]) -> int:
     features = stock.chart_features
     score = stock.chart_analysis.chart_score * 0.4 + stock.news_analysis.news_score * 0.2 + stock.final_analysis.final_score * 0.4
     if features.above_ma60:
@@ -347,6 +439,8 @@ def _mid_term_score(stock: EvaluatedStock) -> int:
         score -= 5
     if features.recent_sharp_runup:
         score -= 3
+    score += _macro_score_adjustment(macro_score, horizon="mid")
+    score += _sector_adjustment(stock, sector_biases)[1]
     return max(0, min(100, int(round(score))))
 
 
@@ -400,3 +494,55 @@ def _earnings_event_note(ticker: str) -> str:
     if not earnings_date:
         return ""
     return f"예상 실적 발표일 {earnings_date} 전후 변동성 확대 가능성을 확인한다."
+
+
+def _sector_bias_map(details: list[dict]) -> dict[str, int]:
+    mapping: dict[str, int] = {}
+    for item in details:
+        sector_name = str(item.get("sector_name", "")).strip()
+        label = str(item.get("sector_trend_label", "")).strip()
+        if not sector_name or not label:
+            continue
+        if label == "strong":
+            mapping[sector_name] = 3
+        elif label == "weak":
+            mapping[sector_name] = -3
+        else:
+            mapping[sector_name] = 0
+    return mapping
+
+
+def _sector_adjustment(stock: EvaluatedStock, sector_biases: dict[str, int]) -> tuple[str, int, str]:
+    sector_name = infer_sector_name(stock.market, stock.ticker)
+    if not sector_name:
+        return "", 0, ""
+    bias = sector_biases.get(sector_name, 0)
+    if bias > 0:
+        return sector_name, bias, f"{sector_name} 섹터 강도가 우호적이라 추천 점수에 가산했다."
+    if bias < 0:
+        return sector_name, bias, f"{sector_name} 섹터 강도가 약해 추천 점수에 감산했다."
+    return sector_name, 0, f"{sector_name} 섹터 흐름은 중립 수준이다."
+
+
+def _macro_score_adjustment(macro_score: int, horizon: str) -> int:
+    if macro_score >= 70:
+        return 4 if horizon == "short" else 5
+    if macro_score >= 60:
+        return 2 if horizon == "short" else 3
+    if macro_score < 40:
+        return -5 if horizon == "short" else -6
+    if macro_score < 50:
+        return -2 if horizon == "short" else -3
+    return 0
+
+
+def _macro_note(macro_score: int) -> str:
+    if macro_score >= 65:
+        return "시장 국면 점수가 우호적이라 신규 접근 부담이 낮은 편이다."
+    if macro_score < 45:
+        return "시장 국면 점수가 낮아 신규 접근은 보수적으로 보는 편이 좋다."
+    return "시장 국면은 중립 수준이라 종목 단위 선별이 중요하다."
+
+
+def _join_non_empty(values: list[str]) -> str:
+    return " / ".join([value for value in values if value])

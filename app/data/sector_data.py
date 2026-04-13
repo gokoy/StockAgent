@@ -4,14 +4,14 @@ from app.data.market_data import fetch_trailing_return
 
 
 US_SECTOR_SYMBOLS: dict[str, list[str]] = {
-    "기술": ["XLK", "SOXX"],
+    "기술": ["XLK", "SOXX", "AAPL", "MSFT"],
     "반도체": ["SOXX", "NVDA", "AVGO"],
     "금융": ["XLF"],
     "에너지": ["XLE"],
     "헬스케어": ["XLV"],
     "산업재": ["XLI"],
-    "소비재": ["XLY", "XLP"],
-    "커뮤니케이션": ["XLC"],
+    "소비재": ["XLY", "XLP", "AMZN", "TSLA"],
+    "커뮤니케이션": ["XLC", "META", "GOOGL"],
     "부동산": ["XLRE"],
 }
 
@@ -83,3 +83,12 @@ def get_sector_strength_details(market: str) -> list[dict]:
             }
         )
     return details
+
+
+def infer_sector_name(market: str, ticker: str) -> str:
+    sector_map = KR_SECTOR_SYMBOLS if market.upper() == "KR" else US_SECTOR_SYMBOLS
+    normalized = ticker.upper()
+    for sector_name, symbols in sector_map.items():
+        if normalized in {symbol.upper() for symbol in symbols}:
+            return sector_name
+    return ""

@@ -188,11 +188,15 @@
 - `data/performance/recommendations.jsonl` 추천 기록 저장과 `performance_summary.json` 성과 요약 생성 추가 완료
 - `macro_agent`, `sector_data`, `evaluation`, `portfolio` placeholder를 실제 동작하는 최소 기능으로 확장 완료
 - 시장 브리핑 결과 JSON과 리포트에 `추천 자세`, `리스크 플래그`, `섹터 강도` 노출 추가 완료
+- 단기/중기 후보 점수에 시장 국면 점수와 섹터 강도 보정을 직접 반영 완료
+- 단기/중기 후보 브리핑에 `섹터명`, `제안 비중`, `비중 산정 이유` 노출 추가 완료
+- `recommendations.jsonl` 저장 로직을 날짜/티커 기준 정리 방식으로 수정해 반복 실행 중복 누적 완화 완료
+- `performance_summary.json`에 `by_sector`, `by_macro_bucket`, `by_chart_bucket` 그룹 비교 요약 추가 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-2. Phase 2 세부 정교화: 성과 지표 확장, 조건별 성과 비교, backtest 심화, sizing 고도화
+2. Phase 2 심화: 최대 상승폭/최대 낙폭, 조건 조합별 비교, 백테스트 로직 구체화
 
 ## 메모
 

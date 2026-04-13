@@ -325,10 +325,24 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 
 샘플 파일: [data/outputs/sample_result.json](/Users/young/PycharmProjects/StockAgent/data/outputs/sample_result.json)
 
-추가로 Phase 2 준비용 평가 파일도 저장된다.
+추가로 Phase 2 평가 파일도 저장된다.
 
 - [data/performance/recommendations.jsonl](/Users/young/PycharmProjects/StockAgent/data/performance/recommendations.jsonl)
 - [data/performance/performance_summary.json](/Users/young/PycharmProjects/StockAgent/data/performance/performance_summary.json)
+
+이 파일에는 아래 비교가 포함된다.
+
+- `by_action`: 후보/관찰 상태별 성과
+- `by_market`: 한국/미국 시장별 성과
+- `by_sector`: 섹터별 성과
+- `by_macro_bucket`: 시장 국면 구간별 성과
+- `by_chart_bucket`: 차트 점수 구간별 성과
+
+단기/중기 추천 브리핑에는 아래 값도 함께 노출된다.
+
+- `sector_name`: 종목이 속한 섹터 추정값
+- `suggested_weight_pct`: 기본 제안 비중
+- `sizing_reason`: 점수, 시장 국면, 섹터 보정이 어떻게 반영됐는지에 대한 짧은 설명
 
 ## 어떻게 실행하나
 

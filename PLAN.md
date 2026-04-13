@@ -343,10 +343,11 @@ watchlist 운영 예외:
 
 - `macro_agent.py`는 시장 국면, 추천 자세, 리스크 플래그를 실제 브리핑과 저장 JSON에 반영한다.
 - `sector_data.py`는 상대강도와 추세 라벨을 가진 섹터 강도 상세 데이터를 생성한다.
-- `evaluation/tracker.py`는 실행 결과를 `recommendations.jsonl`로 누적 저장한다.
-- `evaluation/performance.py`는 5/10/20일 후 수익률 요약 파일을 생성한다.
-- `evaluation/backtest_stub.py`는 저장된 추천 기록을 기준으로 기본 성과 집계를 반환한다.
-- `portfolio/sizing_stub.py`는 점수와 시장 국면을 반영한 기본 비중 제안을 반환한다.
+- `orchestrator.py`는 단기/중기 후보 점수에 시장 국면 점수와 섹터 강도 보정을 직접 반영한다.
+- `evaluation/tracker.py`는 실행 결과를 `recommendations.jsonl`로 날짜/티커 기준 정리해 저장한다.
+- `evaluation/performance.py`는 5/10/20일 후 수익률 요약과 함께 action, market, sector, macro bucket, chart bucket별 비교 요약을 생성한다.
+- `evaluation/backtest_stub.py`는 저장된 추천 기록을 기준으로 기본 성과 집계와 그룹별 비교 결과를 반환한다.
+- `portfolio/sizing_stub.py`는 점수와 시장 국면을 반영한 기본 비중 제안을 반환하고, 브리핑에 제안 비중을 노출한다.
 
 ## Definition Of Done
 

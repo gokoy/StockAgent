@@ -28,6 +28,11 @@ def summarize_performance(performance_dir: Path) -> dict:
         "avg_return_5d": _avg([item["return_5d"] for item in evaluated]),
         "avg_return_10d": _avg([item["return_10d"] for item in evaluated]),
         "avg_return_20d": _avg([item["return_20d"] for item in evaluated]),
+        "by_action": _group_summary(evaluated, key="action_label"),
+        "by_market": _group_summary(evaluated, key="market"),
+        "by_sector": _group_summary(evaluated, key_func=_sector_name),
+        "by_macro_bucket": _group_summary(evaluated, key_func=_macro_bucket),
+        "by_chart_bucket": _group_summary(evaluated, key_func=_chart_bucket),
         "records": evaluated[-50:],
     }
     target = performance_dir / "performance_summary.json"
@@ -41,3 +46,44 @@ def _avg(values: list[float | None]) -> float | None:
     if not usable:
         return None
     return round(sum(usable) / len(usable), 2)
+
+
+def _group_summary(records: list[dict], key: str | None = None, key_func=None) -> dict:
+    grouped: dict[str, list[dict]] = {}
+    for record in records:
+        group_key = key_func(record) if key_func else str(record.get(key, "unknown"))
+        grouped.setdefault(group_key, []).append(record)
+    summary: dict[str, dict] = {}
+    for group_key, items in grouped.items():
+        summary[group_key] = {
+            "count": len(items),
+            "avg_return_5d": _avg([item["return_5d"] for item in items]),
+            "avg_return_10d": _avg([item["return_10d"] for item in items]),
+            "avg_return_20d": _avg([item["return_20d"] for item in items]),
+        }
+    return summary
+
+
+def _chart_bucket(record: dict) -> str:
+    chart_score = int(record.get("chart_score", 0))
+    if chart_score >= 70:
+        return "chart_strong"
+    if chart_score >= 55:
+        return "chart_mid"
+    return "chart_weak"
+
+
+def _sector_name(record: dict) -> str:
+    return str(record.get("sector_name") or "sector_unknown")
+
+
+def _macro_bucket(record: dict) -> str:
+    macro_score = record.get("macro_score")
+    if macro_score is None:
+        return "macro_unknown"
+    value = int(macro_score)
+    if value >= 65:
+        return "macro_risk_on"
+    if value >= 50:
+        return "macro_neutral"
+    return "macro_cautious"

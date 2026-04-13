@@ -246,8 +246,11 @@ def _format_holding_text(item: HoldingBrief) -> list[str]:
 
 def _format_candidate_html(item: CandidateBrief) -> list[str]:
     horizon_emoji = "⚡" if item.horizon == "short" else "🏗️"
+    title = f"<b>• {escape(item.name)} | {escape(item.ticker)}</b>"
+    if item.sector_name:
+        title += f" <i>({escape(item.sector_name)})</i>"
     lines = [
-        f"<b>• {escape(item.name)} | {escape(item.ticker)}</b>",
+        title,
         f"  {horizon_emoji} 점수: {item.score} | 상태: {escape(_candidate_status_text(item.status_label))}",
     ]
     if item.rationale_points:
@@ -262,13 +265,20 @@ def _format_candidate_html(item: CandidateBrief) -> list[str]:
     if item.confirm_conditions:
         lines.append("  - 확인 조건")
         lines.extend(f"    • {escape(_truncate(point, 100))}" for point in item.confirm_conditions[:3])
+    if item.suggested_weight_pct:
+        lines.append(f"  - 제안 비중: {item.suggested_weight_pct}%")
+        if item.sizing_reason:
+            lines.append(f"    • {escape(_truncate(item.sizing_reason, 100))}")
     return lines
 
 
 def _format_candidate_text(item: CandidateBrief) -> list[str]:
     horizon_emoji = "⚡" if item.horizon == "short" else "🏗️"
+    title = f"- {item.name} | {item.ticker}"
+    if item.sector_name:
+        title += f" ({item.sector_name})"
     lines = [
-        f"- {item.name} | {item.ticker}",
+        title,
         f"  {horizon_emoji} 점수: {item.score} | 상태: {_candidate_status_text(item.status_label)}",
     ]
     if item.rationale_points:
@@ -283,6 +293,10 @@ def _format_candidate_text(item: CandidateBrief) -> list[str]:
     if item.confirm_conditions:
         lines.append("  - 확인 조건")
         lines.extend(f"    • {point}" for point in item.confirm_conditions[:3])
+    if item.suggested_weight_pct:
+        lines.append(f"  - 제안 비중: {item.suggested_weight_pct}%")
+        if item.sizing_reason:
+            lines.append(f"    • {item.sizing_reason}")
     return lines
 
 
