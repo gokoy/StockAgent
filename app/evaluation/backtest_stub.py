@@ -20,6 +20,7 @@ def run_backtest_stub(performance_dir: Path) -> dict:
         "avg_max_upside_20d": summary.get("avg_max_upside_20d"),
         "avg_max_drawdown_20d": summary.get("avg_max_drawdown_20d"),
         "reward_risk_ratio_20d": summary.get("reward_risk_ratio_20d"),
+        "scenario_results": summary.get("scenario_results", {}),
         "by_action": summary.get("by_action", {}),
         "by_market": summary.get("by_market", {}),
         "by_sector": summary.get("by_sector", {}),

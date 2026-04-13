@@ -135,6 +135,22 @@ def fetch_forward_path_stats(symbol: str, start_date: str, trading_days: int) ->
         return _empty_forward_stats(trading_days)
 
 
+def fetch_forward_close_path(symbol: str, start_date: str, trading_days: int) -> list[float]:
+    try:
+        history = fetch_symbol_history(symbol, period="18mo", interval="1d").copy()
+        history = history.dropna(subset=["date", "close"]).reset_index(drop=True)
+        date_only = pd.to_datetime(history["date"]).dt.strftime("%Y-%m-%d")
+        matches = history.index[date_only >= start_date].tolist()
+        if not matches:
+            return []
+        start_idx = matches[0]
+        end_idx = min(start_idx + trading_days, len(history) - 1)
+        closes = history.loc[start_idx:end_idx, "close"].dropna().astype(float).tolist()
+        return closes
+    except Exception:
+        return []
+
+
 def _empty_forward_stats(trading_days: int) -> dict[str, float | None]:
     return {
         f"return_{trading_days}d": None,

@@ -41,6 +41,17 @@ jobs:
         run: |
           python scripts/update_kr_flow_snapshot.py --source auto --output "${KR_FLOW_PATH:-data/inputs/kr_flow_snapshot.json}" || true
 
+      - name: Prepare event calendar snapshot
+        continue-on-error: true
+        env:
+          HOLDINGS_PATH: ${{ vars.HOLDINGS_PATH }}
+          EVENT_CALENDAR_PATH: ${{ vars.EVENT_CALENDAR_PATH }}
+          US_STOCK_UNIVERSE: ${{ vars.US_STOCK_UNIVERSE }}
+          KR_STOCK_UNIVERSE: ${{ vars.KR_STOCK_UNIVERSE }}
+          US_UNIVERSE_SOURCE: ${{ vars.US_UNIVERSE_SOURCE }}
+        run: |
+          python scripts/update_event_calendar.py --output "${EVENT_CALENDAR_PATH:-data/inputs/event_calendar.json}" || true
+
       - name: Run swing scan
         env:
           LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'openai' }}
@@ -50,8 +61,10 @@ jobs:
           LLM_MODEL_FINAL: ${{ vars.LLM_MODEL_FINAL }}
           LLM_MODEL_MACRO: ${{ vars.LLM_MODEL_MACRO }}
           UNIVERSE_MODE: ${{ vars.UNIVERSE_MODE || 'discovery_plus_watchlist' }}
+          US_UNIVERSE_SOURCE: ${{ vars.US_UNIVERSE_SOURCE || 'curated' }}
           HOLDINGS_PATH: ${{ vars.HOLDINGS_PATH }}
           KR_FLOW_PATH: ${{ vars.KR_FLOW_PATH }}
+          EVENT_CALENDAR_PATH: ${{ vars.EVENT_CALENDAR_PATH }}
           KR_FLOW_KOSPI_FOREIGN: ${{ vars.KR_FLOW_KOSPI_FOREIGN }}
           KR_FLOW_KOSPI_INSTITUTION: ${{ vars.KR_FLOW_KOSPI_INSTITUTION }}
           KR_FLOW_KOSPI_INDIVIDUAL: ${{ vars.KR_FLOW_KOSPI_INDIVIDUAL }}
@@ -83,4 +96,11 @@ jobs:
         with:
           name: stockagent-outputs
           path: data/outputs/*.json
+          if-no-files-found: warn
+
+      - name: Upload performance outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: stockagent-performance
+          path: data/performance/*.json
           if-no-files-found: warn

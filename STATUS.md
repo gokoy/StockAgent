@@ -197,11 +197,15 @@
 - 실행 시 `backtest_summary.json` 자동 생성 연결 완료
 - `backtest_summary.json`과 `performance_summary.json`에 `win_rate_*`, `reward_risk_ratio_20d` 추가 완료
 - 시장별 단기/중기 추천 섹션 아래 `포트폴리오 가이드` 추가 완료
+- `EVENT_CALENDAR_PATH` 구조화 이벤트 파일 경로와 `scripts/update_event_calendar.py` 자동 생성 경로 추가 완료
+- 시장 브리핑이 `event_calendar.json`과 뉴스 기반 이벤트를 함께 반영하도록 갱신 완료
+- `scripts/update_kr_flow_snapshot.py`에 `Naver 증권` best-effort fallback 추가 완료
+- 백테스트 시나리오 `scenario_tp10_sl5_20d`, `scenario_tp15_sl7_20d` 추가 완료
 
 ## 다음 작업
 
-1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-2. 외부 데이터 제약이 풀리면 한국 수급 자동화와 이벤트 캘린더 정밀도 보강
+1. 한국 수급 Naver 경로가 실제 데이터 행을 반환하는 날짜/페이지 패턴을 추가 검증하고 parser 보강
+2. 공식 경제 캘린더 또는 유료 소스를 붙일 수 있으면 event calendar 정확도 추가 개선
 
 ## 메모
 

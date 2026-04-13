@@ -42,6 +42,8 @@ data/outputs/*
 !data/outputs/sample_result.json
 data/performance/*
 !data/performance/.gitkeep
+data/inputs/event_calendar.json
+data/inputs/kr_flow_snapshot.json
 
 # Local environment files
 .env

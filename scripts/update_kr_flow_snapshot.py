@@ -3,8 +3,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime
+import re
+from datetime import datetime, timedelta
+from html import unescape
 from pathlib import Path
+
+import requests
 
 try:
     from pykrx import stock as krx_stock
@@ -16,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Update Korean market investor flow snapshot")
     parser.add_argument("--output", default="data/inputs/kr_flow_snapshot.json", help="Output JSON path")
     parser.add_argument("--date", default=datetime.now().strftime("%Y-%m-%d"), help="As-of date in YYYY-MM-DD")
-    parser.add_argument("--source", choices=("auto", "manual", "pykrx"), default="auto", help="Snapshot source")
+    parser.add_argument("--source", choices=("auto", "manual", "pykrx", "naver"), default="auto", help="Snapshot source")
     parser.add_argument("--print-template", action="store_true", help="Print a manual snapshot template and exit")
     return parser
 
@@ -39,6 +43,16 @@ def main() -> int:
             return 0
         if args.source == "pykrx":
             print("kr_flow_snapshot_failed source=pykrx")
+            return 1
+
+    if args.source in {"auto", "naver"}:
+        payload = _naver_payload(args.date)
+        if payload:
+            output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(f"kr_flow_snapshot_written source=naver path={output_path}")
+            return 0
+        if args.source == "naver":
+            print("kr_flow_snapshot_failed source=naver")
             return 1
 
     payload = _manual_payload(args.date)
@@ -90,6 +104,72 @@ def _manual_payload(as_of_date: str) -> dict[str, dict[str, str]]:
             "individual": os.getenv("KR_FLOW_KOSDAQ_INDIVIDUAL", "").strip(),
         },
     }
+
+
+def _naver_payload(as_of_date: str) -> dict[str, dict[str, str]] | None:
+    base_date = datetime.strptime(as_of_date, "%Y-%m-%d")
+    payload: dict[str, dict[str, str]] = {}
+    for market_name, sosok in (("KOSPI", "0"), ("KOSDAQ", "1")):
+        parsed = None
+        for offset in range(0, 14):
+            target_date = (base_date - timedelta(days=offset)).strftime("%Y%m%d")
+            parsed = _fetch_naver_market_row(target_date, sosok)
+            if parsed:
+                payload[market_name] = {
+                    "as_of": parsed["date"],
+                    "foreign": parsed["foreign"],
+                    "institution": parsed["institution"],
+                    "individual": parsed["individual"],
+                }
+                break
+    return payload or None
+
+
+def _fetch_naver_market_row(target_date: str, sosok: str) -> dict[str, str] | None:
+    url = f"https://finance.naver.com/sise/investorDealTrendDay.naver?bizdate={target_date}&sosok={sosok}&page=1"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers, timeout=15)
+    response.raise_for_status()
+    html = response.text
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S):
+        cells = [
+            _strip_html(cell)
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S)
+        ]
+        if len(cells) < 4:
+            continue
+        if not re.match(r"\d{4}\.\d{2}\.\d{2}", cells[0]):
+            continue
+        return {
+            "date": cells[0].replace(".", "-"),
+            "individual": _signed_from_cell(cells[1]),
+            "foreign": _signed_from_cell(cells[2]),
+            "institution": _signed_from_cell(cells[3]),
+        }
+    return None
+
+
+def _strip_html(value: str) -> str:
+    cleaned = re.sub(r"<br\s*/?>", " ", value, flags=re.I)
+    cleaned = re.sub(r"<[^>]+>", "", cleaned)
+    return " ".join(unescape(cleaned).split())
+
+
+def _signed_from_cell(value: str) -> str:
+    normalized = value.replace(",", "").replace(" ", "")
+    if not normalized:
+        return "-"
+    if normalized.startswith(("+", "-")):
+        try:
+            numeric = float(normalized)
+            return f"{numeric:+,.0f}억"
+        except Exception:
+            return value
+    try:
+        numeric = float(normalized)
+        return f"{numeric:+,.0f}억"
+    except Exception:
+        return value
 
 
 def _has_values(payload: dict[str, dict[str, str]]) -> bool:

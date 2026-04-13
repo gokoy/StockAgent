@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from app.data.market_data import fetch_forward_path_stats
+from app.data.market_data import fetch_forward_close_path, fetch_forward_path_stats
 from app.evaluation.tracker import load_recommendations
 
 
@@ -23,6 +23,8 @@ def summarize_performance(performance_dir: Path) -> dict:
             "return_20d": path_20d["return_20d"],
             "max_upside_20d": path_20d["max_upside_20d"],
             "max_drawdown_20d": path_20d["max_drawdown_20d"],
+            "scenario_tp10_sl5_20d": _simulate_exit_scenario(record["ticker"], record["run_at"], 20, take_profit_pct=10, stop_loss_pct=-5),
+            "scenario_tp15_sl7_20d": _simulate_exit_scenario(record["ticker"], record["run_at"], 20, take_profit_pct=15, stop_loss_pct=-7),
         }
         evaluated.append(item)
 
@@ -42,6 +44,7 @@ def summarize_performance(performance_dir: Path) -> dict:
             _avg([item["max_upside_20d"] for item in evaluated]),
             _avg([item["max_drawdown_20d"] for item in evaluated]),
         ),
+        "scenario_results": _scenario_summary(evaluated),
         "by_action": _group_summary(evaluated, key="action_label"),
         "by_market": _group_summary(evaluated, key="market"),
         "by_sector": _group_summary(evaluated, key_func=_sector_name),
@@ -100,6 +103,46 @@ def _group_summary(records: list[dict], key: str | None = None, key_func=None) -
                 _avg([item.get("max_upside_20d") for item in items]),
                 _avg([item.get("max_drawdown_20d") for item in items]),
             ),
+        }
+    return summary
+
+
+def _simulate_exit_scenario(
+    ticker: str,
+    start_date: str,
+    trading_days: int,
+    take_profit_pct: float,
+    stop_loss_pct: float,
+) -> dict:
+    closes = fetch_forward_close_path(ticker, start_date, trading_days)
+    if len(closes) < 2:
+        return {"result_pct": None, "exit_reason": "insufficient_data", "exit_day": None}
+    entry = float(closes[0])
+    for idx, close in enumerate(closes[1:], start=1):
+        pnl_pct = ((float(close) / entry) - 1.0) * 100
+        if pnl_pct >= take_profit_pct:
+            return {"result_pct": round(pnl_pct, 2), "exit_reason": "take_profit", "exit_day": idx}
+        if pnl_pct <= stop_loss_pct:
+            return {"result_pct": round(pnl_pct, 2), "exit_reason": "stop_loss", "exit_day": idx}
+    final_pct = ((float(closes[-1]) / entry) - 1.0) * 100
+    return {"result_pct": round(final_pct, 2), "exit_reason": "time_exit", "exit_day": len(closes) - 1}
+
+
+def _scenario_summary(records: list[dict]) -> dict:
+    scenarios = ("scenario_tp10_sl5_20d", "scenario_tp15_sl7_20d")
+    summary: dict[str, dict] = {}
+    for scenario in scenarios:
+        items = [record.get(scenario) for record in records if isinstance(record.get(scenario), dict)]
+        values = [item.get("result_pct") for item in items if item.get("result_pct") is not None]
+        reasons: dict[str, int] = {}
+        for item in items:
+            reason = str(item.get("exit_reason", "unknown"))
+            reasons[reason] = reasons.get(reason, 0) + 1
+        summary[scenario] = {
+            "count": len(items),
+            "avg_result_pct": _avg(values),
+            "win_rate": _win_rate(values),
+            "exit_reason_counts": reasons,
         }
     return summary
 

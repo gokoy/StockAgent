@@ -349,6 +349,8 @@ watchlist 운영 예외:
 - `evaluation/backtest_stub.py`는 저장된 추천 기록을 기준으로 기본 성과 집계와 그룹별 비교 결과를 반환하고 `backtest_summary.json`을 생성한다.
 - `portfolio/sizing_stub.py`는 점수와 시장 국면을 반영한 기본 비중 제안을 반환하고, 브리핑에 제안 비중을 노출한다.
 - `portfolio/sizing_stub.py`는 후보 목록 기준 총 제안 비중, 단일 종목 최대 비중, 운용 자세를 담은 시장별 포트폴리오 가이드를 생성한다.
+- `scripts/update_event_calendar.py`는 구조화 이벤트 파일을 생성하고, 시장 이벤트 뉴스와 예상 실적 발표일을 합쳐 `event_calendar.json`을 갱신한다.
+- `scripts/update_kr_flow_snapshot.py`는 `pykrx -> Naver 증권 -> manual snapshot` 순서로 한국 수급 snapshot 생성을 시도한다.
 
 ## Definition Of Done
 

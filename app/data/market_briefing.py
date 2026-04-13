@@ -7,6 +7,7 @@ import re
 
 from app.agents.macro_agent import analyze_market_regime
 from app.config import load_config
+from app.data.event_calendar import load_event_calendar
 from app.data.market_data import fetch_latest_close_change
 from app.data.news_data import fetch_market_event_news, fetch_market_news
 from app.data.sector_data import get_sector_snapshot, get_sector_strength_details
@@ -37,6 +38,7 @@ MACRO_SYMBOLS = {
 def build_market_briefing(market: str, run_at: datetime, max_news_age_hours: int) -> MarketBriefing:
     normalized = market.upper()
     title = MARKET_LABELS.get(normalized, normalized)
+    config = load_config()
     index_snapshots = _build_index_snapshots(normalized)
     macro_snapshots = _build_macro_snapshots(normalized)
     sector_snapshot = get_sector_snapshot(normalized)
@@ -48,10 +50,10 @@ def build_market_briefing(market: str, run_at: datetime, max_news_age_hours: int
         market_summary="",
         index_snapshots=index_snapshots,
         macro_snapshots=macro_snapshots,
-        flow_summary=_build_flow_summary(normalized, run_at),
+        flow_summary=_build_flow_summary(normalized, run_at, config.kr_flow_path),
         strong_sectors=sector_snapshot["strong"],
         weak_sectors=sector_snapshot["weak"],
-        key_events=_build_key_events(event_items),
+        key_events=_build_key_events(event_items, load_event_calendar(config.event_calendar_path, normalized)),
         key_headlines=[_to_market_headline(item, normalized) for item in news_items],
         sector_strength_details=get_sector_strength_details(normalized),
     )
@@ -95,10 +97,10 @@ def _build_macro_snapshots(market: str) -> list[MacroSnapshot]:
     return snapshots
 
 
-def _build_flow_summary(market: str, run_at: datetime) -> list[str]:
+def _build_flow_summary(market: str, run_at: datetime, snapshot_path: Path) -> list[str]:
     if market != "KR":
         return _build_us_flow_proxy()
-    return _build_kr_flow_summary(run_at)
+    return _build_kr_flow_summary(run_at, snapshot_path)
 
 
 def _build_us_flow_proxy() -> list[str]:
@@ -117,8 +119,8 @@ def _build_us_flow_proxy() -> list[str]:
     return messages
 
 
-def _build_kr_flow_summary(run_at: datetime) -> list[str]:
-    snapshot_messages = _load_kr_flow_snapshot(load_config().kr_flow_path)
+def _build_kr_flow_summary(run_at: datetime, snapshot_path: Path) -> list[str]:
+    snapshot_messages = _load_kr_flow_snapshot(snapshot_path)
     if snapshot_messages:
         return snapshot_messages
 
@@ -185,16 +187,30 @@ def _to_market_headline(item, market: str) -> MarketHeadline:
     )
 
 
-def _build_key_events(items) -> list[str]:
+def _build_key_events(items, structured_events: list[str] | None = None) -> list[str]:
     events = []
     seen: set[str] = set()
+    for event in structured_events or []:
+        canonical = _event_canonical_key(event)
+        if event and canonical not in seen:
+            seen.add(canonical)
+            events.append(event)
     for item in items:
         label = _normalize_event_label(item.headline.strip(), item.published_at)
-        if not label or label in seen:
+        canonical = _event_canonical_key(label)
+        if not label or canonical in seen:
             continue
-        seen.add(label)
+        seen.add(canonical)
         events.append(label)
     return events
+
+
+def _event_canonical_key(value: str) -> str:
+    return re.sub(
+        r"^\s*(\d{4}-\d{2}-\d{2}|\d{2}월 \d{2}일|[A-Z][a-z]{2} \d{2})\s+",
+        "",
+        value.strip(),
+    ).lower()
 
 
 def _normalize_event_label(headline: str, published_at: datetime) -> str:

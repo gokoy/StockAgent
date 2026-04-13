@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-04-14 09:00:00",
+  "KR": [
+    {
+      "date": "2026-04-23",
+      "title": "POSCO Holdings 실적 발표 예정",
+      "category": "earnings",
+      "importance": "medium",
+      "ticker": "005490.KS",
+      "source": "yfinance"
+    }
+  ],
+  "US": [
+    {
+      "date": "2026-04-30",
+      "title": "Meta Platforms, Inc. 실적 발표 예정",
+      "category": "earnings",
+      "importance": "medium",
+      "ticker": "META",
+      "source": "yfinance"
+    },
+    {
+      "date": "2026-05-01",
+      "title": "미국 CPI 관련 이벤트",
+      "category": "macro",
+      "importance": "high",
+      "source": "google_news"
+    }
+  ]
+}

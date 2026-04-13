@@ -58,7 +58,8 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 
 1. `KR_FLOW_PATH` 파일
 2. `pykrx` best-effort
-3. 둘 다 실패하면 fallback 문구
+3. `Naver 증권` 스크래핑 best-effort
+4. 셋 다 실패하면 fallback 문구
 
 `KR_FLOW_PATH`는 한국 시장 수급 값을 담은 JSON 파일 경로다. 기본값은 [kr_flow_snapshot.json](/Users/young/PycharmProjects/StockAgent/data/inputs/kr_flow_snapshot.json)이다.
 
@@ -66,7 +67,20 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 
 - 이 값은 항상 자동으로 갱신되는 실시간 데이터 경로가 아니다.
 - GitHub Actions에서 `KR_FLOW_*` Variables를 넣으면 workflow가 실행 전에 자동 생성할 수 있다.
-- 그렇지 않으면 수동 입력 파일 또는 `pykrx` 결과를 사용한다.
+- 그렇지 않으면 `pykrx`와 `Naver 증권` 경로를 순서대로 시도하고, 그래도 실패하면 수동 입력 파일 또는 fallback 문구를 사용한다.
+
+### 이벤트 캘린더 데이터
+
+- 구조화 이벤트 파일: `EVENT_CALENDAR_PATH`
+- 기본값: [event_calendar.json](/Users/young/PycharmProjects/StockAgent/data/inputs/event_calendar.json)
+- 자동 생성 스크립트: [update_event_calendar.py](/Users/young/PycharmProjects/StockAgent/scripts/update_event_calendar.py)
+
+이 파일은 아래 소스를 합쳐 만든다.
+
+- 시장 이벤트 뉴스 기반 주요 매크로 이벤트
+- 보유 종목과 discovery universe 주요 종목의 예상 실적 발표일
+
+즉 현재 이벤트는 `뉴스 기반 추정 + yfinance 실적 일정`의 혼합 구조다.
 
 ## 종목을 어떤 기준으로 보나
 
@@ -345,6 +359,9 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 - `return_5d`, `return_10d`, `return_20d`
 - `max_upside_20d`: 추천 후 20거래일 안에서의 최대 상승폭
 - `max_drawdown_20d`: 추천 후 20거래일 안에서의 최대 낙폭
+- `win_rate_5d`, `win_rate_10d`, `win_rate_20d`
+- `reward_risk_ratio_20d`
+- `scenario_results`: 익절/손절 시나리오 백테스트 결과
 
 단기/중기 추천 브리핑에는 아래 값도 함께 노출된다.
 
@@ -421,6 +438,7 @@ workflow 파일: [.github/workflows/stock_scan.yml](/Users/young/PycharmProjects
 - `LLM_MODEL_FINAL`
 - `HOLDINGS_PATH`
 - `KR_FLOW_PATH`
+- `EVENT_CALENDAR_PATH`
 - `US_UNIVERSE_SOURCE`
 - `MIN_PRICE_US`
 - `MIN_PRICE_KR`
@@ -447,15 +465,17 @@ workflow 파일: [.github/workflows/stock_scan.yml](/Users/young/PycharmProjects
 
 workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. 위 값이 있으면 한국 시장 수급 snapshot을 만들고, 없으면 조용히 건너뛴다.
 
+이벤트 캘린더는 workflow 실행 전에 `scripts/update_event_calendar.py`가 자동 생성한다.
+
 ## 현재 데이터 범위와 한계
 
 - 미국/한국 discovery universe는 아직 완전 시장 전체가 아니라 curated pool 중심이다.
 - 한국 시장 수급은 안정적인 무료 공식 실시간 API를 아직 확보하지 못했다.
-- 그래서 한국 수급은 `KR_FLOW_PATH` 또는 `pykrx optional` 구조로 운영한다.
-- 시장 이벤트는 경제 캘린더 API가 아니라 최신 시장 뉴스 기반 요약이다.
+- 그래서 한국 수급은 `KR_FLOW_PATH` + `pykrx` + `Naver 증권` best-effort 구조로 운영한다.
+- 시장 이벤트는 공식 경제 캘린더 API가 아니라 `구조화 event_calendar 파일 + 최신 시장 뉴스 + yfinance 실적 일정` 기반이다.
 - 뉴스는 Google News RSS 기반이라 source 품질과 정밀도는 계속 보강 대상이다.
 - 현재 뉴스 전략은 `Google News RSS + Reuters 우선순위` 구조다.
-- 주요 이벤트 문구는 현재 최신 이벤트성 뉴스의 발행일과 키워드를 정규화해서 보여준다.
+- 주요 이벤트 문구는 현재 구조화 이벤트 파일과 최신 이벤트성 뉴스의 날짜/키워드를 함께 정규화해서 보여준다.
 - 자동매매용 서비스가 아니라 의사결정 보조 도구다.
 
 ## 운영자가 매일 확인할 것

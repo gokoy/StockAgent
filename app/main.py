@@ -99,6 +99,7 @@ def run_self_check(config) -> str:
         f"holdings_kr={holdings['kr']}",
         f"holdings_us={holdings['us']}",
         f"kr_flow_path={config.kr_flow_path}",
+        f"event_calendar_path={config.event_calendar_path}",
         f"watchlist_path={config.watchlist_path}",
         f"watchlist_max_weak_runs={config.watchlist_max_weak_runs}",
     ]

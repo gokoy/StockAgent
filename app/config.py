@@ -44,6 +44,7 @@ class AppConfig:
     universe_mode: str
     holdings_path: Path
     kr_flow_path: Path
+    event_calendar_path: Path
     watchlist_path: Path
     include_watchlist: bool
     watchlist_max_weak_runs: int
@@ -173,6 +174,7 @@ def load_config() -> AppConfig:
     watchlist_path = output_dir / "watchlist.json"
     holdings_path = input_dir / "holdings.json"
     kr_flow_path = input_dir / "kr_flow_snapshot.json"
+    event_calendar_path = input_dir / "event_calendar.json"
     output_dir.mkdir(parents=True, exist_ok=True)
     input_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -220,6 +222,7 @@ def load_config() -> AppConfig:
         universe_mode=(_env_value("UNIVERSE_MODE") or "discovery_plus_watchlist").lower(),
         holdings_path=Path(_env_value("HOLDINGS_PATH") or str(holdings_path)),
         kr_flow_path=Path(_env_value("KR_FLOW_PATH") or str(kr_flow_path)),
+        event_calendar_path=Path(_env_value("EVENT_CALENDAR_PATH") or str(event_calendar_path)),
         watchlist_path=Path(_env_value("WATCHLIST_PATH") or str(watchlist_path)),
         include_watchlist=(os.getenv("INCLUDE_WATCHLIST", "true").strip().lower() in {"1", "true", "yes", "on"}),
         watchlist_max_weak_runs=int(os.getenv("WATCHLIST_MAX_WEAK_RUNS", "3")),
