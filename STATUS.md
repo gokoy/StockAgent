@@ -131,14 +131,14 @@
 - holdings 입력 모델 기본값 버그 수정으로 `kr` 섹션 종목이 `KR` 시장으로 올바르게 저장되는 것 확인 완료
 - 시장 뉴스와 종목 뉴스에 대한 저신호 source 배제 규칙 강화 완료
 - 샘플 holdings 기준 재실행에서 미국 시장 핵심 뉴스 잡음과 종목 뉴스 출처 품질이 개선된 것 확인 완료
+- 종목 뉴스의 `quote/forecast/price target` 성격 headline 추가 정제 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
-2. 종목 뉴스에서 `quote/forecast` 성격의 저가치 headline 추가 정제
-3. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
-4. GitHub Actions 기준 최신 뉴스 품질 재검증
-5. Anthropic/Gemini smoke test는 후순위로 보류
+2. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
+3. GitHub Actions 기준 최신 뉴스 품질 재검증
+4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 

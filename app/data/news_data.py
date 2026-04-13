@@ -300,11 +300,17 @@ def _score_stock_news_item(item: NewsItem) -> int:
     low_signal_patterns = (
         "top stocks to buy",
         "prediction:",
+        "stock quote price and forecast",
+        "stock quote",
+        "price target",
+        "forecast -",
+        "forecast:",
         "jim cramer",
         "best stock",
         "stocks to buy",
         "price prediction",
         "is it time to buy",
+        "reports earnings!!!",
     )
     for pattern in low_signal_patterns:
         if pattern in text:
