@@ -92,7 +92,6 @@ HIGH_SIGNAL_SOURCES = {
     "marketwatch",
     "ap news",
     "associated press",
-    "msn",
     "marketscreener.com",
     "yahoo finance",
 }
@@ -243,7 +242,7 @@ def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[New
         score = _score_market_news_item(item, market=market, event_mode=event_mode)
         if score <= 0:
             continue
-        source_key = item.source.strip().lower()
+        source_key = _normalized_source(item.source)
         if source_key:
             max_per_source = 1 if event_mode else 2
             if source_counts.get(source_key, 0) >= max_per_source:
@@ -305,6 +304,9 @@ def _score_stock_news_item(item: NewsItem) -> int:
         "price target",
         "forecast -",
         "forecast:",
+        "stock quote and forecast",
+        "stock reports earnings",
+        "turns positive for 2026",
         "jim cramer",
         "best stock",
         "stocks to buy",
@@ -318,6 +320,10 @@ def _score_stock_news_item(item: NewsItem) -> int:
 
     if "valuation after strong recent share price momentum" in text:
         score -= 3
+    if source == "msn" and any(pattern in text for pattern in ("stock quote", "forecast", "price target")):
+        return -100
+    if source == "cnn" and "forecast" in text:
+        return -100
 
     if any(word in text for word in ("earnings", "guidance", "forecast", "revenue", "deal", "data center", "chip", "ai")):
         score += 2

@@ -147,6 +147,7 @@ python -m app.main --telegram-test
 ```
 
 실제 Telegram 전송은 합본 1건이 아니라 `한국 시장`, `미국 시장`을 각각 별도 메시지로 보낸다. 콘솔 출력과 JSON 저장은 기존처럼 전체 실행 결과를 한 번에 유지한다.
+현재 GitHub Actions 기준으로도 이 시장별 2건 전송 포맷이 실제 산출물과 일관되게 동작하는 것을 확인했다.
 
 ## GitHub Actions
 

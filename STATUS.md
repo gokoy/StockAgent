@@ -137,12 +137,15 @@
 - 공공데이터포털 조사 기준 공식 주가 OpenAPI는 확인했지만, 한국 시장 외국인/기관/개인 수급을 바로 주는 안정적인 공식 OpenAPI는 아직 확인하지 못함
 - Telegram 전송을 합본 1건이 아니라 한국 시장/미국 시장 2건으로 분리 완료
 - 실제 holdings 파일이 비어 있는 상태에서도 `보유 종목 없음` 브리핑과 시장별 Telegram 분리 메시지가 정상 생성되는 것 확인 완료
+- 최신 GitHub Actions run `24321734534` 성공 및 시장별 Telegram 2건 재현 확인 완료
+- 최신 artifact 기준 한국 관찰 후보 `005930.KS`, `000660.KS`, 미국 매수 후보 `AMD`, 미국 관찰 후보 `AMZN/AVGO/AAPL` 확인 완료
+- 시장 뉴스 source 정규화와 `MSN/CNN` generic headline 추가 정제 완료
 
 ## 다음 작업
 
 1. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
 2. 한국 시장 수급 대체 소스는 `공식 API 부재` 전제에서 파일/스크래핑/유료 소스 중 하나로 재평가
-3. 종목 뉴스에서 `MSN/CNN` 계열 generic headline 추가 정제
+3. GitHub Actions Node 24 전환 대응 여부 점검
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
