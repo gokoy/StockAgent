@@ -4,7 +4,7 @@
 
 - 프로젝트명: StockAgent
 - 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist + 시장 브리핑 구조 확장 진행중
-- 마지막 업데이트: 2026-04-12
+- 마지막 업데이트: 2026-04-13
 
 ## 완료된 작업
 
@@ -129,13 +129,16 @@
 - `holdings.sample.json` 추가 완료
 - 샘플 holdings 검증에서 한국/미국 보유 종목 브리핑 섹션이 모두 정상 생성되는 것 확인 완료
 - holdings 입력 모델 기본값 버그 수정으로 `kr` 섹션 종목이 `KR` 시장으로 올바르게 저장되는 것 확인 완료
+- 시장 뉴스와 종목 뉴스에 대한 저신호 source 배제 규칙 강화 완료
+- 샘플 holdings 기준 재실행에서 미국 시장 핵심 뉴스 잡음과 종목 뉴스 출처 품질이 개선된 것 확인 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
-2. 미국 시장 핵심 뉴스 source 품질 필터 추가 개선
+2. 종목 뉴스에서 `quote/forecast` 성격의 저가치 headline 추가 정제
 3. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
-4. Anthropic/Gemini smoke test는 후순위로 보류
+4. GitHub Actions 기준 최신 뉴스 품질 재검증
+5. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 

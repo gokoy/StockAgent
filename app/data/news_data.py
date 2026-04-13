@@ -61,12 +61,54 @@ KR_NOISE_KEYWORDS = (
 LOW_SIGNAL_SOURCES = {
     "ad hoc news",
     "finimize",
+    "aol.com",
+    "invezz",
+    "thestreet.com",
+    "the street",
+    "benzinga",
+    "futubull",
+    "富途牛牛",
+    "the motley fool",
+    "motley fool",
+    "zacks",
+    "simplywall.st",
+    "quiver quantitative",
+    "tikr.com",
+    "nyse",
+    "seeking alpha",
+    "mshale",
+    "nai500",
+    "tipranks",
+    "marketbeat",
+}
+
+HIGH_SIGNAL_SOURCES = {
+    "reuters",
+    "bloomberg.com",
+    "cnbc",
+    "wsj",
+    "the wall street journal",
+    "financial times",
+    "marketwatch",
+    "ap news",
+    "associated press",
+    "msn",
+    "marketscreener.com",
+    "yahoo finance",
 }
 
 
 def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
     query = f"{ticker} stock"
-    return fetch_news_by_query(query=query, max_age_hours=max_age_hours, limit=limit, hl="en-US", gl="US", ceid="US:en")
+    items = fetch_news_by_query(
+        query=query,
+        max_age_hours=max_age_hours,
+        limit=max(limit * 4, 12),
+        hl="en-US",
+        gl="US",
+        ceid="US:en",
+    )
+    return _rank_stock_news(items, limit=limit)
 
 
 def fetch_news_by_query(
@@ -167,6 +209,28 @@ def _rank_event_news(items: list[NewsItem], market: str, limit: int) -> list[New
     return ranked[:limit]
 
 
+def _rank_stock_news(items: list[NewsItem], limit: int) -> list[NewsItem]:
+    seen: set[str] = set()
+    source_counts: dict[str, int] = {}
+    scored: list[tuple[int, NewsItem]] = []
+    for item in items:
+        dedupe_key = _headline_dedupe_key(item.headline)
+        if not dedupe_key or dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        score = _score_stock_news_item(item)
+        if score <= 0:
+            continue
+        source_key = _normalized_source(item.source)
+        if source_key:
+            if source_counts.get(source_key, 0) >= 1:
+                continue
+            source_counts[source_key] = source_counts.get(source_key, 0) + 1
+        scored.append((score, item))
+    scored.sort(key=lambda pair: (pair[0], pair[1].published_at), reverse=True)
+    return [item for _, item in scored[:limit]]
+
+
 def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[NewsItem]:
     seen: set[str] = set()
     source_counts: dict[str, int] = {}
@@ -204,12 +268,55 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
         if keyword in text:
             score -= 3
 
+    if market == "US" and any(pattern in text for pattern in ("etf", "dividend etf", "nyse |", "new york stock exchange |")):
+        return -100
+
     if "cpi" in text or "fomc" in text or "yield" in text or "실적" in text or "환율" in text:
         score += 2
     if item.source:
+        source = _normalized_source(item.source)
         score += 1
-        if item.source.strip().lower() in LOW_SIGNAL_SOURCES:
-            score -= 2
+        if _source_matches(source, HIGH_SIGNAL_SOURCES):
+            score += 2
+        if _source_matches(source, LOW_SIGNAL_SOURCES):
+            return -100
+    if market == "US" and any(word in text for word in ("tariff", "hormuz", "geopolitical", "oil")):
+        score += 1
+    return score
+
+
+def _score_stock_news_item(item: NewsItem) -> int:
+    text = f"{item.headline} {item.summary}".lower()
+    source = _normalized_source(item.source)
+    if _source_matches(source, LOW_SIGNAL_SOURCES):
+        return -100
+
+    score = 1
+    if _source_matches(source, HIGH_SIGNAL_SOURCES):
+        score += 3
+    elif source:
+        score += 1
+
+    low_signal_patterns = (
+        "top stocks to buy",
+        "prediction:",
+        "jim cramer",
+        "best stock",
+        "stocks to buy",
+        "price prediction",
+        "is it time to buy",
+    )
+    for pattern in low_signal_patterns:
+        if pattern in text:
+            score -= 3
+
+    if "valuation after strong recent share price momentum" in text:
+        score -= 3
+
+    if any(word in text for word in ("earnings", "guidance", "forecast", "revenue", "deal", "data center", "chip", "ai")):
+        score += 2
+    if any(word in text for word in ("lawsuit", "probe", "downgrade", "cut", "delay", "tariff")):
+        score += 1
     return score
 
 
@@ -219,3 +326,13 @@ def _headline_dedupe_key(headline: str) -> str:
     stopwords = {"the", "a", "an", "after", "ahead", "with", "and", "as", "in", "on", "of"}
     tokens = [token for token in tokens if token not in stopwords]
     return " ".join(tokens[:8])
+
+
+def _normalized_source(source: str) -> str:
+    return re.sub(r"\s+", " ", source.strip().lower())
+
+
+def _source_matches(source: str, candidates: set[str]) -> bool:
+    if not source:
+        return False
+    return any(candidate in source for candidate in candidates)
