@@ -122,12 +122,16 @@
 - 짧은 제한 스캔 재검증에서 미국 시장 핵심 뉴스 중복도가 낮아진 것 확인 완료
 - Telegram 전송 포맷을 시장별 핵심 요약 중심으로 추가 압축 완료
 - 콘솔 출력은 상세형 유지, Telegram 출력은 압축형 유지로 역할 분리 완료
+- 최신 GitHub Actions run `24320645108` 성공 확인 완료
+- 최신 artifact `latest.json` 기준 `candidate_count=2`, `AVGO/AMD` 후보 확인 완료
+- 최신 artifact로 복원한 Telegram 본문 길이 `2364`자로 분할 없이 안전 범위인 것 확인 완료
+- GitHub Actions 기준 최신 Telegram 압축 포맷이 실제 결과 JSON과 일관되게 생성되는 것 확인 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
-2. GitHub Actions 기준 새 Telegram 압축 포맷 실전 확인
-3. 미국 시장 핵심 뉴스 source 품질 필터 추가 개선
+2. 미국 시장 핵심 뉴스 source 품질 필터 추가 개선
+3. holdings 입력을 넣은 보유 종목 브리핑 실전 검증
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
