@@ -1,4 +1,11 @@
 {
-  "kr": [],
-  "us": []
+  "kr": [
+    { "ticker": "005490.KS" },
+    { "ticker": "097950.KS" },
+    { "ticker": "402340.KS" }
+  ],
+  "us": [
+    { "ticker": "TSLA" },
+    { "ticker": "META" }
+  ]
 }

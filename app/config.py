@@ -24,7 +24,8 @@ class AppConfig:
     output_dir: Path
     log_dir: Path
     performance_dir: Path
-    min_price: float
+    min_price_us: float
+    min_price_kr: float
     min_avg_volume: int
     top_n_candidates: int
     candidate_min_final_score: int
@@ -73,6 +74,9 @@ class AppConfig:
         if normalized == "macro":
             return self.llm_model_macro
         return self.llm_model_default
+
+    def min_price_for_market(self, market: str) -> float:
+        return self.min_price_kr if market.upper() == "KR" else self.min_price_us
 
 
 def _env_value(name: str) -> str | None:
@@ -191,7 +195,8 @@ def load_config() -> AppConfig:
         output_dir=output_dir,
         log_dir=log_dir,
         performance_dir=performance_dir,
-        min_price=float(os.getenv("MIN_PRICE", "10")),
+        min_price_us=float(os.getenv("MIN_PRICE_US", os.getenv("MIN_PRICE", "10"))),
+        min_price_kr=float(os.getenv("MIN_PRICE_KR", "5000")),
         min_avg_volume=int(os.getenv("MIN_AVG_VOLUME", "1000000")),
         top_n_candidates=int(os.getenv("TOP_N_CANDIDATES", "5")),
         candidate_min_final_score=int(os.getenv("CANDIDATE_MIN_FINAL_SCORE", "70")),

@@ -14,6 +14,7 @@ from app.models.schemas import ChartFeatures
 
 
 def build_chart_features(history: pd.DataFrame) -> ChartFeatures:
+    history = history.dropna(subset=["close", "high", "low", "volume"]).reset_index(drop=True)
     close = history["close"]
     last_close = float(close.iloc[-1])
     ma20 = moving_average(close, 20)

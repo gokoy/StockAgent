@@ -74,6 +74,8 @@ def run_self_check(config) -> str:
         f"llm_model_news={config.llm_model_news}",
         f"llm_model_final={config.llm_model_final}",
         f"llm_model_macro={config.llm_model_macro}",
+        f"min_price_us={config.min_price_us}",
+        f"min_price_kr={config.min_price_kr}",
         f"candidate_min_final_score={config.candidate_min_final_score}",
         f"observe_min_final_score={config.observe_min_final_score}",
         f"candidate_min_chart_score={config.candidate_min_chart_score}",

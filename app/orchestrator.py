@@ -32,7 +32,7 @@ def run_scan(
     run_at = datetime.now(ZoneInfo(timezone_name))
     stocks = resolve_scan_universe(config)
     if max_stocks is not None:
-        stocks = stocks[:max_stocks]
+        stocks = _limit_scan_stocks(stocks, max_stocks)
     company_names = fetch_company_names(stocks)
     stocks = [stock.model_copy(update={"name": company_names.get(stock.ticker, stock.name)}) for stock in stocks]
     candidates: list[EvaluatedStock] = []
@@ -42,8 +42,8 @@ def run_scan(
     for stock in stocks:
         try:
             history = fetch_price_history(stock)
-            passed, reason = screen_stock(history, config.min_price, config.min_avg_volume)
-            if not passed:
+            passed, reason = screen_stock(history, config.min_price_for_market(stock.market), config.min_avg_volume)
+            if not passed and not (stock.in_holdings and reason in {"price_below_threshold", "volume_below_threshold"}):
                 screened_out.append(
                     RejectedStock(
                         ticker=stock.ticker,
@@ -128,6 +128,14 @@ def _build_llm_client(config: AppConfig) -> LLMClient | None:
         return LLMClient(config)
     except Exception:
         return None
+
+
+def _limit_scan_stocks(stocks: list, max_stocks: int) -> list:
+    holdings = [stock for stock in stocks if getattr(stock, "in_holdings", False)]
+    others = [stock for stock in stocks if not getattr(stock, "in_holdings", False)]
+    if max_stocks <= 0:
+        return holdings
+    return holdings + others[:max_stocks]
 
 
 def build_console_output(result: RunResult) -> str:

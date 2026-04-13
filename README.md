@@ -83,6 +83,8 @@ Mermaid 원본: [docs/system-diagram.mmd](/Users/young/PycharmProjects/StockAgen
 - `UNIVERSE_MODE` 선택사항, `discovery_plus_watchlist|watchlist|manual`, 기본값 `discovery_plus_watchlist`
 - `HOLDINGS_PATH` 선택사항, 기본값 `data/inputs/holdings.json`
 - `KR_FLOW_PATH` 선택사항, 기본값 `data/inputs/kr_flow_snapshot.json`
+- `MIN_PRICE_US` 선택사항, 기본값 `10`
+- `MIN_PRICE_KR` 선택사항, 기본값 `5000`
 - `INCLUDE_WATCHLIST` 선택사항, 기본값 `true`
 - `WATCHLIST_PATH` 선택사항, 기본값 `data/outputs/watchlist.json`
 - `WATCHLIST_MAX_WEAK_RUNS` 선택사항, 기본값 `3`
@@ -145,6 +147,7 @@ python -m app.main --self-check
 ```
 
 `--self-check`에는 현재 `holdings_total`, `holdings_kr`, `holdings_us`가 같이 출력되므로, GitHub Actions나 로컬에서 보유 종목 입력이 실제로 읽혔는지 바로 확인할 수 있다.
+또한 `min_price_us`, `min_price_kr`가 같이 출력되므로 미국/한국 가격 기준이 분리됐는지 바로 확인할 수 있다.
 
 보유 종목 ticker가 제대로 풀리는지 빠르게 보려면:
 
@@ -163,6 +166,8 @@ HOLDINGS_PATH=data/inputs/holdings.sample.json python -m app.main --holdings-pre
 ```bash
 python -m app.main --no-telegram --limit 2
 ```
+
+`--limit`를 써도 보유 종목은 항상 우선 포함된다. 즉 빠른 검증을 돌릴 때도 보유 종목 브리핑이 사라지지 않는다.
 
 선택한 provider의 structured JSON 응답을 최소 단위로 확인하려면:
 
@@ -234,6 +239,7 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 
 workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. `KR_FLOW_*` Variables가 채워져 있으면 한국 수급 snapshot을 자동 생성하고, 비어 있으면 이 단계는 조용히 건너뛴다.
 운영 중에는 이 값들을 GitHub Variables에 유지해도 되고, 일시 검증 후 비워도 된다. 비워 두면 한국 수급은 다시 `pykrx optional -> fallback 문구` 경로로 동작한다.
+현재 저장소의 테스트용 `KR_FLOW_*` 값은 검증 후 제거해 두었다.
 
 ## 저장 결과
 
