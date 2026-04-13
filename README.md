@@ -122,6 +122,8 @@ python -m app.main --no-telegram
 python -m app.main --self-check
 ```
 
+`--self-check`에는 현재 `holdings_total`, `holdings_kr`, `holdings_us`가 같이 출력되므로, GitHub Actions나 로컬에서 보유 종목 입력이 실제로 읽혔는지 바로 확인할 수 있다.
+
 실제 스캔을 일부 종목으로 제한하려면:
 
 ```bash

@@ -140,6 +140,8 @@
 - 최신 GitHub Actions run `24321734534` 성공 및 시장별 Telegram 2건 재현 확인 완료
 - 최신 artifact 기준 한국 관찰 후보 `005930.KS`, `000660.KS`, 미국 매수 후보 `AMD`, 미국 관찰 후보 `AMZN/AVGO/AAPL` 확인 완료
 - 시장 뉴스 source 정규화와 `MSN/CNN` generic headline 추가 정제 완료
+- `self-check`에 holdings 총계/시장별 개수 출력 추가 완료
+- 보유 종목이 비어 있을 때 브리핑에 `holdings.json 비어 있음 또는 미설정` 문구가 표시되도록 개선 완료
 
 ## 다음 작업
 

@@ -48,7 +48,7 @@ def _format_market_section_html(section: MarketRunSection) -> list[str]:
             lines.extend(_format_holding_html(item))
             lines.append("")
     else:
-        lines.append("보유 종목 없음")
+        lines.append("보유 종목 없음 (`holdings.json` 비어 있음 또는 미설정)")
         lines.append("")
 
     lines.append("<b>[3] 추가 매수 후보</b>")
@@ -83,7 +83,7 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
             lines.extend(_format_holding_text(item))
             lines.append("")
     else:
-        lines.append("- 보유 종목 없음")
+        lines.append("- 보유 종목 없음 (`holdings.json` 비어 있음 또는 미설정)")
         lines.append("")
 
     lines.append("[3] 추가 매수 후보")

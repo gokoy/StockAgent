@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.agents.llm_client import LLMClient
 from app.config import LLM_ROLES, load_config
+from app.data.holdings import count_holdings
 from app.orchestrator import build_console_output, run_scan
 from app.reporting.telegram import send_telegram_test_message
 
@@ -54,6 +55,7 @@ def main() -> int:
 
 
 def run_self_check(config) -> str:
+    holdings = count_holdings(config.holdings_path)
     provider_package = {
         "openai": "openai",
         "anthropic": "anthropic",
@@ -81,6 +83,9 @@ def run_self_check(config) -> str:
         f"kr_universe_size={len(config.kr_universe_symbols)}",
         f"include_watchlist={config.include_watchlist}",
         f"holdings_path={config.holdings_path}",
+        f"holdings_total={holdings['total']}",
+        f"holdings_kr={holdings['kr']}",
+        f"holdings_us={holdings['us']}",
         f"watchlist_path={config.watchlist_path}",
         f"watchlist_max_weak_runs={config.watchlist_max_weak_runs}",
     ]
