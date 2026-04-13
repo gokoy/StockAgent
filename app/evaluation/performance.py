@@ -33,8 +33,15 @@ def summarize_performance(performance_dir: Path) -> dict:
         "avg_return_5d": _avg([item["return_5d"] for item in evaluated]),
         "avg_return_10d": _avg([item["return_10d"] for item in evaluated]),
         "avg_return_20d": _avg([item["return_20d"] for item in evaluated]),
+        "win_rate_5d": _win_rate([item["return_5d"] for item in evaluated]),
+        "win_rate_10d": _win_rate([item["return_10d"] for item in evaluated]),
+        "win_rate_20d": _win_rate([item["return_20d"] for item in evaluated]),
         "avg_max_upside_20d": _avg([item["max_upside_20d"] for item in evaluated]),
         "avg_max_drawdown_20d": _avg([item["max_drawdown_20d"] for item in evaluated]),
+        "reward_risk_ratio_20d": _reward_risk_ratio(
+            _avg([item["max_upside_20d"] for item in evaluated]),
+            _avg([item["max_drawdown_20d"] for item in evaluated]),
+        ),
         "by_action": _group_summary(evaluated, key="action_label"),
         "by_market": _group_summary(evaluated, key="market"),
         "by_sector": _group_summary(evaluated, key_func=_sector_name),
@@ -56,6 +63,22 @@ def _avg(values: list[float | None]) -> float | None:
     return round(sum(usable) / len(usable), 2)
 
 
+def _win_rate(values: list[float | None]) -> float | None:
+    usable = [value for value in values if value is not None]
+    if not usable:
+        return None
+    wins = [value for value in usable if value > 0]
+    return round((len(wins) / len(usable)) * 100, 2)
+
+
+def _reward_risk_ratio(avg_upside: float | None, avg_drawdown: float | None) -> float | None:
+    if avg_upside is None or avg_drawdown is None or avg_drawdown == 0:
+        return None
+    if avg_drawdown > 0:
+        return None
+    return round(avg_upside / abs(avg_drawdown), 2)
+
+
 def _group_summary(records: list[dict], key: str | None = None, key_func=None) -> dict:
     grouped: dict[str, list[dict]] = {}
     for record in records:
@@ -68,8 +91,15 @@ def _group_summary(records: list[dict], key: str | None = None, key_func=None) -
             "avg_return_5d": _avg([item["return_5d"] for item in items]),
             "avg_return_10d": _avg([item["return_10d"] for item in items]),
             "avg_return_20d": _avg([item["return_20d"] for item in items]),
+            "win_rate_5d": _win_rate([item["return_5d"] for item in items]),
+            "win_rate_10d": _win_rate([item["return_10d"] for item in items]),
+            "win_rate_20d": _win_rate([item["return_20d"] for item in items]),
             "avg_max_upside_20d": _avg([item.get("max_upside_20d") for item in items]),
             "avg_max_drawdown_20d": _avg([item.get("max_drawdown_20d") for item in items]),
+            "reward_risk_ratio_20d": _reward_risk_ratio(
+                _avg([item.get("max_upside_20d") for item in items]),
+                _avg([item.get("max_drawdown_20d") for item in items]),
+            ),
         }
     return summary
 

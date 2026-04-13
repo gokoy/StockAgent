@@ -21,7 +21,7 @@ from app.evaluation.performance import summarize_performance
 from app.evaluation.tracker import record_recommendation
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
 from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunResult
-from app.portfolio.sizing_stub import suggest_position_size
+from app.portfolio.sizing_stub import build_portfolio_guidance, suggest_position_size
 from app.reporting.formatter import format_console_report, format_telegram_message, format_telegram_messages_by_market
 from app.reporting.storage import save_run_result
 from app.reporting.telegram import send_telegram_messages
@@ -177,6 +177,20 @@ def _build_market_sections(
         market_briefing = build_market_briefing(market, run_at, config.max_news_age_hours)
         macro_analysis = analyze_market_regime(market_briefing)
         sector_biases = _sector_bias_map(market_briefing.sector_strength_details)
+        short_term_briefs = _build_horizon_candidate_briefs(
+            recommendation_pool,
+            "short",
+            config,
+            macro_analysis.macro_score,
+            sector_biases,
+        )
+        mid_term_briefs = _build_horizon_candidate_briefs(
+            recommendation_pool,
+            "mid",
+            config,
+            macro_analysis.macro_score,
+            sector_biases,
+        )
 
         sections.append(
             MarketRunSection(
@@ -192,20 +206,10 @@ def _build_market_sections(
                     )
                     for stock in holdings
                 ],
-                short_term_candidate_briefs=_build_horizon_candidate_briefs(
-                    recommendation_pool,
-                    "short",
-                    config,
-                    macro_analysis.macro_score,
-                    sector_biases,
-                ),
-                mid_term_candidate_briefs=_build_horizon_candidate_briefs(
-                    recommendation_pool,
-                    "mid",
-                    config,
-                    macro_analysis.macro_score,
-                    sector_biases,
-                ),
+                short_term_candidate_briefs=short_term_briefs,
+                mid_term_candidate_briefs=mid_term_briefs,
+                short_term_portfolio_guidance=build_portfolio_guidance(short_term_briefs, "short", macro_analysis.macro_score),
+                mid_term_portfolio_guidance=build_portfolio_guidance(mid_term_briefs, "mid", macro_analysis.macro_score),
                 candidate_briefs=[
                     _to_candidate_brief(
                         stock,

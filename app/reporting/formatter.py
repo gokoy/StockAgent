@@ -56,6 +56,9 @@ def _format_market_section_html(section: MarketRunSection) -> list[str]:
         for item in section.short_term_candidate_briefs[:5]:
             lines.extend(_format_candidate_html(item))
             lines.append("")
+        if section.short_term_portfolio_guidance:
+            lines.extend(_format_portfolio_guidance_html(section.short_term_portfolio_guidance))
+            lines.append("")
     else:
         lines.append("• 단기 추천 종목 없음")
         for reason in section.no_candidate_reason:
@@ -67,6 +70,8 @@ def _format_market_section_html(section: MarketRunSection) -> list[str]:
         for item in section.mid_term_candidate_briefs[:5]:
             lines.extend(_format_candidate_html(item))
             lines.append("")
+        if section.mid_term_portfolio_guidance:
+            lines.extend(_format_portfolio_guidance_html(section.mid_term_portfolio_guidance))
     else:
         lines.append("• 중기 추천 종목 없음")
         for reason in section.no_candidate_reason:
@@ -98,6 +103,9 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
         for item in section.short_term_candidate_briefs[:5]:
             lines.extend(_format_candidate_text(item))
             lines.append("")
+        if section.short_term_portfolio_guidance:
+            lines.extend(_format_portfolio_guidance_text(section.short_term_portfolio_guidance))
+            lines.append("")
     else:
         lines.append("- 단기 추천 종목 없음")
         for reason in section.no_candidate_reason:
@@ -109,6 +117,8 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
         for item in section.mid_term_candidate_briefs[:5]:
             lines.extend(_format_candidate_text(item))
             lines.append("")
+        if section.mid_term_portfolio_guidance:
+            lines.extend(_format_portfolio_guidance_text(section.mid_term_portfolio_guidance))
     else:
         lines.append("- 중기 추천 종목 없음")
         for reason in section.no_candidate_reason:
@@ -297,6 +307,26 @@ def _format_candidate_text(item: CandidateBrief) -> list[str]:
         lines.append(f"  - 제안 비중: {item.suggested_weight_pct}%")
         if item.sizing_reason:
             lines.append(f"    • {item.sizing_reason}")
+    return lines
+
+
+def _format_portfolio_guidance_html(guidance) -> list[str]:
+    lines = [
+        f"<b>🧮 포트폴리오 가이드 ({escape('단기' if guidance.horizon == 'short' else '중기')})</b>",
+        f"• 추천 자세: {escape(guidance.stance)}",
+        f"• 총 제안 비중: {guidance.total_suggested_weight_pct}% | 후보 수: {guidance.candidate_count} | 단일 최대: {guidance.max_single_position_pct}%",
+    ]
+    lines.extend(f"• {escape(_truncate(note, 100))}" for note in guidance.notes[:3])
+    return lines
+
+
+def _format_portfolio_guidance_text(guidance) -> list[str]:
+    lines = [
+        f"🧮 포트폴리오 가이드 ({'단기' if guidance.horizon == 'short' else '중기'})",
+        f"- 추천 자세: {guidance.stance}",
+        f"- 총 제안 비중: {guidance.total_suggested_weight_pct}% | 후보 수: {guidance.candidate_count} | 단일 최대: {guidance.max_single_position_pct}%",
+    ]
+    lines.extend(f"- {note}" for note in guidance.notes[:3])
     return lines
 
 

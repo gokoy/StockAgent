@@ -348,6 +348,7 @@ watchlist 운영 예외:
 - `evaluation/performance.py`는 5/10/20일 후 수익률과 20일 최대 상승폭/최대 낙폭을 계산하고, action, market, sector, macro bucket, chart bucket, setup combo별 비교 요약을 생성한다.
 - `evaluation/backtest_stub.py`는 저장된 추천 기록을 기준으로 기본 성과 집계와 그룹별 비교 결과를 반환하고 `backtest_summary.json`을 생성한다.
 - `portfolio/sizing_stub.py`는 점수와 시장 국면을 반영한 기본 비중 제안을 반환하고, 브리핑에 제안 비중을 노출한다.
+- `portfolio/sizing_stub.py`는 후보 목록 기준 총 제안 비중, 단일 종목 최대 비중, 운용 자세를 담은 시장별 포트폴리오 가이드를 생성한다.
 
 ## Definition Of Done
 

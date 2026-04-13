@@ -351,6 +351,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 - `sector_name`: 종목이 속한 섹터 추정값
 - `suggested_weight_pct`: 기본 제안 비중
 - `sizing_reason`: 점수, 시장 국면, 섹터 보정이 어떻게 반영됐는지에 대한 짧은 설명
+- `short_term_portfolio_guidance`, `mid_term_portfolio_guidance`: 시장별 총 제안 비중, 단일 종목 최대 비중, 운용 자세
 
 ## 어떻게 실행하나
 

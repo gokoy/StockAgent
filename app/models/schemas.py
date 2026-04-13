@@ -181,6 +181,15 @@ class RejectionSummary(BaseModel):
     count: int
 
 
+class PortfolioGuidance(BaseModel):
+    horizon: str
+    total_suggested_weight_pct: int = 0
+    candidate_count: int = 0
+    max_single_position_pct: int = 0
+    stance: str = ""
+    notes: list[str] = Field(default_factory=list)
+
+
 class MarketRunSection(BaseModel):
     market: str
     title: str
@@ -189,6 +198,8 @@ class MarketRunSection(BaseModel):
     holdings: list[HoldingBrief] = Field(default_factory=list)
     short_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     mid_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
+    short_term_portfolio_guidance: PortfolioGuidance | None = None
+    mid_term_portfolio_guidance: PortfolioGuidance | None = None
     candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     observe_briefs: list[CandidateBrief] = Field(default_factory=list)
     rejection_summary: list[RejectionSummary] = Field(default_factory=list)

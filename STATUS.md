@@ -195,11 +195,13 @@
 - `performance_summary.json`에 `max_upside_20d`, `max_drawdown_20d`, `by_setup_combo` 비교 요약 추가 완료
 - tracker에 `above_ma60`, `above_ma120`, `breakout_setup`, `pullback_setup`, `volatility_contracting`, `recent_sharp_runup` 기록 추가 완료
 - 실행 시 `backtest_summary.json` 자동 생성 연결 완료
+- `backtest_summary.json`과 `performance_summary.json`에 `win_rate_*`, `reward_risk_ratio_20d` 추가 완료
+- 시장별 단기/중기 추천 섹션 아래 `포트폴리오 가이드` 추가 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-2. Phase 2 심화: 백테스트 로직 구체화와 추천 전략별 리포트 활용 고도화
+2. 외부 데이터 제약이 풀리면 한국 수급 자동화와 이벤트 캘린더 정밀도 보강
 
 ## 메모
 
