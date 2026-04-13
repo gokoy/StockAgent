@@ -48,8 +48,10 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 
 ### 뉴스 데이터
 
-- 시장 뉴스, 종목 뉴스: Google News RSS
+- 미국 시장/종목 뉴스: `Google News RSS + Reuters 우선순위 + Yahoo Finance 보조`
+- 한국 시장/종목 뉴스: `Google News RSS + 네이버 증권 경로 보조 + OpenDART 공시`
 - 같은 검색 결과 안에서는 `Reuters`를 최우선 source로 우대한다.
+- 한국 종목은 OpenDART 공시를 뉴스보다 상위 신호로 취급한다.
 - 최신성 필터를 적용해 일정 시간보다 오래된 뉴스는 제외한다.
 
 ### 한국 시장 수급 데이터
@@ -427,6 +429,7 @@ workflow 파일: [.github/workflows/stock_scan.yml](/Users/young/PycharmProjects
 ### 필수 Secrets
 
 - `OPENAI_API_KEY`
+- `OPENDART_API_KEY` (한국 공시 자동 수집을 쓰려면 권장)
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 
@@ -474,8 +477,8 @@ workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. 
 - 한국 시장 수급은 안정적인 무료 공식 실시간 API를 아직 확보하지 못했다.
 - 그래서 한국 수급은 `KR_FLOW_PATH` + `pykrx` + `Naver 증권` best-effort 구조로 운영한다.
 - 시장 이벤트는 공식 경제 캘린더 API가 아니라 `구조화 event_calendar 파일 + 최신 시장 뉴스 + yfinance 실적 일정` 기반이다.
-- 뉴스는 Google News RSS 기반이라 source 품질과 정밀도는 계속 보강 대상이다.
-- 현재 뉴스 전략은 `Google News RSS + Reuters 우선순위` 구조다.
+- 뉴스는 여전히 RSS/스크래핑 기반 비중이 있어서 source 품질과 정밀도는 계속 보강 대상이다.
+- 현재 뉴스 전략은 미국 `Google News RSS + Reuters 우선순위 + Yahoo Finance 보조`, 한국 `Google News RSS + OpenDART 공시 + 네이버 증권 경로 보조` 구조다.
 - 주요 이벤트 문구는 현재 구조화 이벤트 파일과 최신 이벤트성 뉴스의 날짜/키워드를 함께 정규화해서 보여준다.
 - 자동매매용 서비스가 아니라 의사결정 보조 도구다.
 

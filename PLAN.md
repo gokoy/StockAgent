@@ -353,6 +353,26 @@ watchlist 운영 예외:
 - `scripts/update_kr_flow_snapshot.py`는 `pykrx -> Naver 증권 -> manual snapshot` 순서로 한국 수급 snapshot 생성을 시도한다.
 - `reporting/storage.py`와 `orchestrator.py`는 직전 `latest.json`과 비교해 시장별 전일 대비 변화 요약을 생성한다.
 
+## Phase 3 구현 범위
+
+### 미국(US) 데이터 파이프라인
+
+- Reuters 우선순위가 반영된 시장/종목 뉴스 수집
+- Yahoo Finance 종목 뉴스/기본 정보 보조
+- 가격/차트 데이터는 `yfinance` 유지
+
+### 한국(KR) 데이터 파이프라인
+
+- OpenDART 공시 수집
+- 네이버 증권/국내 뉴스 보조 경로
+- 한국 종목은 공시를 뉴스보다 상위 신호로 반영
+
+### 운영 고도화
+
+- 구조화 이벤트 캘린더 snapshot 자동 생성
+- 한국 수급 `pykrx -> Naver 증권 -> manual snapshot` 다중 경로
+- 이벤트/공시/뉴스를 시장 브리핑과 종목 판단에 반영
+
 ## Definition Of Done
 
 - 필수 디렉터리 구조가 생성되어 있다.

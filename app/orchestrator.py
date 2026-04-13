@@ -65,7 +65,13 @@ def run_scan(
 
             chart_features = build_chart_features(history)
             chart_analysis = analyze_chart(stock.ticker, stock.name, chart_features, llm_client)
-            news_items = fetch_latest_news(stock.ticker, stock.name, config.max_news_age_hours)
+            news_items = fetch_latest_news(
+                stock.ticker,
+                stock.name,
+                stock.market,
+                config.max_news_age_hours,
+                opendart_api_key=config.opendart_api_key,
+            )
             news_analysis = analyze_news(stock.ticker, stock.name, news_items, llm_client)
             final_analysis = analyze_final_decision(
                 stock.ticker,

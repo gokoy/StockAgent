@@ -17,6 +17,7 @@ class AppConfig:
     llm_model_final: str
     llm_model_macro: str
     openai_api_key: str | None
+    opendart_api_key: str | None
     anthropic_api_key: str | None
     google_api_key: str | None
     telegram_bot_token: str | None
@@ -195,6 +196,7 @@ def load_config() -> AppConfig:
         llm_model_final=_env_value("LLM_MODEL_FINAL") or role_defaults["final"],
         llm_model_macro=_env_value("LLM_MODEL_MACRO") or role_defaults["macro"],
         openai_api_key=_env_value("OPENAI_API_KEY"),
+        opendart_api_key=_env_value("OPENDART_API_KEY"),
         anthropic_api_key=_env_value("ANTHROPIC_API_KEY"),
         google_api_key=_env_value("GOOGLE_API_KEY"),
         telegram_bot_token=_env_value("TELEGRAM_BOT_TOKEN"),

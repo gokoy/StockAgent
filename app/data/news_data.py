@@ -6,7 +6,9 @@ import re
 from urllib.parse import quote_plus
 
 import feedparser
+import yfinance as yf
 
+from app.data.disclosure_data import fetch_recent_disclosures
 from app.models.schemas import NewsItem
 
 US_MARKET_KEYWORDS = (
@@ -101,7 +103,49 @@ REUTERS_SOURCES = {
 }
 
 
-def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
+def fetch_latest_news(
+    ticker: str,
+    name: str,
+    market: str,
+    max_age_hours: int,
+    limit: int = 5,
+    opendart_api_key: str | None = None,
+) -> list[NewsItem]:
+    normalized_market = market.upper()
+    if normalized_market == "KR":
+        items: list[NewsItem] = []
+        items.extend(
+            fetch_recent_disclosures(
+                ticker=ticker,
+                name=name,
+                max_age_hours=max_age_hours,
+                api_key=opendart_api_key,
+                cache_path=_corp_code_cache_path(),
+                limit=max(limit, 3),
+            )
+        )
+        items.extend(
+            fetch_news_by_query(
+                query=f"{name} OR {ticker.replace('.KS', '').replace('.KQ', '')} site:finance.naver.com",
+                max_age_hours=max_age_hours,
+                limit=max(limit * 4, 12),
+                hl="ko",
+                gl="KR",
+                ceid="KR:ko",
+            )
+        )
+        items.extend(
+            fetch_news_by_query(
+                query=f"{name} 주식 OR {ticker.replace('.KS', '').replace('.KQ', '')} 종목 뉴스",
+                max_age_hours=max_age_hours,
+                limit=max(limit * 2, 8),
+                hl="ko",
+                gl="KR",
+                ceid="KR:ko",
+            )
+        )
+        return _rank_stock_news(items, limit=limit, market=normalized_market)
+
     query = f"{ticker} stock"
     items = fetch_news_by_query(
         query=query,
@@ -111,7 +155,8 @@ def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5
         gl="US",
         ceid="US:en",
     )
-    return _rank_stock_news(items, limit=limit)
+    items.extend(fetch_yahoo_ticker_news(ticker, name, max_age_hours=max_age_hours, limit=max(limit * 2, 8)))
+    return _rank_stock_news(items, limit=limit, market=normalized_market)
 
 
 def fetch_news_by_query(
@@ -212,7 +257,7 @@ def _rank_event_news(items: list[NewsItem], market: str, limit: int) -> list[New
     return ranked[:limit]
 
 
-def _rank_stock_news(items: list[NewsItem], limit: int) -> list[NewsItem]:
+def _rank_stock_news(items: list[NewsItem], limit: int, market: str = "US") -> list[NewsItem]:
     seen: set[str] = set()
     source_counts: dict[str, int] = {}
     scored: list[tuple[int, NewsItem]] = []
@@ -221,7 +266,7 @@ def _rank_stock_news(items: list[NewsItem], limit: int) -> list[NewsItem]:
         if not dedupe_key or dedupe_key in seen:
             continue
         seen.add(dedupe_key)
-        score = _score_stock_news_item(item)
+        score = _score_stock_news_item(item, market=market)
         if score <= 0:
             continue
         source_key = _normalized_source(item.source)
@@ -257,6 +302,51 @@ def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[New
     return [item for _, item in scored]
 
 
+def fetch_yahoo_ticker_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
+    try:
+        raw_items = getattr(yf.Ticker(ticker), "news", None) or []
+    except Exception:
+        return []
+    cutoff = datetime.now(UTC) - timedelta(hours=max_age_hours)
+    name_token = (name.split()[0] if name else ticker).lower()
+    relevance_tokens = {ticker.lower(), name_token}
+    items: list[NewsItem] = []
+    for raw in raw_items:
+        content = raw.get("content", {})
+        if not isinstance(content, dict):
+            continue
+        title = str(content.get("title", "")).strip()
+        summary = str(content.get("summary", "")).strip()
+        published_raw = content.get("pubDate") or content.get("displayTime")
+        if not title or not published_raw:
+            continue
+        try:
+            published_at = datetime.fromisoformat(str(published_raw).replace("Z", "+00:00")).astimezone(UTC)
+        except Exception:
+            continue
+        if published_at < cutoff:
+            continue
+        haystack = f"{title} {summary}".lower()
+        if not any(token and token in haystack for token in relevance_tokens):
+            storyline = content.get("storyline", {})
+            if not isinstance(storyline, dict) or ticker.lower() not in str(storyline).lower():
+                continue
+        provider = content.get("provider", {}) if isinstance(content.get("provider"), dict) else {}
+        canonical = content.get("canonicalUrl", {}) if isinstance(content.get("canonicalUrl"), dict) else {}
+        items.append(
+            NewsItem(
+                headline=title,
+                summary=(summary or title)[:400],
+                published_at=published_at,
+                source=str(provider.get("displayName", "Yahoo Finance")).strip() or "Yahoo Finance",
+                url=str(canonical.get("url", "")).strip(),
+            )
+        )
+        if len(items) >= limit:
+            break
+    return items
+
+
 def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> int:
     text = f"{item.headline} {item.summary}".lower()
     keywords = KR_MARKET_KEYWORDS if market == "KR" else US_MARKET_KEYWORDS
@@ -290,9 +380,11 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
     return score
 
 
-def _score_stock_news_item(item: NewsItem) -> int:
+def _score_stock_news_item(item: NewsItem, market: str) -> int:
     text = f"{item.headline} {item.summary}".lower()
     source = _normalized_source(item.source)
+    if source == "opendart":
+        return 100
     if _source_matches(source, LOW_SIGNAL_SOURCES):
         return -100
 
@@ -333,9 +425,11 @@ def _score_stock_news_item(item: NewsItem) -> int:
     if source == "cnn" and "forecast" in text:
         return -100
 
-    if any(word in text for word in ("earnings", "guidance", "forecast", "revenue", "deal", "data center", "chip", "ai")):
+    if any(word in text for word in ("earnings", "guidance", "forecast", "revenue", "deal", "data center", "chip", "ai", "공시", "수주", "유상증자", "공급계약")):
         score += 2
     if any(word in text for word in ("lawsuit", "probe", "downgrade", "cut", "delay", "tariff")):
+        score += 1
+    if market.upper() == "KR" and "site:finance.naver.com" in text:
         score += 1
     return score
 
@@ -360,6 +454,8 @@ def _source_matches(source: str, candidates: set[str]) -> bool:
 
 def _source_priority(source: str) -> int:
     normalized = _normalized_source(source)
+    if normalized == "opendart":
+        return 4
     if _source_matches(normalized, REUTERS_SOURCES):
         return 3
     if _source_matches(normalized, HIGH_SIGNAL_SOURCES):
@@ -367,3 +463,9 @@ def _source_priority(source: str) -> int:
     if normalized:
         return 1
     return 0
+
+
+def _corp_code_cache_path():
+    from pathlib import Path
+
+    return Path(__file__).resolve().parents[2] / "data" / "inputs" / "opendart_corp_codes.json"

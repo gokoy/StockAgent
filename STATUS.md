@@ -202,11 +202,15 @@
 - `scripts/update_kr_flow_snapshot.py`에 `Naver 증권` best-effort fallback 추가 완료
 - 백테스트 시나리오 `scenario_tp10_sl5_20d`, `scenario_tp15_sl7_20d` 추가 완료
 - 직전 `latest.json` 기준으로 시장별 `전일 대비 변화(run_delta)` 요약 추가 완료
+- 미국 종목 뉴스에 `Yahoo Finance` 보조 입력 추가 완료
+- 한국 종목 뉴스에 `OpenDART` 공시 경로 추가 완료
+- `OPENDART_API_KEY` 설정 경로와 self-check 노출 추가 완료
+- Phase 3 데이터 파이프라인 구조를 문서에 반영 완료
 
 ## 다음 작업
 
-1. 한국 수급 Naver 경로가 실제 데이터 행을 반환하는 날짜/페이지 패턴을 추가 검증하고 parser 보강
-2. 공식 경제 캘린더 또는 유료 소스를 붙일 수 있으면 event calendar 정확도 추가 개선
+1. 한국 종목 뉴스에서 네이버 증권 경로 relevance를 더 높이고 무의미한 제목 정제
+2. OpenDART 키가 있는 환경에서 실제 공시 자동 수집 end-to-end 검증
 
 ## 메모
 
