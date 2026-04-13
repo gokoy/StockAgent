@@ -62,6 +62,9 @@ jobs:
           KR_STOCK_UNIVERSE: ${{ vars.KR_STOCK_UNIVERSE }}
           INCLUDE_WATCHLIST: ${{ vars.INCLUDE_WATCHLIST || 'true' }}
           WATCHLIST_MAX_WEAK_RUNS: ${{ vars.WATCHLIST_MAX_WEAK_RUNS || '3' }}
+          MIN_PRICE_US: ${{ vars.MIN_PRICE_US || '10' }}
+          MIN_PRICE_KR: ${{ vars.MIN_PRICE_KR || '5000' }}
+          MIN_AVG_VOLUME: ${{ vars.MIN_AVG_VOLUME || '1000000' }}
           MAX_NEWS_AGE_HOURS: ${{ vars.MAX_NEWS_AGE_HOURS || '72' }}
           TOP_N_CANDIDATES: ${{ vars.TOP_N_CANDIDATES || '5' }}
           CANDIDATE_MIN_FINAL_SCORE: ${{ vars.CANDIDATE_MIN_FINAL_SCORE || '70' }}

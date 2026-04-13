@@ -166,11 +166,14 @@
 - 미국/한국 최소 가격 기준을 `min_price_us`, `min_price_kr`로 분리 완료
 - 차트 feature 계산 전에 유효 OHLCV 행만 사용하도록 정리해 `MA20/MA60 NaN` 노출 제거 완료
 - 실제 holdings 기준 검증에서 한국 3종목, 미국 2종목이 보유 종목 브리핑에 정상 반영되는 것 확인 완료
+- 릴리스 기준 문서 `docs/release-v0.1.0.md` 추가 완료
+- GitHub Actions 운영 변수 점검 중 `MIN_PRICE_US`, `MIN_PRICE_KR`, `MIN_AVG_VOLUME` 전달 누락 확인 및 workflow 반영 완료
+- GitHub Variables 운영 기본값 세팅 완료
+- 현재 범위 기준 필수 Secrets `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` 존재 확인 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-2. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
 
@@ -182,5 +185,6 @@
 - LLM orchestration은 현재 순수 Python으로 유지한다.
 - `LangChain`, `LangGraph`는 Phase 2에서 실제 복잡도가 커질 때 재검토한다.
 - provider 교체 요구는 adapter 패턴으로 수용하고, 초기 대상은 OpenAI/Anthropic/Gemini다.
+- 현재 프로젝트 완료 판단에서는 `Anthropic/Gemini` 실연동 검증을 범위에서 제외하고, 추후 멀티 provider 확장 작업으로 분리한다.
 - 역할별 모델 구조는 provider와 분리된 공통 설정 이름으로 유지한다.
 - 다음 구조 변경 이후에도 문서와 `STATUS.md`를 항상 함께 갱신한다.
