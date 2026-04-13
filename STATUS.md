@@ -3,8 +3,8 @@
 ## 프로젝트 상태
 
 - 프로젝트명: StockAgent
-- 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist + 시장 브리핑 구조 확장 진행중
-- 마지막 업데이트: 2026-04-13
+- 현재 단계: Phase 1 기본 구현 완료, Phase 1.5 dynamic watchlist + 시장 브리핑 구조 운영 정리 완료
+- 마지막 업데이트: 2026-04-14
 
 ## 완료된 작업
 
@@ -170,6 +170,7 @@
 - GitHub Actions 운영 변수 점검 중 `MIN_PRICE_US`, `MIN_PRICE_KR`, `MIN_AVG_VOLUME` 전달 누락 확인 및 workflow 반영 완료
 - GitHub Variables 운영 기본값 세팅 완료
 - 현재 범위 기준 필수 Secrets `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` 존재 확인 완료
+- 처음 보는 사용자 기준으로 `README.md`를 서비스 소개/사용법/데이터 출처/필터 기준/출력 예시 중심으로 전면 재작성 완료
 
 ## 다음 작업
 
