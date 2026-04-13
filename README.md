@@ -48,6 +48,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 ### 뉴스 데이터
 
 - 시장 뉴스, 종목 뉴스: Google News RSS
+- 같은 검색 결과 안에서는 `Reuters`를 최우선 source로 우대한다.
 - 최신성 필터를 적용해 일정 시간보다 오래된 뉴스는 제외한다.
 
 ### 한국 시장 수급 데이터
@@ -422,6 +423,7 @@ workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. 
 - 그래서 한국 수급은 `KR_FLOW_PATH` 또는 `pykrx optional` 구조로 운영한다.
 - 시장 이벤트는 경제 캘린더 API가 아니라 최신 시장 뉴스 기반 요약이다.
 - 뉴스는 Google News RSS 기반이라 source 품질과 정밀도는 계속 보강 대상이다.
+- 현재 뉴스 전략은 `Google News RSS + Reuters 우선순위` 구조다.
 - 주요 이벤트 문구는 현재 최신 이벤트성 뉴스의 발행일과 키워드를 정규화해서 보여준다.
 - 자동매매용 서비스가 아니라 의사결정 보조 도구다.
 

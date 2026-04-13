@@ -2,7 +2,7 @@
 
 ## 목표 요약
 
-Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다. 이후 Phase 1.5에서는 고정 관심 종목 스캔에서 `discovery universe + dynamic watchlist` 구조와 `시장 브리핑 -> 보유 종목 -> 신규 후보` 출력 구조로 확장한다.
+Phase 1에서는 GitHub Actions에서 정기 실행되는 개인용 스윙 투자 보조 도구의 최소 실행 가능한 구조를 완성한다. 핵심은 Python 정량 계산, LLM 기반 차트/뉴스 해석, 순차 orchestrator, JSON 저장, Telegram 전송, 후보 없음 처리다. 이후 Phase 1.5에서는 고정 관심 종목 스캔에서 `discovery universe + dynamic watchlist` 구조와 `시장 브리핑 -> 보유 종목 -> 신규 후보` 출력 구조로 확장하고, 단기/중기 추천 분리와 `Google News RSS + Reuters 우선순위` 뉴스 전략까지 포함한다.
 
 ## 비목표
 
@@ -73,6 +73,7 @@ GitHub Actions
 - 종목별 가격/거래량 데이터 확보
 - 뉴스는 최신성 필터 적용
 - 시장 브리핑용 지수/거시/섹터/이벤트/핵심 뉴스 수집 가능
+- 뉴스는 `Google News RSS + Reuters 우선순위`로 정렬 가능
 
 ### 3. 스크리닝/피처 계산
 

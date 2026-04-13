@@ -96,6 +96,10 @@ HIGH_SIGNAL_SOURCES = {
     "yahoo finance",
 }
 
+REUTERS_SOURCES = {
+    "reuters",
+}
+
 
 def fetch_latest_news(ticker: str, name: str, max_age_hours: int, limit: int = 5) -> list[NewsItem]:
     query = f"{ticker} stock"
@@ -226,7 +230,7 @@ def _rank_stock_news(items: list[NewsItem], limit: int) -> list[NewsItem]:
                 continue
             source_counts[source_key] = source_counts.get(source_key, 0) + 1
         scored.append((score, item))
-    scored.sort(key=lambda pair: (pair[0], pair[1].published_at), reverse=True)
+    scored.sort(key=lambda pair: (_source_priority(pair[1].source), pair[0], pair[1].published_at), reverse=True)
     return [item for _, item in scored[:limit]]
 
 
@@ -249,7 +253,7 @@ def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[New
                 continue
             source_counts[source_key] = source_counts.get(source_key, 0) + 1
         scored.append((score, item))
-    scored.sort(key=lambda pair: (pair[0], pair[1].published_at), reverse=True)
+    scored.sort(key=lambda pair: (_source_priority(pair[1].source), pair[0], pair[1].published_at), reverse=True)
     return [item for _, item in scored]
 
 
@@ -275,6 +279,8 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
     if item.source:
         source = _normalized_source(item.source)
         score += 1
+        if _source_matches(source, REUTERS_SOURCES):
+            score += 5
         if _source_matches(source, HIGH_SIGNAL_SOURCES):
             score += 2
         if _source_matches(source, LOW_SIGNAL_SOURCES):
@@ -291,7 +297,9 @@ def _score_stock_news_item(item: NewsItem) -> int:
         return -100
 
     score = 1
-    if _source_matches(source, HIGH_SIGNAL_SOURCES):
+    if _source_matches(source, REUTERS_SOURCES):
+        score += 6
+    elif _source_matches(source, HIGH_SIGNAL_SOURCES):
         score += 3
     elif source:
         score += 1
@@ -348,3 +356,14 @@ def _source_matches(source: str, candidates: set[str]) -> bool:
     if not source:
         return False
     return any(candidate in source for candidate in candidates)
+
+
+def _source_priority(source: str) -> int:
+    normalized = _normalized_source(source)
+    if _source_matches(normalized, REUTERS_SOURCES):
+        return 3
+    if _source_matches(normalized, HIGH_SIGNAL_SOURCES):
+        return 2
+    if normalized:
+        return 1
+    return 0

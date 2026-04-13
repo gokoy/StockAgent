@@ -13,6 +13,7 @@
 - 모든 종목은 동일한 출력 포맷을 유지한다.
 - 후보가 없을 경우 `후보 없음` 또는 `관찰만`이 가능해야 한다.
 - 최신 뉴스만 사용한다.
+- 뉴스 source는 기본적으로 `Google News RSS`를 쓰되, 동일 검색 결과 안에서는 `Reuters`를 최우선 source로 다룬다.
 - 근거 중심으로만 판단한다.
 - 민감정보(`OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`)는 agent 입력, 출력, 로그에 포함하지 않는다.
 - 종목 universe는 `discovery pool`과 `watchlist`를 분리해 운영할 수 있어야 한다.
