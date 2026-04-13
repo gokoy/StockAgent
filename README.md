@@ -114,6 +114,8 @@ python -m app.main --no-telegram
 }
 ```
 
+샘플 입력은 [data/inputs/holdings.sample.json](/Users/young/PycharmProjects/StockAgent/data/inputs/holdings.sample.json)에 있다. 검증용으로 다른 파일을 쓰려면 `HOLDINGS_PATH`로 경로를 바꾸면 된다.
+
 설정과 의존성만 점검하려면:
 
 ```bash

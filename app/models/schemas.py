@@ -103,7 +103,7 @@ class RejectedStock(BaseModel):
 
 class HoldingInput(BaseModel):
     ticker: str
-    market: str = "US"
+    market: str | None = None
 
 
 class HoldingsInput(BaseModel):

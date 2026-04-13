@@ -126,12 +126,15 @@
 - 최신 artifact `latest.json` 기준 `candidate_count=2`, `AVGO/AMD` 후보 확인 완료
 - 최신 artifact로 복원한 Telegram 본문 길이 `2364`자로 분할 없이 안전 범위인 것 확인 완료
 - GitHub Actions 기준 최신 Telegram 압축 포맷이 실제 결과 JSON과 일관되게 생성되는 것 확인 완료
+- `holdings.sample.json` 추가 완료
+- 샘플 holdings 검증에서 한국/미국 보유 종목 브리핑 섹션이 모두 정상 생성되는 것 확인 완료
+- holdings 입력 모델 기본값 버그 수정으로 `kr` 섹션 종목이 `KR` 시장으로 올바르게 저장되는 것 확인 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
 2. 미국 시장 핵심 뉴스 source 품질 필터 추가 개선
-3. holdings 입력을 넣은 보유 종목 브리핑 실전 검증
+3. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모

@@ -1,0 +1,10 @@
+{
+  "kr": [
+    { "ticker": "005930.KS" },
+    { "ticker": "000660.KS" }
+  ],
+  "us": [
+    { "ticker": "NVDA" },
+    { "ticker": "AMZN" }
+  ]
+}
