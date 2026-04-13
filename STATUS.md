@@ -114,6 +114,8 @@
 - 실제 실행 결과에서 한국 시장 수급은 `pykrx` 미설치로 placeholder 문구가 출력되는 것 확인 완료
 - `.venv`에 `pykrx` 설치 완료
 - `pykrx` 설치 후 재실행에서 한국 시장 수급 API는 응답 공백/호환 문제로 placeholder 문구를 유지하는 것 확인 완료
+- 사용자 로컬 테스트 기준 `data.krx.co.kr` 접근은 되지만 `pykrx` 시장 데이터 함수는 과거 날짜에서도 빈 DataFrame을 반환하는 것 확인 완료
+- 현재 한국 시장 수급은 `pykrx` 기반 best-effort optional source로만 유지하기로 결정
 - 시장 뉴스 relevance 필터와 headline 중복 제거 로직 추가 완료
 - Telegram 실전송 포함 전체 실행 재검증 완료
 - 시장 뉴스 source 편향 완화와 동일 source 과다 노출 제한 로직 추가 완료

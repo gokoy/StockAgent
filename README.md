@@ -271,7 +271,8 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 ## 구현 메모
 
 - 시세 데이터는 `yfinance`를 사용한다.
-- 한국 시장 수급 데이터는 `pykrx`가 설치된 환경에서 실제 데이터를 사용한다.
+- 한국 시장 수급 데이터는 `pykrx`를 best-effort optional source로 사용한다.
+- 다만 현재 `pykrx`/KRX 응답 경로는 환경과 시점에 따라 빈 응답 또는 실패가 발생할 수 있어, 실수급 데이터는 보장하지 않는다.
 - 뉴스는 Google News RSS를 사용해 최신성 필터를 적용한다.
 - discovery universe는 현재 `US/KR curated symbol pool`로 시작하며, 실행 중 유효한 종목은 watchlist에 자동 편입/유지될 수 있다.
 - 시장 브리핑은 실제 지수/거시/섹터/뉴스 데이터를 사용하고, 이벤트는 최신 시장 뉴스 기반으로 요약한다.
@@ -291,5 +292,5 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 
 - 미장/국장 discovery universe는 아직 curated symbol list 중심이며, S&P500/Nasdaq100 및 KOSPI/KOSDAQ 전체 동기화는 다음 단계다.
 - 시장 이벤트는 경제 캘린더 API가 아니라 최신 이벤트성 뉴스 기반 요약이다.
-- 한국 시장 수급은 `pykrx` 설치 환경에서만 실제 집계가 제공된다.
+- 한국 시장 수급은 `pykrx`를 우선 시도하되, 현재 KRX 응답 공백/네트워크 문제로 실제 집계가 안정적으로 보장되지는 않는다.
 - 뉴스는 ticker 중심 Google News RSS라 국장 종목과 시장 이벤트에서 정밀도가 떨어질 수 있다.

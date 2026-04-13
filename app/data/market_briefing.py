@@ -114,7 +114,7 @@ def _build_us_flow_proxy() -> list[str]:
 
 def _build_kr_flow_summary(run_at: datetime) -> list[str]:
     if krx_stock is None:
-        return ["pykrx 미설치 상태라 외국인/기관/개인 수급 집계는 아직 제공하지 않는다."]
+        return ["한국 시장 수급은 현재 optional 데이터다. pykrx 미설치 상태라 외국인/기관/개인 수급 집계를 제공하지 않는다."]
 
     end = run_at.strftime("%Y%m%d")
     start = (run_at - timedelta(days=7)).strftime("%Y%m%d")
@@ -136,7 +136,7 @@ def _build_kr_flow_summary(run_at: datetime) -> list[str]:
             )
         except Exception:
             continue
-    return summaries or ["한국 시장 수급 데이터는 장 종료 후 반영 지연 또는 데이터 소스 응답 문제로 집계하지 못했다."]
+    return summaries or ["한국 시장 수급은 현재 best-effort optional 데이터다. pykrx/KRX 응답 공백 또는 네트워크 문제로 집계하지 못했다."]
 
 
 def _to_market_headline(item, market: str) -> MarketHeadline:
