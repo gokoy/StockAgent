@@ -16,6 +16,7 @@ from app.data.news_data import fetch_latest_news
 from app.data.sector_data import infer_sector_name
 from app.data.universe import resolve_scan_universe
 from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
+from app.evaluation.backtest_stub import run_backtest_stub
 from app.evaluation.performance import summarize_performance
 from app.evaluation.tracker import record_recommendation
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
@@ -115,6 +116,7 @@ def run_scan(
     save_run_result(result, config.output_dir)
     record_recommendation(result, config.performance_dir)
     summarize_performance(config.performance_dir)
+    run_backtest_stub(config.performance_dir)
     if config.include_watchlist:
         watchlist_state = load_watchlist(config.watchlist_path)
         updated_watchlist = update_watchlist_from_run(watchlist_state, result, config.watchlist_max_weak_runs)

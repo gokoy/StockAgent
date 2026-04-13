@@ -194,6 +194,7 @@
 - `performance_summary.json`에 `by_sector`, `by_macro_bucket`, `by_chart_bucket` 그룹 비교 요약 추가 완료
 - `performance_summary.json`에 `max_upside_20d`, `max_drawdown_20d`, `by_setup_combo` 비교 요약 추가 완료
 - tracker에 `above_ma60`, `above_ma120`, `breakout_setup`, `pullback_setup`, `volatility_contracting`, `recent_sharp_runup` 기록 추가 완료
+- 실행 시 `backtest_summary.json` 자동 생성 연결 완료
 
 ## 다음 작업
 

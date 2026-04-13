@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from app.evaluation.performance import summarize_performance
@@ -7,7 +8,7 @@ from app.evaluation.performance import summarize_performance
 
 def run_backtest_stub(performance_dir: Path) -> dict:
     summary = summarize_performance(performance_dir)
-    return {
+    result = {
         "status": "stub_with_live_history_check",
         "evaluated_records": summary.get("count", 0),
         "avg_return_5d": summary.get("avg_return_5d"),
@@ -22,3 +23,7 @@ def run_backtest_stub(performance_dir: Path) -> dict:
         "by_chart_bucket": summary.get("by_chart_bucket", {}),
         "by_setup_combo": summary.get("by_setup_combo", {}),
     }
+    target = performance_dir / "backtest_summary.json"
+    performance_dir.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    return result

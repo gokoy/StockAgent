@@ -329,6 +329,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 
 - [data/performance/recommendations.jsonl](/Users/young/PycharmProjects/StockAgent/data/performance/recommendations.jsonl)
 - [data/performance/performance_summary.json](/Users/young/PycharmProjects/StockAgent/data/performance/performance_summary.json)
+- [data/performance/backtest_summary.json](/Users/young/PycharmProjects/StockAgent/data/performance/backtest_summary.json)
 
 이 파일에는 아래 비교가 포함된다.
 
