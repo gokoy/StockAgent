@@ -172,6 +172,7 @@
 - 현재 범위 기준 필수 Secrets `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` 존재 확인 완료
 - 처음 보는 사용자 기준으로 `README.md`를 서비스 소개/사용법/데이터 출처/필터 기준/출력 예시 중심으로 전면 재작성 완료
 - `README.md`의 차트 feature 용어 설명과 운영 문서를 실제 서비스 소개 문서 형태로 재정리 완료
+- `README.md`에 로컬/GitHub Actions 기준 운영자가 매일 확인할 체크리스트 섹션 추가 완료
 
 ## 다음 작업
 

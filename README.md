@@ -393,6 +393,33 @@ workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. 
 - 뉴스는 Google News RSS 기반이라 source 품질과 정밀도는 계속 보강 대상이다.
 - 자동매매용 서비스가 아니라 의사결정 보조 도구다.
 
+## 운영자가 매일 확인할 것
+
+### 로컬에서 쓸 때
+
+1. [data/inputs/holdings.json](/Users/young/PycharmProjects/StockAgent/data/inputs/holdings.json)에 보유 종목이 맞게 들어 있는지 확인
+2. 필요하면 한국 수급 입력 파일이나 관련 값 갱신
+3. `python -m app.main --self-check`로 설정 확인
+4. `python -m app.main --holdings-preview`로 보유 종목 이름이 정상 해석되는지 확인
+5. `python -m app.main --no-telegram` 또는 일반 실행으로 결과 확인
+6. [data/outputs/latest.json](/Users/young/PycharmProjects/StockAgent/data/outputs/latest.json)과 Telegram 메시지가 기대한 형식인지 확인
+
+### GitHub Actions로 운영할 때
+
+1. GitHub Secrets에 `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`가 들어 있는지 확인
+2. GitHub Variables에 threshold, holdings 경로, 한국 수급 관련 값이 맞는지 확인
+3. `workflow_dispatch`로 한 번 수동 실행
+4. Actions artifact의 `latest.json`, `watchlist.json` 확인
+5. Telegram에서 한국 시장 1건, 미국 시장 1건이 정상 전송됐는지 확인
+
+### 결과를 볼 때 특히 볼 것
+
+- 보유 종목 상태가 내 체감과 크게 어긋나지 않는지
+- 신규 후보가 없을 때 그 이유가 납득 가능한지
+- 후보 종목의 `왜 지금 보는가`, `리스크`, `무효화 기준`이 충분히 실용적인지
+- 뉴스가 너무 오래됐거나 잡음 source에 치우치지 않았는지
+- 한국 수급이 fallback 문구인지 실제 입력값인지
+
 ## 운영에 꼭 알아야 하는 파일
 
 - [app/config.py](/Users/young/PycharmProjects/StockAgent/app/config.py)
