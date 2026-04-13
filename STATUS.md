@@ -132,12 +132,15 @@
 - 시장 뉴스와 종목 뉴스에 대한 저신호 source 배제 규칙 강화 완료
 - 샘플 holdings 기준 재실행에서 미국 시장 핵심 뉴스 잡음과 종목 뉴스 출처 품질이 개선된 것 확인 완료
 - 종목 뉴스의 `quote/forecast/price target` 성격 headline 추가 정제 완료
+- 최신 GitHub Actions run `24321474890` 성공 및 뉴스 품질 필터 반영 확인 완료
+- 최신 artifact 기준 `candidate_count=1`, `AMD` 매수 후보 / `KR(005930.KS, 000660.KS)` 관찰 후보 확인 완료
+- 공공데이터포털 조사 기준 공식 주가 OpenAPI는 확인했지만, 한국 시장 외국인/기관/개인 수급을 바로 주는 안정적인 공식 OpenAPI는 아직 확인하지 못함
 
 ## 다음 작업
 
-1. 한국 시장 수급 데이터 소스를 `pykrx` 외 대안까지 포함해 재검토
-2. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
-3. GitHub Actions 기준 최신 뉴스 품질 재검증
+1. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
+2. 한국 시장 수급 대체 소스는 `공식 API 부재` 전제에서 파일/스크래핑/유료 소스 중 하나로 재평가
+3. 종목 뉴스에서 `MSN/CNN` 계열 generic headline 추가 정제
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
