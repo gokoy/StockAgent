@@ -202,6 +202,12 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `LLM_MODEL_MACRO`
 - `HOLDINGS_PATH`
 - `KR_FLOW_PATH`
+- `KR_FLOW_KOSPI_FOREIGN`
+- `KR_FLOW_KOSPI_INSTITUTION`
+- `KR_FLOW_KOSPI_INDIVIDUAL`
+- `KR_FLOW_KOSDAQ_FOREIGN`
+- `KR_FLOW_KOSDAQ_INSTITUTION`
+- `KR_FLOW_KOSDAQ_INDIVIDUAL`
 - `UNIVERSE_MODE`
 - `US_STOCK_UNIVERSE`
 - `KR_STOCK_UNIVERSE`
@@ -213,6 +219,8 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `OBSERVE_MIN_FINAL_SCORE`
 - `CANDIDATE_MIN_CHART_SCORE`
 - `CANDIDATE_MIN_NEWS_SCORE`
+
+workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. `KR_FLOW_*` Variables가 채워져 있으면 한국 수급 snapshot을 자동 생성하고, 비어 있으면 이 단계는 조용히 건너뛴다.
 
 ## 저장 결과
 

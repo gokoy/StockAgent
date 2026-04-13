@@ -149,12 +149,14 @@
 - 수급 snapshot 스크립트의 `--print-template`, `--source manual` 동작 검증 완료
 - 최신 GitHub Actions run `24322104109` 성공 확인 완료
 - Node 24 opt-in 후 로그가 `강제 Node 24 실행` 경고로 바뀐 것 확인 완료
+- workflow에 `Prepare KR flow snapshot` step 추가 완료
+- GitHub Variables의 `KR_FLOW_*` 값으로 snapshot을 자동 생성할 수 있도록 연결 완료
 
 ## 다음 작업
 
 1. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
 2. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-3. GitHub Actions에서 필요하면 수급 snapshot 갱신 스크립트를 별도 step으로 연결
+3. 최신 workflow run에서 `Prepare KR flow snapshot` step 동작 확인
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모
