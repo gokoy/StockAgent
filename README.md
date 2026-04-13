@@ -119,6 +119,25 @@ python -m app.main --no-telegram
 
 한국 시장 수급은 기본적으로 `pykrx`를 best-effort로 시도하고, 실패하면 `KR_FLOW_PATH`의 파일 기반 snapshot을 읽는다. 샘플 형식은 [data/inputs/kr_flow_snapshot.sample.json](/Users/young/PycharmProjects/StockAgent/data/inputs/kr_flow_snapshot.sample.json)에 있다.
 
+수급 snapshot을 자동으로 만들거나 갱신하려면 `scripts/update_kr_flow_snapshot.py`를 쓸 수 있다.
+
+```bash
+python scripts/update_kr_flow_snapshot.py --print-template
+python scripts/update_kr_flow_snapshot.py --source auto
+```
+
+`pykrx`가 비거나 실패하면, 아래 환경변수로 수급 값을 주입해 snapshot을 만들 수 있다.
+
+```bash
+KR_FLOW_KOSPI_FOREIGN="+420억" \
+KR_FLOW_KOSPI_INSTITUTION="-180억" \
+KR_FLOW_KOSPI_INDIVIDUAL="-210억" \
+KR_FLOW_KOSDAQ_FOREIGN="-35억" \
+KR_FLOW_KOSDAQ_INSTITUTION="+62억" \
+KR_FLOW_KOSDAQ_INDIVIDUAL="-18억" \
+python scripts/update_kr_flow_snapshot.py --source manual
+```
+
 설정과 의존성만 점검하려면:
 
 ```bash
@@ -163,6 +182,7 @@ python -m app.main --telegram-test
 
 이 workflow는 `actions/setup-python`의 `pip` 캐시를 사용하므로, 실행할 때마다 `pip install`은 수행하지만 패키지 다운로드는 재사용될 수 있다.
 또한 `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`를 설정해 Node 24 전환을 선제 적용했다.
+현재 로그 기준으로 기존 `Node.js 20 actions are deprecated` 경고는 `Node.js 20 액션이 Node.js 24에서 강제 실행 중`이라는 형태로 바뀌었다. 즉 전환은 적용됐고, 경고를 완전히 없애려면 각 액션의 차기 릴리스를 따라가야 한다.
 
 GitHub Secrets에 아래 값을 설정한다.
 
