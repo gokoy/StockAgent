@@ -351,6 +351,7 @@ watchlist 운영 예외:
 - `portfolio/sizing_stub.py`는 후보 목록 기준 총 제안 비중, 단일 종목 최대 비중, 운용 자세를 담은 시장별 포트폴리오 가이드를 생성한다.
 - `scripts/update_event_calendar.py`는 구조화 이벤트 파일을 생성하고, 시장 이벤트 뉴스와 예상 실적 발표일을 합쳐 `event_calendar.json`을 갱신한다.
 - `scripts/update_kr_flow_snapshot.py`는 `pykrx -> Naver 증권 -> manual snapshot` 순서로 한국 수급 snapshot 생성을 시도한다.
+- `reporting/storage.py`와 `orchestrator.py`는 직전 `latest.json`과 비교해 시장별 전일 대비 변화 요약을 생성한다.
 
 ## Definition Of Done
 

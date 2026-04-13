@@ -129,6 +129,9 @@ def _format_market_section_text(section: MarketRunSection) -> list[str]:
 def _market_lines(section: MarketRunSection) -> list[str]:
     briefing = section.market_briefing
     lines = [f"- 요약: {briefing.market_summary}"]
+    if section.run_delta:
+        lines.append("- 전일 대비 변화:")
+        lines.extend(f"  • {line}" for line in _delta_lines(section.run_delta))
     if section.macro_analysis:
         lines.append(f"- 추천 자세: {section.macro_analysis.recommended_posture}")
         if section.macro_analysis.risk_flags:
@@ -163,6 +166,9 @@ def _market_lines(section: MarketRunSection) -> list[str]:
 def _market_lines_telegram(section: MarketRunSection) -> list[str]:
     briefing = section.market_briefing
     lines = [f"• 요약: {_truncate(briefing.market_summary, 100)}"]
+    if section.run_delta:
+        lines.append("• 전일 대비 변화")
+        lines.extend(f"  - {_truncate(line, 100)}" for line in _delta_lines(section.run_delta)[:4])
     if section.macro_analysis:
         lines.append(f"• 추천 자세: {_truncate(section.macro_analysis.recommended_posture, 90)}")
         if section.macro_analysis.risk_flags:
@@ -211,6 +217,21 @@ def _special_market_lines(briefing: MarketBriefing) -> list[str]:
         strong = ", ".join(briefing.strong_sectors[:3]) or "데이터 부족"
         weak = ", ".join(briefing.weak_sectors[:3]) or "데이터 부족"
         lines.append(f"강한 섹터: {strong} / 약한 섹터: {weak}")
+    return lines
+
+
+def _delta_lines(delta) -> list[str]:
+    lines: list[str] = []
+    if delta.new_candidates:
+        lines.append(f"신규 후보: {', '.join(delta.new_candidates[:5])}")
+    if delta.removed_candidates:
+        lines.append(f"후보 제외: {', '.join(delta.removed_candidates[:5])}")
+    if delta.new_observes:
+        lines.append(f"신규 관찰: {', '.join(delta.new_observes[:5])}")
+    if delta.removed_observes:
+        lines.append(f"관찰 제외: {', '.join(delta.removed_observes[:5])}")
+    if delta.holding_status_changes:
+        lines.extend(delta.holding_status_changes[:3])
     return lines
 
 

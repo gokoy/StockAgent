@@ -6,6 +6,16 @@ from pathlib import Path
 from app.models.schemas import RunResult
 
 
+def load_latest_result(output_dir: Path) -> RunResult | None:
+    latest = output_dir / "latest.json"
+    if not latest.exists():
+        return None
+    try:
+        return RunResult.model_validate_json(latest.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 def save_run_result(run_result: RunResult, output_dir: Path) -> Path:
     stamp = run_result.run_at.strftime("%Y%m%d_%H%M%S")
     target = output_dir / f"scan_{stamp}.json"

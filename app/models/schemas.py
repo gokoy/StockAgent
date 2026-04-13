@@ -190,6 +190,14 @@ class PortfolioGuidance(BaseModel):
     notes: list[str] = Field(default_factory=list)
 
 
+class RunDelta(BaseModel):
+    new_candidates: list[str] = Field(default_factory=list)
+    removed_candidates: list[str] = Field(default_factory=list)
+    new_observes: list[str] = Field(default_factory=list)
+    removed_observes: list[str] = Field(default_factory=list)
+    holding_status_changes: list[str] = Field(default_factory=list)
+
+
 class MarketRunSection(BaseModel):
     market: str
     title: str
@@ -202,6 +210,7 @@ class MarketRunSection(BaseModel):
     mid_term_portfolio_guidance: PortfolioGuidance | None = None
     candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     observe_briefs: list[CandidateBrief] = Field(default_factory=list)
+    run_delta: RunDelta | None = None
     rejection_summary: list[RejectionSummary] = Field(default_factory=list)
     no_candidate_reason: list[str] = Field(default_factory=list)
 

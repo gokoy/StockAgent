@@ -20,10 +20,10 @@ from app.evaluation.backtest_stub import run_backtest_stub
 from app.evaluation.performance import summarize_performance
 from app.evaluation.tracker import record_recommendation
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
-from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunResult
+from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunDelta, RunResult
 from app.portfolio.sizing_stub import build_portfolio_guidance, suggest_position_size
 from app.reporting.formatter import format_console_report, format_telegram_message, format_telegram_messages_by_market
-from app.reporting.storage import save_run_result
+from app.reporting.storage import load_latest_result, save_run_result
 from app.reporting.telegram import send_telegram_messages
 from app.screening.screener import screen_stock
 
@@ -36,6 +36,7 @@ def run_scan(
 ) -> tuple[RunResult, str]:
     llm_client = _build_llm_client(config)
     run_at = datetime.now(ZoneInfo(timezone_name))
+    previous_result = load_latest_result(config.output_dir)
     stocks = resolve_scan_universe(config)
     if max_stocks is not None:
         stocks = _limit_scan_stocks(stocks, max_stocks)
@@ -113,6 +114,7 @@ def run_scan(
         screened_out=screened_out,
         market_sections=_build_market_sections(run_at, candidates, non_candidates, screened_out, config),
     )
+    result = result.model_copy(update={"market_sections": _apply_run_deltas(result.market_sections, previous_result)})
     save_run_result(result, config.output_dir)
     record_recommendation(result, config.performance_dir)
     summarize_performance(config.performance_dir)
@@ -233,6 +235,66 @@ def _build_market_sections(
             )
         )
     return sections
+
+
+def _apply_run_deltas(sections: list[MarketRunSection], previous_result: RunResult | None) -> list[MarketRunSection]:
+    if previous_result is None:
+        return sections
+    previous_sections = {section.market: section for section in previous_result.market_sections}
+    updated: list[MarketRunSection] = []
+    for section in sections:
+        previous = previous_sections.get(section.market)
+        updated.append(section.model_copy(update={"run_delta": _build_run_delta(section, previous)}))
+    return updated
+
+
+def _build_run_delta(current: MarketRunSection, previous: MarketRunSection | None) -> RunDelta | None:
+    if previous is None:
+        candidate_names = [item.ticker for item in current.candidate_briefs[:3]]
+        observe_names = [item.ticker for item in current.observe_briefs[:3]]
+        if not candidate_names and not observe_names:
+            return None
+        return RunDelta(
+            new_candidates=candidate_names,
+            new_observes=observe_names,
+        )
+
+    prev_candidates = {item.ticker for item in previous.candidate_briefs}
+    curr_candidates = {item.ticker for item in current.candidate_briefs}
+    prev_observes = {item.ticker for item in previous.observe_briefs}
+    curr_observes = {item.ticker for item in current.observe_briefs}
+
+    previous_holdings = {item.ticker: item for item in previous.holdings}
+    holding_changes: list[str] = []
+    for item in current.holdings:
+        prev = previous_holdings.get(item.ticker)
+        if prev is None:
+            continue
+        short_changed = prev.short_term_status_label != item.short_term_status_label
+        mid_changed = prev.mid_term_status_label != item.mid_term_status_label
+        if short_changed or mid_changed:
+            holding_changes.append(
+                f"{item.ticker}: 단기 {prev.short_term_status_label.value}→{item.short_term_status_label.value}, 중기 {prev.mid_term_status_label.value}→{item.mid_term_status_label.value}"
+            )
+
+    delta = RunDelta(
+        new_candidates=sorted(curr_candidates - prev_candidates),
+        removed_candidates=sorted(prev_candidates - curr_candidates),
+        new_observes=sorted(curr_observes - prev_observes),
+        removed_observes=sorted(prev_observes - curr_observes),
+        holding_status_changes=holding_changes[:5],
+    )
+    if any(
+        [
+            delta.new_candidates,
+            delta.removed_candidates,
+            delta.new_observes,
+            delta.removed_observes,
+            delta.holding_status_changes,
+        ]
+    ):
+        return delta
+    return None
 
 
 def _to_holding_brief(

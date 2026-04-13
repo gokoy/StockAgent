@@ -201,6 +201,7 @@
 - 시장 브리핑이 `event_calendar.json`과 뉴스 기반 이벤트를 함께 반영하도록 갱신 완료
 - `scripts/update_kr_flow_snapshot.py`에 `Naver 증권` best-effort fallback 추가 완료
 - 백테스트 시나리오 `scenario_tp10_sl5_20d`, `scenario_tp15_sl7_20d` 추가 완료
+- 직전 `latest.json` 기준으로 시장별 `전일 대비 변화(run_delta)` 요약 추가 완료
 
 ## 다음 작업
 

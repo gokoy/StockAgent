@@ -369,6 +369,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 - `suggested_weight_pct`: 기본 제안 비중
 - `sizing_reason`: 점수, 시장 국면, 섹터 보정이 어떻게 반영됐는지에 대한 짧은 설명
 - `short_term_portfolio_guidance`, `mid_term_portfolio_guidance`: 시장별 총 제안 비중, 단일 종목 최대 비중, 운용 자세
+- `run_delta`: 전일 대비 신규/이탈 후보, 신규/이탈 관찰, 보유 종목 상태 변화
 
 ## 어떻게 실행하나
 
