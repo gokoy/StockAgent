@@ -165,6 +165,13 @@ discovery 대상 종목은 먼저 아래 기준을 통과해야 한다.
 
 보유 종목은 `단기 관점`과 `중기 관점`을 동시에 보여준다. 신규 후보도 `단기 추천 종목` 최대 5개, `중기 추천 종목` 최대 5개로 따로 보여준다.
 
+관련 운영값도 따로 조절할 수 있다.
+
+- `SHORT_TERM_BUY_SCORE`
+- `SHORT_TERM_WATCH_SCORE`
+- `MID_TERM_BUY_SCORE`
+- `MID_TERM_WATCH_SCORE`
+
 ## 입력 파일은 무엇을 쓰나
 
 ### 1. 보유 종목 입력
@@ -392,6 +399,10 @@ workflow 파일: [.github/workflows/stock_scan.yml](/Users/young/PycharmProjects
 - `OBSERVE_MIN_FINAL_SCORE`
 - `CANDIDATE_MIN_CHART_SCORE`
 - `CANDIDATE_MIN_NEWS_SCORE`
+- `SHORT_TERM_BUY_SCORE`
+- `SHORT_TERM_WATCH_SCORE`
+- `MID_TERM_BUY_SCORE`
+- `MID_TERM_WATCH_SCORE`
 
 ### 한국 수급 값을 Variables로 넣고 싶다면
 
@@ -411,6 +422,7 @@ workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. 
 - 그래서 한국 수급은 `KR_FLOW_PATH` 또는 `pykrx optional` 구조로 운영한다.
 - 시장 이벤트는 경제 캘린더 API가 아니라 최신 시장 뉴스 기반 요약이다.
 - 뉴스는 Google News RSS 기반이라 source 품질과 정밀도는 계속 보강 대상이다.
+- 주요 이벤트 문구는 현재 최신 이벤트성 뉴스의 발행일과 키워드를 정규화해서 보여준다.
 - 자동매매용 서비스가 아니라 의사결정 보조 도구다.
 
 ## 운영자가 매일 확인할 것

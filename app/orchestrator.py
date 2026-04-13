@@ -171,8 +171,8 @@ def _build_market_sections(
                 title=title,
                 market_briefing=build_market_briefing(market, run_at, config.max_news_age_hours),
                 holdings=[_to_holding_brief(stock) for stock in holdings],
-                short_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "short", config.top_n_candidates),
-                mid_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "mid", config.top_n_candidates),
+                short_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "short", config),
+                mid_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "mid", config),
                 candidate_briefs=[_to_candidate_brief(stock, CandidateStatus.BUY) for stock in new_candidates],
                 observe_briefs=[_to_candidate_brief(stock, CandidateStatus.WATCH) for stock in observe_candidates[:3]],
                 rejection_summary=rejection_summary,
@@ -222,19 +222,23 @@ def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus, horizon:
 def _build_horizon_candidate_briefs(
     stocks: list[EvaluatedStock],
     horizon: str,
-    limit: int,
+    config: AppConfig,
 ) -> list[CandidateBrief]:
     scored: list[tuple[int, CandidateBrief]] = []
     for stock in stocks:
         score = _short_term_score(stock) if horizon == "short" else _mid_term_score(stock)
-        status = _candidate_status_for_score(score)
+        status = _candidate_status_for_score(
+            score,
+            config.short_term_buy_score if horizon == "short" else config.mid_term_buy_score,
+            config.short_term_watch_score if horizon == "short" else config.mid_term_watch_score,
+        )
         if stock.final_analysis.action_label != ActionLabel.CANDIDATE and status == CandidateStatus.BUY:
             status = CandidateStatus.WATCH
         if status == CandidateStatus.NONE:
             continue
         scored.append((score, _to_candidate_brief(stock, status, horizon=horizon, score=score)))
     scored.sort(key=lambda item: item[0], reverse=True)
-    return [item for _, item in scored[:limit]]
+    return [item for _, item in scored[: config.top_n_candidates]]
 
 
 def _summarize_rejections(rejected: list[RejectedStock]) -> list[RejectionSummary]:
@@ -347,10 +351,10 @@ def _holding_status_for_score(score: int) -> HoldingStatus:
     return HoldingStatus.REVIEW
 
 
-def _candidate_status_for_score(score: int) -> CandidateStatus:
-    if score >= 70:
+def _candidate_status_for_score(score: int, buy_threshold: int, watch_threshold: int) -> CandidateStatus:
+    if score >= buy_threshold:
         return CandidateStatus.BUY
-    if score >= 55:
+    if score >= watch_threshold:
         return CandidateStatus.WATCH
     return CandidateStatus.NONE
 

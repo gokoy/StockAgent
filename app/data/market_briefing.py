@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
+import re
 
 from app.agents.macro_agent import analyze_market_regime
 from app.config import load_config
@@ -187,12 +188,41 @@ def _build_key_events(items) -> list[str]:
     events = []
     seen: set[str] = set()
     for item in items:
-        label = item.headline.strip()
+        label = _normalize_event_label(item.headline.strip(), item.published_at)
         if not label or label in seen:
             continue
         seen.add(label)
         events.append(label)
     return events
+
+
+def _normalize_event_label(headline: str, published_at: datetime) -> str:
+    text = re.sub(r"\s+", " ", headline).strip(" -")
+    text = re.sub(r"\s+\|\s+.+$", "", text)
+    text = re.sub(r"\s+-\s+[^-]+$", "", text)
+    lowered = text.lower()
+    korean_date = published_at.astimezone().strftime("%m월 %d일")
+    english_date = published_at.strftime("%b %d")
+
+    replacements = (
+        ("cpi", "미국 CPI 관련 이벤트"),
+        ("ppi", "미국 PPI 관련 이벤트"),
+        ("fomc", "FOMC 관련 이벤트"),
+        ("payroll", "미국 고용지표 관련 이벤트"),
+        ("options expiration", "미국 옵션 만기 관련 이벤트"),
+        ("treasury", "미국 국채금리 관련 이벤트"),
+        ("earnings", "실적 발표 관련 이벤트"),
+        ("실적", "실적 발표 관련 이벤트"),
+        ("환율", "환율 관련 이벤트"),
+        ("한국은행", "한국은행 관련 이벤트"),
+        ("정부 정책", "정부 정책 관련 이벤트"),
+    )
+    for pattern, label in replacements:
+        if pattern in lowered:
+            date_label = korean_date if re.search(r"[가-힣]", text) else english_date
+            return f"{date_label} {label}"
+    date_label = korean_date if re.search(r"[가-힣]", text) else english_date
+    return f"{date_label} {text}"
 
 
 def _why_it_matters(headline: str, summary: str, market: str) -> str:

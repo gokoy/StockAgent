@@ -32,6 +32,10 @@ class AppConfig:
     observe_min_final_score: int
     candidate_min_chart_score: int
     candidate_min_news_score: int
+    short_term_buy_score: int
+    short_term_watch_score: int
+    mid_term_buy_score: int
+    mid_term_watch_score: int
     max_news_age_hours: int
     universe_symbols: list[str]
     us_universe_symbols: list[str]
@@ -203,6 +207,10 @@ def load_config() -> AppConfig:
         observe_min_final_score=int(os.getenv("OBSERVE_MIN_FINAL_SCORE", "55")),
         candidate_min_chart_score=int(os.getenv("CANDIDATE_MIN_CHART_SCORE", "68")),
         candidate_min_news_score=int(os.getenv("CANDIDATE_MIN_NEWS_SCORE", "45")),
+        short_term_buy_score=int(os.getenv("SHORT_TERM_BUY_SCORE", "70")),
+        short_term_watch_score=int(os.getenv("SHORT_TERM_WATCH_SCORE", "55")),
+        mid_term_buy_score=int(os.getenv("MID_TERM_BUY_SCORE", "70")),
+        mid_term_watch_score=int(os.getenv("MID_TERM_WATCH_SCORE", "55")),
         max_news_age_hours=int(os.getenv("MAX_NEWS_AGE_HOURS", "72")),
         universe_symbols=_parse_universe(_env_value("STOCK_UNIVERSE")),
         us_universe_symbols=_parse_universe(_env_value("US_STOCK_UNIVERSE") or _env_value("STOCK_UNIVERSE")),
