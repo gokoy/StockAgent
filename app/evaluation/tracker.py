@@ -56,4 +56,10 @@ def _record_for_stock(run_result: RunResult, stock: EvaluatedStock) -> dict:
         "chart_score": stock.chart_analysis.chart_score,
         "news_score": stock.news_analysis.news_score,
         "macro_score": market_section.macro_analysis.macro_score if market_section and market_section.macro_analysis else None,
+        "above_ma60": stock.chart_features.above_ma60,
+        "above_ma120": stock.chart_features.above_ma120,
+        "breakout_setup": stock.chart_features.breakout_setup,
+        "pullback_setup": stock.chart_features.pullback_setup,
+        "volatility_contracting": stock.chart_features.volatility_contracting,
+        "recent_sharp_runup": stock.chart_features.recent_sharp_runup,
     }

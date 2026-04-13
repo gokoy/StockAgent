@@ -192,11 +192,13 @@
 - 단기/중기 후보 브리핑에 `섹터명`, `제안 비중`, `비중 산정 이유` 노출 추가 완료
 - `recommendations.jsonl` 저장 로직을 날짜/티커 기준 정리 방식으로 수정해 반복 실행 중복 누적 완화 완료
 - `performance_summary.json`에 `by_sector`, `by_macro_bucket`, `by_chart_bucket` 그룹 비교 요약 추가 완료
+- `performance_summary.json`에 `max_upside_20d`, `max_drawdown_20d`, `by_setup_combo` 비교 요약 추가 완료
+- tracker에 `above_ma60`, `above_ma120`, `breakout_setup`, `pullback_setup`, `volatility_contracting`, `recent_sharp_runup` 기록 추가 완료
 
 ## 다음 작업
 
 1. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-2. Phase 2 심화: 최대 상승폭/최대 낙폭, 조건 조합별 비교, 백테스트 로직 구체화
+2. Phase 2 심화: 백테스트 로직 구체화와 추천 전략별 리포트 활용 고도화
 
 ## 메모
 

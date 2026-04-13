@@ -337,6 +337,13 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 따로 간다. 한 
 - `by_sector`: 섹터별 성과
 - `by_macro_bucket`: 시장 국면 구간별 성과
 - `by_chart_bucket`: 차트 점수 구간별 성과
+- `by_setup_combo`: 추세/돌파/눌림/변동성 축소 조건 조합별 성과
+
+같이 저장되는 핵심 평가 값:
+
+- `return_5d`, `return_10d`, `return_20d`
+- `max_upside_20d`: 추천 후 20거래일 안에서의 최대 상승폭
+- `max_drawdown_20d`: 추천 후 20거래일 안에서의 최대 낙폭
 
 단기/중기 추천 브리핑에는 아래 값도 함께 노출된다.
 

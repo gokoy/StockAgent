@@ -100,21 +100,44 @@ def fetch_upcoming_earnings_date(symbol: str) -> str | None:
 
 
 def fetch_forward_return(symbol: str, start_date: str, trading_days: int) -> float | None:
+    stats = fetch_forward_path_stats(symbol, start_date, trading_days)
+    return stats.get(f"return_{trading_days}d")
+
+
+def fetch_forward_path_stats(symbol: str, start_date: str, trading_days: int) -> dict[str, float | None]:
     try:
         history = fetch_symbol_history(symbol, period="18mo", interval="1d").copy()
         history = history.dropna(subset=["date", "close"]).reset_index(drop=True)
         date_only = pd.to_datetime(history["date"]).dt.strftime("%Y-%m-%d")
         matches = history.index[date_only >= start_date].tolist()
         if not matches:
-            return None
+            return _empty_forward_stats(trading_days)
         start_idx = matches[0]
         end_idx = start_idx + trading_days
         if end_idx >= len(history):
-            return None
+            return _empty_forward_stats(trading_days)
         start_close = float(history.loc[start_idx, "close"])
-        end_close = float(history.loc[end_idx, "close"])
         if not start_close:
-            return None
-        return ((end_close / start_close) - 1.0) * 100
+            return _empty_forward_stats(trading_days)
+        window = history.loc[start_idx:end_idx].copy()
+        closes = window["close"].dropna().astype(float)
+        if closes.empty:
+            return _empty_forward_stats(trading_days)
+        end_close = float(closes.iloc[-1])
+        max_close = float(closes.max())
+        min_close = float(closes.min())
+        return {
+            f"return_{trading_days}d": ((end_close / start_close) - 1.0) * 100,
+            f"max_upside_{trading_days}d": ((max_close / start_close) - 1.0) * 100,
+            f"max_drawdown_{trading_days}d": ((min_close / start_close) - 1.0) * 100,
+        }
     except Exception:
-        return None
+        return _empty_forward_stats(trading_days)
+
+
+def _empty_forward_stats(trading_days: int) -> dict[str, float | None]:
+    return {
+        f"return_{trading_days}d": None,
+        f"max_upside_{trading_days}d": None,
+        f"max_drawdown_{trading_days}d": None,
+    }
