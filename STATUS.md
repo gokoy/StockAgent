@@ -154,12 +154,15 @@
 - 최신 GitHub Actions run `24347360478` 성공 확인 완료
 - 최신 run 로그에서 `Prepare KR flow snapshot` step이 실제 실행되고, 값 미주입 시 `kr_flow_snapshot_skipped no_manual_values`로 조용히 건너뛰는 것 확인 완료
 - 최신 run 로그에서 Node 24 opt-in이 유지되고, 경고는 `Node 20 액션이 Node 24에서 강제 실행 중` 형태로 남는 것 확인 완료
+- GitHub Variables에 테스트용 `KR_FLOW_*` 값을 주입한 run `24349228372` 성공 확인 완료
+- 최신 run 로그에서 `kr_flow_snapshot_written source=manual path=data/inputs/kr_flow_snapshot.json` 확인 완료
+- 최신 artifact 기준 한국 시장 `flow_summary`에 `KOSPI/KOSDAQ` 외국인·기관·개인 수급 문구가 실제 반영된 것 확인 완료
 
 ## 다음 작업
 
 1. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
 2. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
-3. 실제 GitHub Variables에 `KR_FLOW_*` 값을 넣은 상태로 snapshot 생성 run 1회 검증
+3. 운영용 `KR_FLOW_*` 값을 유지할지, 비워서 fallback 경로를 쓸지 결정
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모

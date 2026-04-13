@@ -221,6 +221,7 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `CANDIDATE_MIN_NEWS_SCORE`
 
 workflow는 실행 전에 `scripts/update_kr_flow_snapshot.py`를 호출한다. `KR_FLOW_*` Variables가 채워져 있으면 한국 수급 snapshot을 자동 생성하고, 비어 있으면 이 단계는 조용히 건너뛴다.
+운영 중에는 이 값들을 GitHub Variables에 유지해도 되고, 일시 검증 후 비워도 된다. 비워 두면 한국 수급은 다시 `pykrx optional -> fallback 문구` 경로로 동작한다.
 
 ## 저장 결과
 
