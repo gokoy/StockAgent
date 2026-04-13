@@ -160,6 +160,7 @@ def _build_market_sections(
             for stock in market_non_candidates
             if stock.final_analysis.action_label == ActionLabel.OBSERVE and not stock.in_holdings
         ]
+        recommendation_pool = market_candidates + observe_candidates
         rejected = [item for item in screened_out if item.market == market and not item.in_holdings]
         rejection_summary = _summarize_rejections(rejected)
         no_candidate_reason = _build_no_candidate_reason(market_candidates, observe_candidates, rejection_summary)
@@ -170,6 +171,8 @@ def _build_market_sections(
                 title=title,
                 market_briefing=build_market_briefing(market, run_at, config.max_news_age_hours),
                 holdings=[_to_holding_brief(stock) for stock in holdings],
+                short_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "short", config.top_n_candidates),
+                mid_term_candidate_briefs=_build_horizon_candidate_briefs(recommendation_pool, "mid", config.top_n_candidates),
                 candidate_briefs=[_to_candidate_brief(stock, CandidateStatus.BUY) for stock in new_candidates],
                 observe_briefs=[_to_candidate_brief(stock, CandidateStatus.WATCH) for stock in observe_candidates[:3]],
                 rejection_summary=rejection_summary,
@@ -180,40 +183,58 @@ def _build_market_sections(
 
 
 def _to_holding_brief(stock: EvaluatedStock) -> HoldingBrief:
-    score = stock.final_analysis.final_score
-    if score >= 75:
-        status = HoldingStatus.KEEP
-    elif score >= 65:
-        status = HoldingStatus.POSITIVE_WATCH
-    elif score >= 55:
-        status = HoldingStatus.CAUTION
-    elif score >= 45:
-        status = HoldingStatus.REDUCE
-    else:
-        status = HoldingStatus.REVIEW
+    short_score = _short_term_score(stock)
+    mid_score = _mid_term_score(stock)
+    short_status = _holding_status_for_score(short_score)
+    mid_status = _holding_status_for_score(mid_score)
     return HoldingBrief(
         ticker=stock.ticker,
         name=stock.name,
         market=stock.market,
-        status_label=status,
-        one_line_summary=stock.final_analysis.summary_reason,
+        short_term_status_label=short_status,
+        mid_term_status_label=mid_status,
+        short_term_summary=_holding_summary_for_horizon(stock, "short", short_score),
+        mid_term_summary=_holding_summary_for_horizon(stock, "mid", mid_score),
         key_points=_limit_points(stock.chart_analysis.positive_signals + [stock.news_analysis.headline_summary], 4),
         risks=_limit_points(stock.final_analysis.main_risks, 3),
         check_points=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if], 3),
     )
 
 
-def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus) -> CandidateBrief:
+def _to_candidate_brief(stock: EvaluatedStock, status: CandidateStatus, horizon: str = "swing", score: int | None = None) -> CandidateBrief:
     return CandidateBrief(
         ticker=stock.ticker,
         name=stock.name,
         market=stock.market,
+        horizon=horizon,
+        score=score if score is not None else stock.final_analysis.final_score,
         status_label=status,
-        why_now=stock.final_analysis.summary_reason,
+        rationale_points=_limit_points(
+            [stock.final_analysis.summary_reason, stock.chart_analysis.why_now, stock.news_analysis.headline_summary],
+            3,
+        ),
         entry_logic=_limit_points(stock.chart_analysis.positive_signals + [stock.chart_analysis.why_now], 3),
         risks=_limit_points(stock.final_analysis.main_risks, 3),
         confirm_conditions=_limit_points(stock.final_analysis.what_to_confirm_next + [stock.chart_analysis.invalid_if], 3),
     )
+
+
+def _build_horizon_candidate_briefs(
+    stocks: list[EvaluatedStock],
+    horizon: str,
+    limit: int,
+) -> list[CandidateBrief]:
+    scored: list[tuple[int, CandidateBrief]] = []
+    for stock in stocks:
+        score = _short_term_score(stock) if horizon == "short" else _mid_term_score(stock)
+        status = _candidate_status_for_score(score)
+        if stock.final_analysis.action_label != ActionLabel.CANDIDATE and status == CandidateStatus.BUY:
+            status = CandidateStatus.WATCH
+        if status == CandidateStatus.NONE:
+            continue
+        scored.append((score, _to_candidate_brief(stock, status, horizon=horizon, score=score)))
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [item for _, item in scored[:limit]]
 
 
 def _summarize_rejections(rejected: list[RejectedStock]) -> list[RejectionSummary]:
@@ -267,3 +288,93 @@ def _normalize_rejection_reason(reason: str) -> str:
         "volume_below_threshold": "최소 거래량 기준 미달",
     }
     return mapping.get(reason, reason)
+
+def _short_term_score(stock: EvaluatedStock) -> int:
+    features = stock.chart_features
+    score = stock.chart_analysis.chart_score * 0.45 + stock.news_analysis.news_score * 0.2 + stock.final_analysis.final_score * 0.35
+    if features.above_ma20:
+        score += 4
+    if features.volume_ratio_20d >= 1.2:
+        score += 5
+    if features.distance_from_20d_high_pct >= -3:
+        score += 5
+    if features.volatility_contracting:
+        score += 4
+    if features.breakout_setup:
+        score += 5
+    if features.pullback_setup:
+        score += 3
+    if features.range_bound:
+        score -= 5
+    if features.overextended_pct >= 12:
+        score -= 8
+    if features.recent_sharp_runup:
+        score -= 6
+    return max(0, min(100, int(round(score))))
+
+
+def _mid_term_score(stock: EvaluatedStock) -> int:
+    features = stock.chart_features
+    score = stock.chart_analysis.chart_score * 0.4 + stock.news_analysis.news_score * 0.2 + stock.final_analysis.final_score * 0.4
+    if features.above_ma60:
+        score += 5
+    if features.above_ma120:
+        score += 6
+    if features.distance_from_60d_high_pct >= -8:
+        score += 4
+    if features.pullback_setup:
+        score += 4
+    if features.breakout_setup:
+        score += 2
+    if features.range_bound:
+        score -= 4
+    if features.overextended_pct >= 15:
+        score -= 5
+    if features.recent_sharp_runup:
+        score -= 3
+    return max(0, min(100, int(round(score))))
+
+
+def _holding_status_for_score(score: int) -> HoldingStatus:
+    if score >= 75:
+        return HoldingStatus.KEEP
+    if score >= 65:
+        return HoldingStatus.POSITIVE_WATCH
+    if score >= 55:
+        return HoldingStatus.CAUTION
+    if score >= 45:
+        return HoldingStatus.REDUCE
+    return HoldingStatus.REVIEW
+
+
+def _candidate_status_for_score(score: int) -> CandidateStatus:
+    if score >= 70:
+        return CandidateStatus.BUY
+    if score >= 55:
+        return CandidateStatus.WATCH
+    return CandidateStatus.NONE
+
+
+def _holding_summary_for_horizon(stock: EvaluatedStock, horizon: str, score: int) -> str:
+    features = stock.chart_features
+    if horizon == "short":
+        if score >= 75:
+            return "한 달 이내 관점에서 모멘텀과 추세가 모두 살아 있어 유지 또는 추가 관찰이 가능한 구간이다."
+        if score >= 65:
+            return "단기 추세는 남아 있지만 거래량과 고점 돌파 확인이 더 필요하다."
+        if score >= 55:
+            return "단기 반등 가능성은 있지만 눌림과 변동성 확대에 주의해야 한다."
+        if score >= 45:
+            return "단기 관점에서는 추세 신뢰도가 약해 비중 조절을 검토할 만하다."
+        return "단기 관점에서는 추세와 모멘텀이 모두 약해 재점검이 필요하다."
+    if score >= 75:
+        return "1개월에서 6개월 관점에서 중기 추세가 유지되고 있어 보유 논리가 비교적 안정적이다."
+    if score >= 65:
+        return "중기 추세는 아직 살아 있으나 추가 상승 전에 조정이나 재정렬이 나올 수 있다."
+    if score >= 55:
+        return "중기 관점에서는 방향성은 남아 있지만 확신이 강한 구간은 아니다."
+    if score >= 45:
+        return "중기 기준 핵심 추세가 약해지고 있어 비중 축소 검토가 가능하다."
+    if not features.above_ma120:
+        return "중기 기준 장기 이동평균 아래에 머물러 재점검이 필요하다."
+    return "중기 기준 보유 논리가 약해져 다시 점검해야 한다."

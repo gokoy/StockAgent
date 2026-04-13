@@ -40,7 +40,7 @@ def build_market_briefing(market: str, run_at: datetime, max_news_age_hours: int
     macro_snapshots = _build_macro_snapshots(normalized)
     sector_snapshot = get_sector_snapshot(normalized)
     news_items = fetch_market_news(normalized, max_age_hours=max_news_age_hours, limit=4)
-    event_items = fetch_market_event_news(normalized, max_age_hours=max_news_age_hours, limit=3)
+    event_items = fetch_market_event_news(normalized, max_age_hours=max_news_age_hours, limit=8)
     market_briefing = MarketBriefing(
         market=normalized,
         title=title,
@@ -185,12 +185,14 @@ def _to_market_headline(item, market: str) -> MarketHeadline:
 
 def _build_key_events(items) -> list[str]:
     events = []
+    seen: set[str] = set()
     for item in items:
         label = item.headline.strip()
-        if not label:
+        if not label or label in seen:
             continue
+        seen.add(label)
         events.append(label)
-    return events[:3]
+    return events
 
 
 def _why_it_matters(headline: str, summary: str, market: str) -> str:

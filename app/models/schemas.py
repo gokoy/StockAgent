@@ -150,8 +150,10 @@ class HoldingBrief(BaseModel):
     ticker: str
     name: str
     market: str
-    status_label: HoldingStatus
-    one_line_summary: str
+    short_term_status_label: HoldingStatus
+    mid_term_status_label: HoldingStatus
+    short_term_summary: str
+    mid_term_summary: str
     key_points: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     check_points: list[str] = Field(default_factory=list)
@@ -161,8 +163,10 @@ class CandidateBrief(BaseModel):
     ticker: str
     name: str
     market: str
+    horizon: str
+    score: int
     status_label: CandidateStatus
-    why_now: str
+    rationale_points: list[str] = Field(default_factory=list)
     entry_logic: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     confirm_conditions: list[str] = Field(default_factory=list)
@@ -178,6 +182,8 @@ class MarketRunSection(BaseModel):
     title: str
     market_briefing: MarketBriefing
     holdings: list[HoldingBrief] = Field(default_factory=list)
+    short_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
+    mid_term_candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     candidate_briefs: list[CandidateBrief] = Field(default_factory=list)
     observe_briefs: list[CandidateBrief] = Field(default_factory=list)
     rejection_summary: list[RejectionSummary] = Field(default_factory=list)
