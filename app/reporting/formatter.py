@@ -15,6 +15,16 @@ def format_telegram_message(run_result: RunResult) -> str:
     return "\n".join(lines).strip()
 
 
+def format_telegram_messages_by_market(run_result: RunResult) -> list[str]:
+    date_str = run_result.run_at.strftime("%Y-%m-%d 데일리 브리핑")
+    messages: list[str] = []
+    for section in run_result.market_sections:
+        lines = [f"<b>[{escape(date_str)}]</b>", ""]
+        lines.extend(_format_market_section_html(section))
+        messages.append("\n".join(lines).strip())
+    return messages
+
+
 def format_console_report(run_result: RunResult) -> str:
     date_str = run_result.run_at.strftime("%Y-%m-%d %H:%M %Z")
     lines = [f"실행 시각: {date_str}", ""]

@@ -146,6 +146,8 @@ Telegram 연결만 테스트하려면:
 python -m app.main --telegram-test
 ```
 
+실제 Telegram 전송은 합본 1건이 아니라 `한국 시장`, `미국 시장`을 각각 별도 메시지로 보낸다. 콘솔 출력과 JSON 저장은 기존처럼 전체 실행 결과를 한 번에 유지한다.
+
 ## GitHub Actions
 
 `.github/workflows/stock_scan.yml`는 다음 트리거를 지원한다.
@@ -244,6 +246,10 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - SK하이닉스 | 000660.KS
   상태: 매수 후보
   왜 지금 보는가: 반도체 강세와 추세 재정렬이 동시에 확인된다.
+```
+
+```text
+[2026-04-12 데일리 브리핑]
 
 🇺🇸 미국 시장
 [1] 시장 상황

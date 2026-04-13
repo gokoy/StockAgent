@@ -16,9 +16,9 @@ from app.data.universe import resolve_scan_universe
 from app.data.watchlist import load_watchlist, save_watchlist, update_watchlist_from_run
 from app.models.enums import ActionLabel, CandidateStatus, HoldingStatus
 from app.models.schemas import CandidateBrief, EvaluatedStock, HoldingBrief, MarketRunSection, RejectedStock, RejectionSummary, RunResult
-from app.reporting.formatter import format_console_report, format_telegram_message
+from app.reporting.formatter import format_console_report, format_telegram_message, format_telegram_messages_by_market
 from app.reporting.storage import save_run_result
-from app.reporting.telegram import send_telegram_message
+from app.reporting.telegram import send_telegram_messages
 from app.screening.screener import screen_stock
 
 
@@ -115,7 +115,7 @@ def run_scan(
     message = format_telegram_message(result)
     if send_telegram:
         try:
-            send_telegram_message(message, config)
+            send_telegram_messages(format_telegram_messages_by_market(result), config)
         except Exception:
             pass
     return result, message

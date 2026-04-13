@@ -6,21 +6,26 @@ from app.config import AppConfig
 
 
 def send_telegram_message(message: str, config: AppConfig) -> bool:
+    return send_telegram_messages([message], config)
+
+
+def send_telegram_messages(messages: list[str], config: AppConfig) -> bool:
     if not config.telegram_enabled:
         return False
     url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage"
-    for chunk in _split_message(message):
-        response = requests.post(
-            url,
-            json={
-                "chat_id": config.telegram_chat_id,
-                "text": chunk,
-                "disable_web_page_preview": True,
-                "parse_mode": "HTML",
-            },
-            timeout=20,
-        )
-        response.raise_for_status()
+    for message in messages:
+        for chunk in _split_message(message):
+            response = requests.post(
+                url,
+                json={
+                    "chat_id": config.telegram_chat_id,
+                    "text": chunk,
+                    "disable_web_page_preview": True,
+                    "parse_mode": "HTML",
+                },
+                timeout=20,
+            )
+            response.raise_for_status()
     return True
 
 
