@@ -82,6 +82,7 @@ Mermaid 원본: [docs/system-diagram.mmd](/Users/young/PycharmProjects/StockAgen
 - `KR_STOCK_UNIVERSE` 선택사항, 국장 discovery pool
 - `UNIVERSE_MODE` 선택사항, `discovery_plus_watchlist|watchlist|manual`, 기본값 `discovery_plus_watchlist`
 - `HOLDINGS_PATH` 선택사항, 기본값 `data/inputs/holdings.json`
+- `KR_FLOW_PATH` 선택사항, 기본값 `data/inputs/kr_flow_snapshot.json`
 - `INCLUDE_WATCHLIST` 선택사항, 기본값 `true`
 - `WATCHLIST_PATH` 선택사항, 기본값 `data/outputs/watchlist.json`
 - `WATCHLIST_MAX_WEAK_RUNS` 선택사항, 기본값 `3`
@@ -115,6 +116,8 @@ python -m app.main --no-telegram
 ```
 
 샘플 입력은 [data/inputs/holdings.sample.json](/Users/young/PycharmProjects/StockAgent/data/inputs/holdings.sample.json)에 있다. 검증용으로 다른 파일을 쓰려면 `HOLDINGS_PATH`로 경로를 바꾸면 된다.
+
+한국 시장 수급은 기본적으로 `pykrx`를 best-effort로 시도하고, 실패하면 `KR_FLOW_PATH`의 파일 기반 snapshot을 읽는다. 샘플 형식은 [data/inputs/kr_flow_snapshot.sample.json](/Users/young/PycharmProjects/StockAgent/data/inputs/kr_flow_snapshot.sample.json)에 있다.
 
 설정과 의존성만 점검하려면:
 
@@ -159,6 +162,7 @@ python -m app.main --telegram-test
 - `schedule`
 
 이 workflow는 `actions/setup-python`의 `pip` 캐시를 사용하므로, 실행할 때마다 `pip install`은 수행하지만 패키지 다운로드는 재사용될 수 있다.
+또한 `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`를 설정해 Node 24 전환을 선제 적용했다.
 
 GitHub Secrets에 아래 값을 설정한다.
 
@@ -177,6 +181,7 @@ GitHub Variables 또는 환경변수로 아래 값을 설정할 수 있다.
 - `LLM_MODEL_FINAL`
 - `LLM_MODEL_MACRO`
 - `HOLDINGS_PATH`
+- `KR_FLOW_PATH`
 - `UNIVERSE_MODE`
 - `US_STOCK_UNIVERSE`
 - `KR_STOCK_UNIVERSE`

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from app.agents.macro_agent import analyze_market_regime
+from app.config import load_config
 from app.data.market_data import fetch_latest_close_change
 from app.data.news_data import fetch_market_event_news, fetch_market_news
 from app.data.sector_data import get_sector_snapshot
@@ -113,8 +116,12 @@ def _build_us_flow_proxy() -> list[str]:
 
 
 def _build_kr_flow_summary(run_at: datetime) -> list[str]:
+    snapshot_messages = _load_kr_flow_snapshot(load_config().kr_flow_path)
+    if snapshot_messages:
+        return snapshot_messages
+
     if krx_stock is None:
-        return ["한국 시장 수급은 현재 optional 데이터다. pykrx 미설치 상태라 외국인/기관/개인 수급 집계를 제공하지 않는다."]
+        return ["한국 시장 수급은 현재 optional 데이터다. kr_flow_snapshot.json이 비어 있고 pykrx도 사용할 수 없어 외국인/기관/개인 수급 집계를 제공하지 않는다."]
 
     end = run_at.strftime("%Y%m%d")
     start = (run_at - timedelta(days=7)).strftime("%Y%m%d")
@@ -136,7 +143,34 @@ def _build_kr_flow_summary(run_at: datetime) -> list[str]:
             )
         except Exception:
             continue
-    return summaries or ["한국 시장 수급은 현재 best-effort optional 데이터다. pykrx/KRX 응답 공백 또는 네트워크 문제로 집계하지 못했다."]
+    return summaries or ["한국 시장 수급은 현재 best-effort optional 데이터다. kr_flow_snapshot.json이 비어 있고 pykrx/KRX 응답 공백 또는 네트워크 문제로 집계하지 못했다."]
+
+
+def _load_kr_flow_snapshot(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    if not isinstance(payload, dict):
+        return []
+
+    lines: list[str] = []
+    for market in ("KOSPI", "KOSDAQ"):
+        item = payload.get(market)
+        if not isinstance(item, dict):
+            continue
+        as_of = str(item.get("as_of", "")).strip()
+        foreign = str(item.get("foreign", "")).strip()
+        institution = str(item.get("institution", "")).strip()
+        individual = str(item.get("individual", "")).strip()
+        if not any((foreign, institution, individual)):
+            continue
+        suffix = f" ({as_of})" if as_of else ""
+        lines.append(f"{market}{suffix}: 외국인 {foreign or '-'}, 기관 {institution or '-'}, 개인 {individual or '-'}")
+    return lines
 
 
 def _to_market_headline(item, market: str) -> MarketHeadline:

@@ -142,12 +142,15 @@
 - 시장 뉴스 source 정규화와 `MSN/CNN` generic headline 추가 정제 완료
 - `self-check`에 holdings 총계/시장별 개수 출력 추가 완료
 - 보유 종목이 비어 있을 때 브리핑에 `holdings.json 비어 있음 또는 미설정` 문구가 표시되도록 개선 완료
+- GitHub Actions workflow에 `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` 적용 완료
+- 한국 시장 수급 대체 경로로 `KR_FLOW_PATH` 파일 기반 snapshot 지원 추가 완료
+- 샘플 `kr_flow_snapshot.sample.json` 기준으로 한국 시장 수급 문구가 실제 브리핑에 반영되는 것 확인 완료
 
 ## 다음 작업
 
 1. 실제 사용자 holdings 입력 기준 보유 종목 브리핑 실전 검증
-2. 한국 시장 수급 대체 소스는 `공식 API 부재` 전제에서 파일/스크래핑/유료 소스 중 하나로 재평가
-3. GitHub Actions Node 24 전환 대응 여부 점검
+2. 한국 시장 수급 대체 소스는 현재 `KR_FLOW_PATH 파일 입력 + pykrx optional` 구조로 유지하고, 장기적으로는 유료/스크래핑 대안 재평가
+3. Node 24 opt-in이 실제 GitHub Actions 로그에서 경고 제거로 이어지는지 재검증
 4. Anthropic/Gemini smoke test는 후순위로 보류
 
 ## 메모

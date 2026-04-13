@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +38,7 @@ jobs:
           LLM_MODEL_MACRO: ${{ vars.LLM_MODEL_MACRO }}
           UNIVERSE_MODE: ${{ vars.UNIVERSE_MODE || 'discovery_plus_watchlist' }}
           HOLDINGS_PATH: ${{ vars.HOLDINGS_PATH }}
+          KR_FLOW_PATH: ${{ vars.KR_FLOW_PATH }}
           US_STOCK_UNIVERSE: ${{ vars.US_STOCK_UNIVERSE }}
           KR_STOCK_UNIVERSE: ${{ vars.KR_STOCK_UNIVERSE }}
           INCLUDE_WATCHLIST: ${{ vars.INCLUDE_WATCHLIST || 'true' }}

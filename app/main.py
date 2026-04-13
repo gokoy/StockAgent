@@ -86,6 +86,7 @@ def run_self_check(config) -> str:
         f"holdings_total={holdings['total']}",
         f"holdings_kr={holdings['kr']}",
         f"holdings_us={holdings['us']}",
+        f"kr_flow_path={config.kr_flow_path}",
         f"watchlist_path={config.watchlist_path}",
         f"watchlist_max_weak_runs={config.watchlist_max_weak_runs}",
     ]
