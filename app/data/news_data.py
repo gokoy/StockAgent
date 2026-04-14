@@ -349,6 +349,7 @@ def fetch_yahoo_ticker_news(ticker: str, name: str, max_age_hours: int, limit: i
 
 def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> int:
     text = f"{item.headline} {item.summary}".lower()
+    headline = item.headline.lower().strip()
     keywords = KR_MARKET_KEYWORDS if market == "KR" else US_MARKET_KEYWORDS
     noise_keywords = KR_NOISE_KEYWORDS if market == "KR" else US_NOISE_KEYWORDS
     score = 0
@@ -361,7 +362,31 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
         if keyword in text:
             score -= 3
 
+    if market == "KR" and _is_low_value_kr_headline(item.headline):
+        return -100
+
     if market == "US" and any(pattern in text for pattern in ("etf", "dividend etf", "nyse |", "new york stock exchange |")):
+        return -100
+
+    if market == "US" and any(
+        pattern in headline
+        for pattern in (
+            "us stock market today:",
+            "stock market today:",
+            "dow falls",
+            "s&p 500 futures edge higher",
+            "what should investor know",
+            "why are us stock market futures up today",
+            "will s&p 500, dow jones and nasdaq stay in green",
+            "us stocks today:",
+        )
+    ):
+        return -100
+
+    if market == "US" and any(
+        source in _normalized_source(item.source)
+        for source in ("yahoo finance australia", "the sunday guardian", "economy middle east", "msn", "the economic times")
+    ):
         return -100
 
     if "cpi" in text or "fomc" in text or "yield" in text or "실적" in text or "환율" in text:
@@ -386,6 +411,8 @@ def _score_stock_news_item(item: NewsItem, market: str) -> int:
     if source == "opendart":
         return 100
     if _source_matches(source, LOW_SIGNAL_SOURCES):
+        return -100
+    if market.upper() == "KR" and _is_low_value_kr_headline(item.headline):
         return -100
 
     score = 1
@@ -432,6 +459,30 @@ def _score_stock_news_item(item: NewsItem, market: str) -> int:
     if market.upper() == "KR" and "site:finance.naver.com" in text:
         score += 1
     return score
+
+
+def _is_low_value_kr_headline(headline: str) -> bool:
+    normalized = re.sub(r"\s+", " ", headline.strip().lower())
+    if not normalized:
+        return True
+    if normalized in {"- 네이버 증권", "네이버 증권", "097950 - 네이버 증권"}:
+        return True
+    if normalized in {
+        "네이버 증권 - 네이버 증권",
+        "주가 - 네이버 증권 - naver - 네이버 증권",
+    }:
+        return True
+    if re.fullmatch(r"\d{6}(\.\w+)? - 네이버 증권", normalized):
+        return True
+    if "네이버 증권 - naver - 네이버 증권" in normalized:
+        return True
+    if normalized.endswith("- 네이버 증권") and ("주가" in normalized or "naver -" in normalized):
+        return True
+    if normalized.endswith("- 네이버 증권") and re.search(r"\d{6}|주가|종목", normalized):
+        return True
+    if normalized.count("네이버 증권") >= 2:
+        return True
+    return False
 
 
 def _headline_dedupe_key(headline: str) -> str:

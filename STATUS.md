@@ -205,12 +205,14 @@
 - 미국 종목 뉴스에 `Yahoo Finance` 보조 입력 추가 완료
 - 한국 종목 뉴스에 `OpenDART` 공시 경로 추가 완료
 - `OPENDART_API_KEY` 설정 경로와 self-check 노출 추가 완료
+- 한국 종목 뉴스에서 `네이버 증권 - 네이버 증권`, 종목코드/주가만 남은 placeholder 제목 제거 완료
+- 미국 시장 뉴스에서 `MSN`, `The Economic Times` 등 generic market wrap headline 일부 제외 완료
 - Phase 3 데이터 파이프라인 구조를 문서에 반영 완료
 
 ## 다음 작업
 
-1. 한국 종목 뉴스에서 네이버 증권 경로 relevance를 더 높이고 무의미한 제목 정제
-2. OpenDART 키가 있는 환경에서 실제 공시 자동 수집 end-to-end 검증
+1. OpenDART 키가 있는 환경에서 실제 공시 자동 수집 end-to-end 검증
+2. 한국 종목 뉴스 relevance를 공시/국내 원문 중심으로 더 높이는 추가 튜닝
 
 ## 메모
 
