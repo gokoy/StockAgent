@@ -211,13 +211,15 @@
 - OpenDART 직접 검증에서 `CJ CheilJedang`, `SKSQUARE`, `SamsungElec`, `SK hynix` 공시 수집 확인 완료
 - 한국 종목 뉴스는 `OPENDART_MAX_AGE_HOURS=720` 기본값으로 공시 조회 범위를 뉴스보다 넓게 보도록 조정 완료
 - 한국 종목 뉴스에 공시가 있을 경우 리포트 근거에 최소 1건은 우선 노출되도록 정렬 규칙 보강 완료
+- 한국 종목 뉴스 relevance를 `공시 > 국내 원문 경제지 > 네이버 경유 기사` 방향으로 추가 튜닝 완료
+- 실제 한국 축약 스캔에서 `CJ CheilJedang`, `SKSQUARE`, `SamsungElec`, `SK hynix` 근거에 OpenDART 공시가 상단 반영되는 것 확인 완료
 - OpenDART corp code 캐시 파일은 생성 산출물로 `.gitignore` 처리 완료
 - Phase 3 데이터 파이프라인 구조를 문서에 반영 완료
 
 ## 다음 작업
 
-1. 한국 종목 뉴스 relevance를 공시/국내 원문 중심으로 더 높이는 추가 튜닝
-2. 전체 스캔에서 외부 소스 응답 병목이 길어질 때 타임아웃/소스별 degrade 정책 정교화
+1. 전체 스캔에서 외부 소스 응답 병목이 길어질 때 타임아웃/소스별 degrade 정책 정교화
+2. 미국 시장 핵심 뉴스 source 품질을 Reuters/AP/WSJ 계열 중심으로 더 압축하는 추가 튜닝
 
 ## 메모
 

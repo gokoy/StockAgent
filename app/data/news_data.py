@@ -98,6 +98,22 @@ HIGH_SIGNAL_SOURCES = {
     "yahoo finance",
 }
 
+KR_HIGH_SIGNAL_SOURCES = {
+    "전자공시시스템",
+    "opendart",
+    "dart",
+    "매일경제",
+    "한국경제",
+    "머니투데이",
+    "연합뉴스",
+    "서울경제",
+    "이데일리",
+    "아시아경제",
+    "조선비즈",
+    "인포스탁데일리",
+}
+KR_HIGH_SIGNAL_SOURCE_MATCHERS = {source.lower() for source in KR_HIGH_SIGNAL_SOURCES}
+
 REUTERS_SOURCES = {
     "reuters",
 }
@@ -401,6 +417,8 @@ def _score_market_news_item(item: NewsItem, market: str, event_mode: bool) -> in
         score += 1
         if _source_matches(source, REUTERS_SOURCES):
             score += 5
+        if market == "KR" and _source_matches(source, KR_HIGH_SIGNAL_SOURCE_MATCHERS):
+            score += 3
         if _source_matches(source, HIGH_SIGNAL_SOURCES):
             score += 2
         if _source_matches(source, LOW_SIGNAL_SOURCES):
@@ -423,6 +441,8 @@ def _score_stock_news_item(item: NewsItem, market: str) -> int:
     score = 1
     if _source_matches(source, REUTERS_SOURCES):
         score += 6
+    elif market.upper() == "KR" and _source_matches(source, KR_HIGH_SIGNAL_SOURCE_MATCHERS):
+        score += 5
     elif _source_matches(source, HIGH_SIGNAL_SOURCES):
         score += 3
     elif source:
@@ -456,13 +476,26 @@ def _score_stock_news_item(item: NewsItem, market: str) -> int:
         return -100
     if source == "cnn" and "forecast" in text:
         return -100
+    if market.upper() == "KR" and any(
+        pattern in text
+        for pattern in (
+            "네이버 금융 - 네이버 증권",
+            "naver finance - naver securities",
+            "주가 - 네이버 증권",
+            "종목분석",
+            "증권 > 뉴스",
+        )
+    ):
+        return -100
 
     if any(word in text for word in ("earnings", "guidance", "forecast", "revenue", "deal", "data center", "chip", "ai", "공시", "수주", "유상증자", "공급계약")):
         score += 2
     if any(word in text for word in ("lawsuit", "probe", "downgrade", "cut", "delay", "tariff")):
         score += 1
     if market.upper() == "KR" and "site:finance.naver.com" in text:
-        score += 1
+        score -= 1
+    if market.upper() == "KR" and any(word in text for word in ("잠정실적", "공정공시", "대표이사", "자기주식", "최대주주", "주요사항보고서")):
+        score += 3
     return score
 
 
@@ -513,6 +546,8 @@ def _source_matches(source: str, candidates: set[str]) -> bool:
 def _source_priority(source: str) -> int:
     normalized = _normalized_source(source)
     if normalized == "opendart":
+        return 5
+    if _source_matches(normalized, KR_HIGH_SIGNAL_SOURCE_MATCHERS):
         return 4
     if _source_matches(normalized, REUTERS_SOURCES):
         return 3
