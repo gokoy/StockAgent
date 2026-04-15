@@ -84,6 +84,8 @@ def run_self_check(config) -> str:
         f"short_term_watch_score={config.short_term_watch_score}",
         f"mid_term_buy_score={config.mid_term_buy_score}",
         f"mid_term_watch_score={config.mid_term_watch_score}",
+        f"max_news_age_hours={config.max_news_age_hours}",
+        f"opendart_max_age_hours={config.opendart_max_age_hours}",
         f"llm_enabled={config.llm_enabled}",
         f"opendart_enabled={bool(config.opendart_api_key)}",
         f"provider_package={provider_package}",

@@ -70,6 +70,7 @@ def run_scan(
                 stock.name,
                 stock.market,
                 config.max_news_age_hours,
+                opendart_max_age_hours=config.opendart_max_age_hours,
                 opendart_api_key=config.opendart_api_key,
             )
             news_analysis = analyze_news(stock.ticker, stock.name, news_items, llm_client)

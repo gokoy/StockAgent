@@ -207,12 +207,17 @@
 - `OPENDART_API_KEY` 설정 경로와 self-check 노출 추가 완료
 - 한국 종목 뉴스에서 `네이버 증권 - 네이버 증권`, 종목코드/주가만 남은 placeholder 제목 제거 완료
 - 미국 시장 뉴스에서 `MSN`, `The Economic Times` 등 generic market wrap headline 일부 제외 완료
+- `OPENDART_API_KEY` 주입 환경에서 self-check 기준 `opendart_enabled=True` 확인 완료
+- OpenDART 직접 검증에서 `CJ CheilJedang`, `SKSQUARE`, `SamsungElec`, `SK hynix` 공시 수집 확인 완료
+- 한국 종목 뉴스는 `OPENDART_MAX_AGE_HOURS=720` 기본값으로 공시 조회 범위를 뉴스보다 넓게 보도록 조정 완료
+- 한국 종목 뉴스에 공시가 있을 경우 리포트 근거에 최소 1건은 우선 노출되도록 정렬 규칙 보강 완료
+- OpenDART corp code 캐시 파일은 생성 산출물로 `.gitignore` 처리 완료
 - Phase 3 데이터 파이프라인 구조를 문서에 반영 완료
 
 ## 다음 작업
 
-1. OpenDART 키가 있는 환경에서 실제 공시 자동 수집 end-to-end 검증
-2. 한국 종목 뉴스 relevance를 공시/국내 원문 중심으로 더 높이는 추가 튜닝
+1. 한국 종목 뉴스 relevance를 공시/국내 원문 중심으로 더 높이는 추가 튜닝
+2. 전체 스캔에서 외부 소스 응답 병목이 길어질 때 타임아웃/소스별 degrade 정책 정교화
 
 ## 메모
 

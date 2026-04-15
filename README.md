@@ -44,7 +44,8 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 ### 시장/종목 가격 데이터
 
 - 미국/한국 종목 가격, 거래량, 지수: `yfinance`
-- 미국 discovery universe는 `US_UNIVERSE_SOURCE=curated|sp500|nasdaq100|sp500_plus_nasdaq100`로 확장할 수 있다.
+- 미국 discovery universe는 기본적으로 `US_UNIVERSE_SOURCE=nasdaq100`을 쓰고, `curated|sp500|nasdaq100|sp500_plus_nasdaq100`로 바꿀 수 있다.
+- 한국 discovery universe는 기본적으로 코스피 시가총액 상위 보통주 100개를 쓰고, `KR_STOCK_UNIVERSE`로 직접 덮어쓸 수 있다.
 
 ### 뉴스 데이터
 
@@ -52,6 +53,7 @@ Telegram은 `한국 시장 1건`, `미국 시장 1건`으로 나눠서 전송하
 - 한국 시장/종목 뉴스: `Google News RSS + 네이버 증권 경로 보조 + OpenDART 공시`
 - 같은 검색 결과 안에서는 `Reuters`를 최우선 source로 우대한다.
 - 한국 종목은 OpenDART 공시를 뉴스보다 상위 신호로 취급한다.
+- 한국 종목은 `OPENDART_MAX_AGE_HOURS` 기본값 `720시간(30일)` 범위까지 공시를 보고, 공시가 있으면 리포트 근거에 최소 1건은 우선 노출한다.
 - 최신성 필터를 적용해 일정 시간보다 오래된 뉴스는 제외한다.
 
 ### 한국 시장 수급 데이터

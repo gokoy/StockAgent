@@ -109,21 +109,21 @@ def fetch_latest_news(
     market: str,
     max_age_hours: int,
     limit: int = 5,
+    opendart_max_age_hours: int | None = None,
     opendart_api_key: str | None = None,
 ) -> list[NewsItem]:
     normalized_market = market.upper()
     if normalized_market == "KR":
         items: list[NewsItem] = []
-        items.extend(
-            fetch_recent_disclosures(
-                ticker=ticker,
-                name=name,
-                max_age_hours=max_age_hours,
-                api_key=opendart_api_key,
-                cache_path=_corp_code_cache_path(),
-                limit=max(limit, 3),
-            )
+        disclosure_items = fetch_recent_disclosures(
+            ticker=ticker,
+            name=name,
+            max_age_hours=opendart_max_age_hours or max(max_age_hours, 24 * 30),
+            api_key=opendart_api_key,
+            cache_path=_corp_code_cache_path(),
+            limit=max(limit, 3),
         )
+        items.extend(disclosure_items)
         items.extend(
             fetch_news_by_query(
                 query=f"{name} OR {ticker.replace('.KS', '').replace('.KQ', '')} site:finance.naver.com",
@@ -144,7 +144,7 @@ def fetch_latest_news(
                 ceid="KR:ko",
             )
         )
-        return _rank_stock_news(items, limit=limit, market=normalized_market)
+        return _rank_stock_news(items, limit=limit, market=normalized_market, require_disclosure=bool(disclosure_items))
 
     query = f"{ticker} stock"
     items = fetch_news_by_query(
@@ -257,7 +257,7 @@ def _rank_event_news(items: list[NewsItem], market: str, limit: int) -> list[New
     return ranked[:limit]
 
 
-def _rank_stock_news(items: list[NewsItem], limit: int, market: str = "US") -> list[NewsItem]:
+def _rank_stock_news(items: list[NewsItem], limit: int, market: str = "US", require_disclosure: bool = False) -> list[NewsItem]:
     seen: set[str] = set()
     source_counts: dict[str, int] = {}
     scored: list[tuple[int, NewsItem]] = []
@@ -276,7 +276,12 @@ def _rank_stock_news(items: list[NewsItem], limit: int, market: str = "US") -> l
             source_counts[source_key] = source_counts.get(source_key, 0) + 1
         scored.append((score, item))
     scored.sort(key=lambda pair: (_source_priority(pair[1].source), pair[0], pair[1].published_at), reverse=True)
-    return [item for _, item in scored[:limit]]
+    ranked = [item for _, item in scored]
+    if market.upper() == "KR" and require_disclosure:
+        disclosure = next((item for item in ranked if _normalized_source(item.source) == "opendart"), None)
+        if disclosure is not None:
+            ranked = [disclosure] + [item for item in ranked if item is not disclosure]
+    return ranked[:limit]
 
 
 def _rank_news(items: list[NewsItem], market: str, event_mode: bool) -> list[NewsItem]:
@@ -466,6 +471,8 @@ def _is_low_value_kr_headline(headline: str) -> bool:
     if not normalized:
         return True
     if normalized in {"- 네이버 증권", "네이버 증권", "097950 - 네이버 증권"}:
+        return True
+    if normalized in {"네이버 금융 - 네이버 증권", "naver finance - naver securities"}:
         return True
     if normalized in {
         "네이버 증권 - 네이버 증권",
