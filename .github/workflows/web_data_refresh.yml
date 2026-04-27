@@ -1,0 +1,68 @@
+name: web-data-refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 22 * * *"
+
+concurrency:
+  group: web-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-web-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      STOCKAGENT_LIVE_FALLBACK: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: "pip"
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Refresh dashboard snapshot
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL_MACRO_SUMMARY: ${{ vars.OPENAI_MODEL_MACRO_SUMMARY || 'gpt-4.1-mini' }}
+        run: |
+          python scripts/refresh_web_data.py \
+            --output data/web/dashboard_snapshot.json \
+            --macro-history-output data/history/macro_history.json \
+            --sector-history-output data/history/sector_history.json
+
+      - name: Upload dashboard snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-data
+          path: |
+            data/web/dashboard_snapshot.json
+            data/history/macro_history.json
+            data/history/sector_history.json
+          if-no-files-found: error
+
+      - name: Commit dashboard snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/web/dashboard_snapshot.json data/history/macro_history.json data/history/sector_history.json
+          if git diff --cached --quiet; then
+            echo "No dashboard data changes to commit."
+          else
+            git commit -m "Refresh web dashboard data"
+            git push
+          fi

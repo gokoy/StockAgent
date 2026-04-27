@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}StockAgent{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}?v=20260427-15">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="{{ url_for('static', path='/dashboard.js') }}?v=20260427-15" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="notice-bar">데이터는 매일 오전 7시(KST)에 갱신됩니다.</div>
+      <header class="topbar">
+        <a class="brand" href="/macro">StockAgent</a>
+        <nav class="nav">
+          <a href="/macro" class="{% if active_page == 'macro' %}active{% endif %}">매크로</a>
+          <a href="/sectors" class="{% if active_page == 'sectors' %}active{% endif %}">섹터</a>
+        </nav>
+      </header>
+      <main class="page">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

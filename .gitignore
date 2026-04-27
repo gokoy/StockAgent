@@ -36,16 +36,6 @@ pip-wheel-metadata/
 data/logs/
 *.log
 
-# Runtime outputs
-data/outputs/*
-!data/outputs/.gitkeep
-!data/outputs/sample_result.json
-data/performance/*
-!data/performance/.gitkeep
-data/inputs/event_calendar.json
-data/inputs/kr_flow_snapshot.json
-data/inputs/opendart_corp_codes.json
-
 # Local environment files
 .env
 .env.*

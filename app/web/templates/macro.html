@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}시장 매크로 - StockAgent{% endblock %}
+
+{% block content %}
+{% set ns = namespace(total=0) %}
+{% for group, indicators in dashboard.groups.items() %}
+  {% set ns.total = ns.total + indicators|length %}
+{% endfor %}
+
+<section class="hero-panel">
+  <div class="status-pill">{{ dashboard.decision.freshness.latest }}</div>
+  <h1>{{ dashboard.ai_summary.headline }}</h1>
+  <div class="hero-score" aria-label="투자 적극도">
+    <div>
+      <span>투자 적극도</span>
+      <strong>{{ dashboard.decision.score }}/100</strong>
+    </div>
+    <div class="score-track">
+      <span style="width: {{ dashboard.decision.score }}%"></span>
+    </div>
+  </div>
+  <p>{{ dashboard.ai_summary.summary }}</p>
+  <div class="hero-action">
+    <span>대응</span>
+    <strong>{{ dashboard.ai_summary.stance }}</strong>
+  </div>
+</section>
+
+<section class="decision-panel">
+  <article class="decision-card">
+    <h3>강한 지표</h3>
+    <ul>
+      {% for item in dashboard.decision.supportive_signals %}
+      <li>{{ item }}</li>
+      {% else %}
+      <li>강한 지표가 아직 부족합니다.</li>
+      {% endfor %}
+    </ul>
+  </article>
+  <article class="decision-card">
+    <h3>부담 요인</h3>
+    <ul>
+      {% for item in dashboard.decision.risk_flags %}
+      <li>{{ item }}</li>
+      {% else %}
+      <li>부담 요인은 제한적입니다.</li>
+      {% endfor %}
+    </ul>
+  </article>
+  <article class="decision-card">
+    <h3>확인할 것</h3>
+    <ul>
+      {% for item in dashboard.ai_summary.watch_points %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </article>
+</section>
+
+<section class="content-frame">
+  <div class="indicator-header">
+    <div>
+      <p class="eyebrow">Macro Indicators</p>
+      <h2>오늘 지표</h2>
+    </div>
+    <span>{{ ns.total }}개 지표 · 실패 {{ dashboard.failed_count }}</span>
+  </div>
+  {% for group, indicators in dashboard.groups.items() %}
+  <section class="metric-section">
+    <h3>{{ group }}</h3>
+    <div class="indicator-list">
+      {% for item in indicators %}
+      <details class="indicator-row history-panel signal-{{ item.signal|replace(' ', '-') }}" data-chart-id="{{ item.id }}">
+        <summary>
+          <div class="indicator-main">
+            <strong>{{ item.name }}</strong>
+            <span>{{ item.latest_date }}</span>
+          </div>
+          <div class="indicator-price">
+            <strong>{{ item.value }}</strong>
+            <span>{{ item.unit }}</span>
+          </div>
+          <div class="indicator-change {% if item.change_pct and item.change_pct > 0 %}up{% elif item.change_pct and item.change_pct < 0 %}down{% endif %}">
+            <strong>{{ "%+.2f"|format(item.change_pct) }}%</strong>
+            <span>{{ "%+.3f"|format(item.change_abs) }}</span>
+          </div>
+          <div class="indicator-signal">{{ item.signal }}</div>
+          <div class="indicator-arrow">⌄</div>
+        </summary>
+        <div class="indicator-detail">
+          <div class="indicator-copy">
+            {% if item.history_stats and item.history_stats.percentile is not none %}
+            <div class="history-badge">
+              5년 중 {{ "%.0f"|format(item.history_stats.percentile) }}%보다 높음 · {{ item.history_stats.zone }}
+            </div>
+            {% endif %}
+            <p>{{ item.description }}</p>
+            <p class="impact">{{ item.market_impact }}</p>
+          </div>
+          <div class="chart-wrap">
+            <canvas class="indicator-chart" id="chart-{{ item.id }}"></canvas>
+          </div>
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</section>
+
+<script id="chart-data" type="application/json">
+{
+  "type": "macro",
+  "charts": {
+    {% set comma = joiner(",") %}
+    {% for group, indicators in dashboard.groups.items() %}
+      {% for item in indicators %}
+      {{ comma() }}"{{ item.id }}": {
+        "label": {{ item.name|tojson }},
+        "points": {{ item.points|tojson }}
+      }
+      {% endfor %}
+    {% endfor %}
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}섹터 상대강도 - StockAgent{% endblock %}
+
+{% block content %}
+<section class="hero-panel sector-hero">
+  <div class="status-pill">Sector Rotation · {{ dashboard.as_of[:10] }}</div>
+  <div class="segmented">
+    <a href="/sectors?market=US" class="{% if dashboard.market == 'US' %}active{% endif %}">미국</a>
+    <a href="/sectors?market=KR" class="{% if dashboard.market == 'KR' %}active{% endif %}">한국</a>
+  </div>
+  <h1>{{ dashboard.benchmark }}보다 강한 섹터</h1>
+  <p>시장 대비 상대강도가 플러스인 섹터를 먼저 확인해서 지금 돈이 몰리는 방향을 찾습니다.</p>
+</section>
+
+<section class="leader-strip">
+  {% for item in dashboard.leaders %}
+  <article>
+    <span>{{ item.name }}</span>
+    <strong>{{ "%+.2f"|format(item.relative_strength) }}%p</strong>
+  </article>
+  {% else %}
+  <article>
+    <span>강한 섹터 없음</span>
+    <strong>방어</strong>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="content-frame">
+  <div class="indicator-header">
+    <div>
+      <p class="eyebrow">Relative Strength</p>
+      <h2>섹터별 시장 대비 흐름</h2>
+    </div>
+    <span>{{ dashboard.sectors|length }}개 섹터 · {{ dashboard.benchmark }} 기준</span>
+  </div>
+  <div class="sector-list">
+    {% for item in dashboard.sectors %}
+    <details class="sector-row history-panel {% if item.relative_strength > 0 %}leader{% endif %}" data-chart-id="{{ item.id }}">
+      <summary>
+        <div class="sector-main">
+          <strong>{{ item.name }}</strong>
+          <span>{{ item.trend_label }} · {{ item.latest_date }}</span>
+        </div>
+        <div class="sector-strength {% if item.relative_strength >= 0 %}up{% else %}down{% endif %}">
+          <strong>{{ "%+.2f"|format(item.relative_strength) }}%p</strong>
+          <span>20일 상대강도</span>
+        </div>
+        <div class="sector-return {% if item.sector_return_20d >= 0 %}up{% else %}down{% endif %}">
+          <strong>{{ "%+.2f"|format(item.sector_return_20d) }}%</strong>
+          <span>섹터 20일</span>
+        </div>
+        <div class="sector-trend">{{ item.trend_label }}</div>
+        <div class="indicator-arrow">⌄</div>
+      </summary>
+      <div class="sector-detail">
+        <div class="indicator-copy">
+          <div class="sector-stats">
+            <span>섹터 {{ "%+.2f"|format(item.sector_return_20d) }}%</span>
+            <span>시장 {{ "%+.2f"|format(item.benchmark_return_20d) }}%</span>
+            {% if item.history_stats and item.history_stats.percentile is not none %}
+            <span>5년 중 {{ "%.0f"|format(item.history_stats.percentile) }}%보다 높음</span>
+            {% endif %}
+          </div>
+          <p>{{ item.description }}</p>
+          <p class="impact">{{ item.market_impact }}</p>
+        </div>
+        <div class="chart-wrap">
+          <canvas class="sector-chart" id="chart-{{ item.id }}"></canvas>
+        </div>
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+
+<script id="chart-data" type="application/json">
+{
+  "type": "sector",
+  "charts": {
+    {% set comma = joiner(",") %}
+    {% for item in dashboard.sectors %}
+    {{ comma() }}"{{ item.id }}": {
+      "label": {{ item.name|tojson }},
+      "benchmark": {{ dashboard.benchmark|tojson }},
+      "points": {{ item.points|tojson }}
+    }
+    {% endfor %}
+  }
+}
+</script>
+{% endblock %}
