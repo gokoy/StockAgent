@@ -3,7 +3,7 @@
 
 {% block content %}
 <section class="hero-panel sector-hero">
-  <div class="status-pill">Sector Rotation · {{ dashboard.as_of[:10] }}</div>
+  <div class="status-pill">섹터 흐름 · {{ dashboard.as_of[:10] }}</div>
   <div class="segmented">
     <a href="/sectors?market=US" class="{% if dashboard.market == 'US' %}active{% endif %}">미국</a>
     <a href="/sectors?market=KR" class="{% if dashboard.market == 'KR' %}active{% endif %}">한국</a>
@@ -12,18 +12,20 @@
   <p>시장 대비 상대강도가 플러스인 섹터를 먼저 확인해서 지금 돈이 몰리는 방향을 찾습니다.</p>
 </section>
 
-<section class="leader-strip">
-  {% for item in dashboard.leaders %}
-  <article>
-    <span>{{ item.name }}</span>
-    <strong>{{ "%+.2f"|format(item.relative_strength) }}%p</strong>
+<section class="flow-panel">
+  <article class="flow-card primary">
+    <span>돈이 몰리는 곳</span>
+    <strong>{{ dashboard.flow_summary.leader_text }}</strong>
   </article>
-  {% else %}
-  <article>
-    <span>강한 섹터 없음</span>
-    <strong>방어</strong>
+  <article class="flow-card">
+    <span>돈이 빠지는 곳</span>
+    <strong>{{ dashboard.flow_summary.laggard_text }}</strong>
   </article>
-  {% endfor %}
+  <article class="flow-card">
+    <span>시장 확산 정도</span>
+    <strong>{{ dashboard.flow_summary.leader_count }}/{{ dashboard.flow_summary.total_count }}개 섹터</strong>
+    <small>{{ dashboard.flow_summary.breadth_label }}</small>
+  </article>
 </section>
 
 <section class="content-frame">
@@ -59,7 +61,7 @@
             <span>섹터 {{ "%+.2f"|format(item.sector_return_20d) }}%</span>
             <span>시장 {{ "%+.2f"|format(item.benchmark_return_20d) }}%</span>
             {% if item.history_stats and item.history_stats.percentile is not none %}
-            <span>5년 중 {{ "%.0f"|format(item.history_stats.percentile) }}%보다 높음</span>
+            <span>{{ item.history_stats.position_label }}</span>
             {% endif %}
           </div>
           <p>{{ item.description }}</p>

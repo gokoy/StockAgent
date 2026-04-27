@@ -393,11 +393,14 @@ def _get_sector_dashboard_live(
     leaders = [item for item in valid if float(item["relative_strength"]) > 0]
     leaders.sort(key=lambda item: float(item["relative_strength"]), reverse=True)
     valid.sort(key=lambda item: float(item["relative_strength"]), reverse=True)
+    laggards = sorted(valid, key=lambda item: float(item["relative_strength"]))
     return {
         "market": market,
         "benchmark": "S&P 500" if market == "US" else "KOSPI",
         "as_of": datetime.now(UTC).isoformat(),
         "leaders": leaders[:5],
+        "laggards": laggards[:5],
+        "flow_summary": _sector_flow_summary(valid, leaders, laggards),
         "sectors": valid,
     }
 
@@ -527,6 +530,7 @@ def _build_indicator(spec: IndicatorSpec) -> dict[str, object]:
             "change_pct": round(change_pct, 2),
             "latest_date": latest_date,
             "previous_date": previous_date,
+            "data_frequency": _data_frequency_label(spec),
             "signal": signal,
             "description": spec.description,
             "market_impact": spec.market_impact,
@@ -544,6 +548,7 @@ def _build_indicator(spec: IndicatorSpec) -> dict[str, object]:
             "change_pct": None,
             "latest_date": "",
             "previous_date": "",
+            "data_frequency": _data_frequency_label(spec),
             "signal": f"데이터 실패: {exc}",
             "description": spec.description,
             "market_impact": spec.market_impact,
@@ -562,6 +567,7 @@ def _attach_macro_history_stats(item: dict[str, object], history_points: list[di
     enriched["history_stats"] = {
         "lookback_years": MACRO_HISTORY_YEARS,
         "percentile": round(percentile, 1),
+        "position_label": _history_position_label(percentile),
         "zone": _history_zone(str(item.get("kind", "neutral")), percentile),
         "min": _round_value(min(values)),
         "max": _round_value(max(values)),
@@ -594,25 +600,28 @@ def _build_macro_decision(indicators: list[dict[str, object]]) -> dict[str, obje
         "unemployment": 3,
     }
     score = 50.0
-    positive: list[tuple[int, str]] = []
-    negative: list[tuple[int, str]] = []
+    positive: list[tuple[float, str]] = []
+    negative: list[tuple[float, str]] = []
 
     for item in indicators:
         item_id = str(item["id"])
         weight = weights.get(item_id, 3)
         contribution = _macro_contribution(item)
         contribution += _history_contribution(item)
-        score += contribution * weight
+        points = contribution * weight
+        score += points
         note = _decision_note(item)
         if contribution > 0:
-            positive.append((weight, note))
+            positive.append((points, note))
         elif contribution < 0:
-            negative.append((weight, note))
+            negative.append((points, note))
 
     final_score = max(0, min(100, round(score)))
     regime_label, action_title, posture, regime_description = _decision_labels(final_score, len(negative))
-    risk_flags = [note for _, note in sorted(negative, reverse=True)[:4]]
-    supportive_signals = [note for _, note in sorted(positive, reverse=True)[:4]]
+    positive_sorted = sorted(positive, key=lambda item: item[0], reverse=True)
+    negative_sorted = sorted(negative, key=lambda item: item[0])
+    risk_flags = [note for _, note in negative_sorted[:4]]
+    supportive_signals = [note for _, note in positive_sorted[:4]]
     confirm_conditions = _confirm_conditions(final_score, risk_flags, supportive_signals)
     dates = sorted({str(item["latest_date"]) for item in indicators if item.get("latest_date")})
 
@@ -624,6 +633,8 @@ def _build_macro_decision(indicators: list[dict[str, object]]) -> dict[str, obje
         "regime_description": regime_description,
         "risk_flags": risk_flags,
         "supportive_signals": supportive_signals,
+        "score_up_drivers": _score_driver_items(positive_sorted[:4]),
+        "score_down_drivers": _score_driver_items(negative_sorted[:4]),
         "confirm_conditions": confirm_conditions,
         "freshness": {
             "latest": dates[-1] if dates else "",
@@ -666,6 +677,10 @@ def _build_macro_ai_summary(decision: dict[str, object], indicators: list[dict[s
     except Exception as exc:
         fallback["source"] = f"fallback:{type(exc).__name__}"
         return fallback
+
+
+def _score_driver_items(items: list[tuple[float, str]]) -> list[dict[str, object]]:
+    return [{"points": round(points, 1), "note": note} for points, note in items]
 
 
 def _macro_summary_prompt(decision: dict[str, object], indicators: list[dict[str, object]]) -> str:
@@ -839,7 +854,7 @@ def _confirm_conditions(score: int, risk_flags: list[str], supportive_signals: l
         return [
             "강한 섹터만 추적하고 약한 섹터 추격은 피하기",
             "S&P 500과 Nasdaq 100이 함께 상승하는지 확인",
-            "방어 신호가 2개 이상 추가되면 신규 비중 확대 보류",
+            "매도 우세 신호가 2개 이상 추가되면 신규 비중 확대 보류",
         ]
     if risk_flags:
         return [
@@ -885,6 +900,38 @@ def _build_sector(spec: SectorSpec, history_points: list[dict[str, object]] | No
     }
 
 
+def _sector_flow_summary(
+    sectors: list[dict[str, object]],
+    leaders: list[dict[str, object]],
+    laggards: list[dict[str, object]],
+) -> dict[str, object]:
+    total = len(sectors)
+    leader_count = len(leaders)
+    breadth_pct = round((leader_count / total) * 100) if total else 0
+    leader_names = [str(item["name"]) for item in leaders[:3]]
+    laggard_names = [str(item["name"]) for item in laggards[:3]]
+
+    if leader_count == 0:
+        breadth_label = "시장보다 강한 섹터가 없습니다"
+    elif breadth_pct >= 60:
+        breadth_label = "강세가 여러 섹터로 퍼져 있습니다"
+    elif breadth_pct >= 35:
+        breadth_label = "일부 섹터에만 돈이 몰립니다"
+    else:
+        breadth_label = "소수 섹터 쏠림이 강합니다"
+
+    return {
+        "leader_count": leader_count,
+        "total_count": total,
+        "breadth_pct": breadth_pct,
+        "breadth_label": breadth_label,
+        "leader_names": leader_names,
+        "laggard_names": laggard_names,
+        "leader_text": ", ".join(leader_names) if leader_names else "없음",
+        "laggard_text": ", ".join(laggard_names) if laggard_names else "없음",
+    }
+
+
 def _sector_history_stats(history_points: list[dict[str, object]], current_relative_strength: float) -> dict[str, object]:
     values: list[float] = []
     for idx in range(20, len(history_points)):
@@ -903,6 +950,7 @@ def _sector_history_stats(history_points: list[dict[str, object]], current_relat
     return {
         "lookback_years": SECTOR_HISTORY_YEARS,
         "percentile": round(percentile, 1),
+        "position_label": _history_position_label(percentile),
         "zone": _relative_strength_zone(percentile),
         "min": round(min(values), 2),
         "max": round(max(values), 2),
@@ -937,6 +985,14 @@ def _fetch_indicator_series(spec: IndicatorSpec, period: str = "1y") -> pd.Serie
         series = frame["numerator"] / frame["denominator"]
         return _clean_series(series)
     return _fetch_yahoo_close(spec.symbol, period=period)
+
+
+def _data_frequency_label(spec: IndicatorSpec) -> str:
+    if spec.id in {"fedfunds", "cpi_yoy", "unemployment"}:
+        return "월간·지연 발표"
+    if spec.source == "fred":
+        return "일간·지연 가능"
+    return "일간"
 
 
 @lru_cache(maxsize=128)
@@ -1039,13 +1095,18 @@ def _relative_strength_zone(percentile: float) -> str:
 
 
 def _history_position_label(percentile: float) -> str:
-    return f"5년 중 {percentile:.0f}%보다 높음"
+    if percentile >= 50:
+        top = max(1, round(100 - percentile))
+        return f"5년 중 상위 {top}% 수준"
+    bottom = max(1, round(percentile))
+    return f"5년 중 하위 {bottom}% 수준"
 
 
 def _empty_history_stats() -> dict[str, object]:
     return {
         "lookback_years": 0,
         "percentile": None,
+        "position_label": "장기 데이터 부족",
         "zone": "장기 데이터 부족",
         "min": None,
         "max": None,

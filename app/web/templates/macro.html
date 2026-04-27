@@ -28,22 +28,22 @@
 
 <section class="decision-panel">
   <article class="decision-card">
-    <h3>강한 지표</h3>
+    <h3>점수 올린 요인</h3>
     <ul>
-      {% for item in dashboard.decision.supportive_signals %}
-      <li>{{ item }}</li>
+      {% for item in dashboard.decision.score_up_drivers %}
+      <li><strong>+{{ "%.1f"|format(item.points) }}</strong> {{ item.note }}</li>
       {% else %}
-      <li>강한 지표가 아직 부족합니다.</li>
+      <li>점수를 올린 지표가 아직 부족합니다.</li>
       {% endfor %}
     </ul>
   </article>
   <article class="decision-card">
-    <h3>부담 요인</h3>
+    <h3>점수 낮춘 요인</h3>
     <ul>
-      {% for item in dashboard.decision.risk_flags %}
-      <li>{{ item }}</li>
+      {% for item in dashboard.decision.score_down_drivers %}
+      <li><strong>{{ "%.1f"|format(item.points) }}</strong> {{ item.note }}</li>
       {% else %}
-      <li>부담 요인은 제한적입니다.</li>
+      <li>점수를 낮춘 지표는 제한적입니다.</li>
       {% endfor %}
     </ul>
   </article>
@@ -74,7 +74,7 @@
         <summary>
           <div class="indicator-main">
             <strong>{{ item.name }}</strong>
-            <span>{{ item.latest_date }}</span>
+            <span>{{ item.latest_date }} · {{ item.data_frequency }}</span>
           </div>
           <div class="indicator-price">
             <strong>{{ item.value }}</strong>
@@ -91,9 +91,10 @@
           <div class="indicator-copy">
             {% if item.history_stats and item.history_stats.percentile is not none %}
             <div class="history-badge">
-              5년 중 {{ "%.0f"|format(item.history_stats.percentile) }}%보다 높음 · {{ item.history_stats.zone }}
+              {{ item.history_stats.position_label }} · {{ item.history_stats.zone }}
             </div>
             {% endif %}
+            <div class="data-badge">{{ item.data_frequency }} 데이터</div>
             <p>{{ item.description }}</p>
             <p class="impact">{{ item.market_impact }}</p>
           </div>
