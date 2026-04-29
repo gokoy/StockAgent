@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import shutil
 import sys
 from pathlib import Path
@@ -17,7 +16,6 @@ from app.web.dashboard_data import ROOT_DIR, get_macro_dashboard, get_sector_das
 
 TEMPLATE_DIR = ROOT_DIR / "app" / "web" / "templates"
 STATIC_DIR = ROOT_DIR / "app" / "web" / "static"
-SNAPSHOT_PATH = ROOT_DIR / "data" / "web" / "dashboard_snapshot.json"
 
 
 def main() -> None:
@@ -31,7 +29,7 @@ def build_static_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / ".nojekyll").write_text("", encoding="utf-8")
     _copy_static_assets(output_dir)
-    _copy_dashboard_data(output_dir)
+    _remove_stale_dashboard_data(output_dir)
 
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
@@ -113,13 +111,10 @@ def _copy_static_assets(output_dir: Path) -> None:
             shutil.copy2(source, target / source.name)
 
 
-def _copy_dashboard_data(output_dir: Path) -> None:
-    if not SNAPSHOT_PATH.exists():
-        return
+def _remove_stale_dashboard_data(output_dir: Path) -> None:
     target = output_dir / "data" / "dashboard_snapshot.json"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
-    target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if target.exists():
+        target.unlink()
 
 
 if __name__ == "__main__":

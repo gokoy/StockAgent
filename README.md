@@ -59,8 +59,8 @@ workflow가 하는 일:
 
 1. Python 의존성을 설치한다.
 2. `scripts/refresh_web_data.py`를 실행한다.
-3. `dashboard_snapshot.json`, `macro_history.json`, `sector_history.json`을 artifact로 업로드한다.
-4. 데이터가 바뀌었으면 `Refresh web dashboard data` 커밋으로 repo에 반영한다.
+3. `dashboard_snapshot.json`, `macro_history.json`, `sector_history.json`, 정적 사이트 산출물을 artifact로 업로드한다.
+4. 데이터나 정적 사이트가 바뀌었으면 `Refresh web dashboard data and static site` 커밋으로 repo에 반영한다.
 
 선택 환경값:
 
@@ -71,7 +71,7 @@ workflow가 하는 일:
 ## 로컬 실행
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/refresh_web_data.py
@@ -82,6 +82,14 @@ python -m uvicorn app.web.server:app --reload --port 8000
 
 - [http://127.0.0.1:8000/macro](http://127.0.0.1:8000/macro)
 - [http://127.0.0.1:8000/sectors](http://127.0.0.1:8000/sectors)
+
+## 검증
+
+```bash
+python -m unittest discover -s tests
+python -m compileall app scripts tests
+python scripts/build_static_site.py --output docs
+```
 
 ## 주요 파일
 

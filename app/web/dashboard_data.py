@@ -329,9 +329,14 @@ def get_sector_dashboard(market: Literal["US", "KR"] = "US") -> dict[str, object
     return _get_sector_dashboard_live(market)
 
 
-def build_dashboard_snapshot() -> dict[str, object]:
-    macro_history = build_macro_history()
-    sector_history = build_sector_history()
+def build_dashboard_snapshot(
+    macro_history: dict[str, object] | None = None,
+    sector_history: dict[str, object] | None = None,
+) -> dict[str, object]:
+    if macro_history is None:
+        macro_history = build_macro_history()
+    if sector_history is None:
+        sector_history = build_sector_history()
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "macro": _get_macro_dashboard_live(macro_history=macro_history),
@@ -347,10 +352,12 @@ def refresh_dashboard_snapshot(
     macro_history_path: Path = MACRO_HISTORY_PATH,
     sector_history_path: Path = SECTOR_HISTORY_PATH,
 ) -> dict[str, object]:
-    snapshot = build_dashboard_snapshot()
+    macro_history = build_macro_history()
+    sector_history = build_sector_history()
+    snapshot = build_dashboard_snapshot(macro_history=macro_history, sector_history=sector_history)
     _write_json_atomic(path, snapshot)
-    _write_json_atomic(macro_history_path, build_macro_history())
-    _write_json_atomic(sector_history_path, build_sector_history())
+    _write_json_atomic(macro_history_path, macro_history)
+    _write_json_atomic(sector_history_path, sector_history)
     return snapshot
 
 
