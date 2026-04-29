@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       STOCKAGENT_LIVE_FALLBACK: "0"
@@ -45,6 +47,10 @@ jobs:
             --macro-history-output data/history/macro_history.json \
             --sector-history-output data/history/sector_history.json
 
+      - name: Build GitHub Pages site
+        run: |
+          python scripts/build_static_site.py --output docs
+
       - name: Upload dashboard snapshot
         uses: actions/upload-artifact@v4
         with:
@@ -53,16 +59,28 @@ jobs:
             data/web/dashboard_snapshot.json
             data/history/macro_history.json
             data/history/sector_history.json
+            docs
           if-no-files-found: error
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v4
 
       - name: Commit dashboard snapshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/web/dashboard_snapshot.json data/history/macro_history.json data/history/sector_history.json
+          git add data/web/dashboard_snapshot.json data/history/macro_history.json data/history/sector_history.json docs
           if git diff --cached --quiet; then
-            echo "No dashboard data changes to commit."
+            echo "No dashboard data or static site changes to commit."
           else
-            git commit -m "Refresh web dashboard data"
+            git commit -m "Refresh web dashboard data and static site"
             git push
           fi

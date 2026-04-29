@@ -729,6 +729,40 @@ p {
   margin-top: 0;
 }
 
+.comparison-chart-wrap {
+  height: clamp(320px, 34vw, 460px);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: 0 8px 18px rgba(28, 55, 32, 0.08);
+}
+
+.chart-range-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 12px;
+}
+
+.chart-range-control button {
+  min-width: 46px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.chart-range-control button.active {
+  border-color: var(--green-900);
+  background: var(--green-900);
+  color: #fff;
+}
+
 .flow-panel,
 .leader-strip {
   display: grid;
@@ -915,9 +949,7 @@ p {
 }
 
 .sector-detail {
-  display: grid;
-  grid-template-columns: minmax(240px, 0.9fr) minmax(320px, 1.4fr);
-  gap: 18px;
+  display: block;
   padding: 0 12px 14px;
   background: #f7fbf3;
 }
@@ -1010,6 +1042,7 @@ p {
   .sector-return {
     display: none;
   }
+
 }
 
 @media (min-width: 981px) {

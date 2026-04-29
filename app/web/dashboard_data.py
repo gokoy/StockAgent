@@ -13,7 +13,7 @@ import warnings
 import pandas as pd
 import requests
 
-from app.web.market_sources import KR_SECTOR_SYMBOLS, fetch_symbol_history
+from app.web.market_sources import fetch_symbol_history
 
 
 SeriesKind = Literal["risk_on", "risk_off", "neutral"]
@@ -50,6 +50,8 @@ class SectorSpec:
     symbols: tuple[str, ...]
     description: str
     market_impact: str
+    tracked_index: str = ""
+    display_symbol: str = ""
 
 
 MACRO_SPECS: tuple[IndicatorSpec, ...] = (
@@ -280,30 +282,30 @@ MACRO_SPECS: tuple[IndicatorSpec, ...] = (
 
 
 US_SECTOR_SPECS: tuple[SectorSpec, ...] = (
-    SectorSpec("us-tech", "기술", "US", "SPY", ("XLK",), "소프트웨어, 하드웨어, 플랫폼 대형주의 흐름이다.", "시장보다 강하면 성장주 위험선호가 살아있다고 본다."),
-    SectorSpec("us-semi", "반도체", "US", "SPY", ("SOXX",), "AI, 데이터센터, 메모리/장비 사이클을 압축해서 본다.", "강세는 시장의 공격성이 높다는 뜻이고, 약세 전환은 고베타 축소 신호다."),
-    SectorSpec("us-financials", "금융", "US", "SPY", ("XLF",), "은행, 보험, 브로커리지의 흐름이다.", "금리곡선과 신용 스트레스에 민감해 경기 신뢰도를 함께 보여준다."),
-    SectorSpec("us-energy", "에너지", "US", "SPY", ("XLE",), "원유/가스 가격과 에너지주 수급을 반영한다.", "강하면 인플레이션 재상승 가능성과 가치주 선호를 같이 점검한다."),
-    SectorSpec("us-healthcare", "헬스케어", "US", "SPY", ("XLV",), "제약, 바이오, 의료장비의 방어적 성장 흐름이다.", "하락장에서도 강하면 방어적 자금 이동으로 해석한다."),
-    SectorSpec("us-industrials", "산업재", "US", "SPY", ("XLI",), "운송, 기계, 방산, 인프라 관련주 흐름이다.", "강세는 경기 확장 기대와 설비투자 기대를 반영할 수 있다."),
-    SectorSpec("us-discretionary", "경기소비재", "US", "SPY", ("XLY",), "자동차, 이커머스, 레저 등 소비 경기 민감주다.", "강세는 소비 여력과 위험선호 개선 신호다."),
-    SectorSpec("us-staples", "필수소비재", "US", "SPY", ("XLP",), "식품, 생활용품 등 방어 섹터다.", "시장보다 강하면 방어적 로테이션일 가능성을 본다."),
-    SectorSpec("us-communication", "커뮤니케이션", "US", "SPY", ("XLC",), "광고, 미디어, 플랫폼 기업 흐름이다.", "기술주와 함께 강하면 성장주 랠리의 폭을 확인하는 데 유용하다."),
-    SectorSpec("us-utilities", "유틸리티", "US", "SPY", ("XLU",), "전력/가스 등 배당 방어 섹터다.", "강세는 방어 자금 또는 금리 하락 수혜를 의미할 수 있다."),
+    SectorSpec("us-tech", "기술", "US", "SPY", ("XLK",), "소프트웨어, 하드웨어, 플랫폼 대형주의 흐름이다.", "시장보다 강하면 성장주 위험선호가 살아있다고 본다.", "Technology Select Sector Index", "XLK"),
+    SectorSpec("us-semi", "반도체", "US", "SPY", ("SOXX",), "AI, 데이터센터, 메모리/장비 사이클을 압축해서 본다.", "강세는 시장의 공격성이 높다는 뜻이고, 약세 전환은 고베타 축소 신호다.", "ICE Semiconductor Index", "SOXX"),
+    SectorSpec("us-financials", "금융", "US", "SPY", ("XLF",), "은행, 보험, 브로커리지의 흐름이다.", "금리곡선과 신용 스트레스에 민감해 경기 신뢰도를 함께 보여준다.", "Financial Select Sector Index", "XLF"),
+    SectorSpec("us-energy", "에너지", "US", "SPY", ("XLE",), "원유/가스 가격과 에너지주 수급을 반영한다.", "강하면 인플레이션 재상승 가능성과 가치주 선호를 같이 점검한다.", "Energy Select Sector Index", "XLE"),
+    SectorSpec("us-healthcare", "헬스케어", "US", "SPY", ("XLV",), "제약, 바이오, 의료장비의 방어적 성장 흐름이다.", "하락장에서도 강하면 방어적 자금 이동으로 해석한다.", "Health Care Select Sector Index", "XLV"),
+    SectorSpec("us-industrials", "산업재", "US", "SPY", ("XLI",), "운송, 기계, 방산, 인프라 관련주 흐름이다.", "강세는 경기 확장 기대와 설비투자 기대를 반영할 수 있다.", "Industrial Select Sector Index", "XLI"),
+    SectorSpec("us-discretionary", "경기소비재", "US", "SPY", ("XLY",), "자동차, 이커머스, 레저 등 소비 경기 민감주다.", "강세는 소비 여력과 위험선호 개선 신호다.", "Consumer Discretionary Select Sector Index", "XLY"),
+    SectorSpec("us-staples", "필수소비재", "US", "SPY", ("XLP",), "식품, 생활용품 등 방어 섹터다.", "시장보다 강하면 방어적 로테이션일 가능성을 본다.", "Consumer Staples Select Sector Index", "XLP"),
+    SectorSpec("us-communication", "커뮤니케이션", "US", "SPY", ("XLC",), "광고, 미디어, 플랫폼 기업 흐름이다.", "기술주와 함께 강하면 성장주 랠리의 폭을 확인하는 데 유용하다.", "Communication Services Select Sector Index", "XLC"),
+    SectorSpec("us-utilities", "유틸리티", "US", "SPY", ("XLU",), "전력/가스 등 배당 방어 섹터다.", "강세는 방어 자금 또는 금리 하락 수혜를 의미할 수 있다.", "Utilities Select Sector Index", "XLU"),
 )
 
 
-KR_SECTOR_SPECS: tuple[SectorSpec, ...] = tuple(
-    SectorSpec(
-        id=f"kr-{name}",
-        name=name,
-        market="KR",
-        benchmark="^KS11",
-        symbols=tuple(symbols),
-        description=f"한국 {name} 대표 종목 묶음의 평균 흐름이다.",
-        market_impact="코스피보다 강하면 해당 업종으로 국내 수급이 몰리는지 확인할 우선순위가 올라간다.",
-    )
-    for name, symbols in KR_SECTOR_SYMBOLS.items()
+KR_SECTOR_SPECS: tuple[SectorSpec, ...] = (
+    SectorSpec("kr-semi", "반도체", "KR", "^KS11", ("091160.KS",), "국내 반도체 섹터 지수를 추종하는 ETF 흐름이다.", "코스피보다 강하면 한국 시장의 주도축이 반도체로 모이는지 우선 확인한다.", "KRX 반도체", "KODEX 반도체"),
+    SectorSpec("kr-auto", "자동차", "KR", "^KS11", ("091180.KS",), "국내 자동차 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 수출주와 경기민감 대형주 수급 개선으로 해석할 수 있다.", "KRX 자동차", "KODEX 자동차"),
+    SectorSpec("kr-it", "정보기술", "KR", "^KS11", ("139260.KS",), "코스피 200 정보기술 섹터를 추종하는 ETF 흐름이다.", "반도체 외 IT 전반까지 자금이 확산되는지 확인한다.", "KOSPI 200 정보기술", "TIGER 200 IT"),
+    SectorSpec("kr-battery", "2차전지", "KR", "^KS11", ("305720.KS",), "국내 2차전지 산업 지수를 추종하는 ETF 흐름이다.", "강하면 성장 테마 수급이 회복되는 신호이고, 약하면 고밸류 성장주 부담을 점검한다.", "FnGuide 2차전지 산업", "KODEX 2차전지산업"),
+    SectorSpec("kr-healthcare", "헬스케어", "KR", "^KS11", ("143860.KS",), "국내 헬스케어 섹터 지수를 추종하는 ETF 흐름이다.", "시장보다 강하면 방어 성장주 또는 바이오 이벤트 수급을 확인한다.", "KRX 헬스케어", "TIGER 헬스케어"),
+    SectorSpec("kr-energy-chemical", "에너지화학", "KR", "^KS11", ("117460.KS",), "국내 에너지화학 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 유가, 화학 스프레드, 소재 수요 기대와 함께 해석한다.", "KRX 에너지화학", "KODEX 에너지화학"),
+    SectorSpec("kr-discretionary", "경기소비재", "KR", "^KS11", ("266390.KS",), "국내 경기소비재 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 내수와 소비 경기 민감주로 자금이 이동하는 신호일 수 있다.", "KRX 경기소비재", "KODEX 경기소비재"),
+    SectorSpec("kr-staples", "필수소비재", "KR", "^KS11", ("266410.KS",), "국내 필수소비재 섹터 지수를 추종하는 ETF 흐름이다.", "하락장에서도 강하면 방어적 자금 이동으로 해석한다.", "KRX 필수소비재", "KODEX 필수소비재"),
+    SectorSpec("kr-bank", "은행", "KR", "^KS11", ("091170.KS",), "국내 은행 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 금리, 배당, 경기 신뢰 개선과 함께 본다.", "KRX 은행", "KODEX 은행"),
+    SectorSpec("kr-securities", "증권", "KR", "^KS11", ("102970.KS",), "국내 증권 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 거래대금 증가와 위험선호 개선 가능성을 함께 보여준다.", "KRX 증권", "KODEX 증권"),
 )
 
 
@@ -387,6 +389,7 @@ def _get_sector_dashboard_live(
     sector_history: dict[str, object] | None = None,
 ) -> dict[str, object]:
     specs = US_SECTOR_SPECS if market == "US" else KR_SECTOR_SPECS
+    benchmark_name = "S&P 500" if market == "US" else "KOSPI"
     history_by_id = _history_series_by_id(sector_history or build_sector_history(), "sectors")
     sectors = [_build_sector(spec, history_by_id.get(spec.id, [])) for spec in specs]
     valid = [item for item in sectors if item["points"]]
@@ -396,11 +399,12 @@ def _get_sector_dashboard_live(
     laggards = sorted(valid, key=lambda item: float(item["relative_strength"]))
     return {
         "market": market,
-        "benchmark": "S&P 500" if market == "US" else "KOSPI",
+        "benchmark": benchmark_name,
         "as_of": datetime.now(UTC).isoformat(),
         "leaders": leaders[:5],
         "laggards": laggards[:5],
         "flow_summary": _sector_flow_summary(valid, leaders, laggards),
+        "comparison_chart": _sector_comparison_chart(valid, benchmark_name),
         "sectors": valid,
     }
 
@@ -876,11 +880,13 @@ def _build_sector(spec: SectorSpec, history_points: list[dict[str, object]] | No
     benchmark_return_20d = _window_return(frame["benchmark"], 20)
     relative_strength = sector_return_20d - benchmark_return_20d
     trend_label = "시장보다 강함" if relative_strength > 0 else "시장보다 약함"
+    chart_points = _sector_chart_points(history_points or [], frame)
     return {
         "id": spec.id,
         "name": spec.name,
         "market": spec.market,
         "benchmark": spec.benchmark,
+        "tracked_index": _sector_tracked_index_label(spec),
         "latest_date": str(frame.index[-1].date()),
         "sector_return_20d": round(sector_return_20d, 2),
         "benchmark_return_20d": round(benchmark_return_20d, 2),
@@ -889,15 +895,80 @@ def _build_sector(spec: SectorSpec, history_points: list[dict[str, object]] | No
         "description": spec.description,
         "market_impact": spec.market_impact,
         "history_stats": _sector_history_stats(history_points or [], relative_strength),
-        "points": [
-            {
-                "date": str(index.date()),
-                "sector": round(float(row["sector"]), 2),
-                "benchmark": round(float(row["benchmark"]), 2),
-            }
-            for index, row in frame.tail(126).iterrows()
-        ],
+        "points": chart_points,
     }
+
+
+def _sector_chart_points(history_points: list[dict[str, object]], fallback_frame: pd.DataFrame) -> list[dict[str, object]]:
+    points = [
+        {
+            "date": str(point["date"]),
+            "sector": round(float(point["sector"]), 2),
+            "benchmark": round(float(point["benchmark"]), 2),
+        }
+        for point in history_points
+        if isinstance(point.get("date"), str) and _is_number(point.get("sector")) and _is_number(point.get("benchmark"))
+    ]
+    if points:
+        return points[-1260:]
+    return [
+        {
+            "date": str(index.date()),
+            "sector": round(float(row["sector"]), 2),
+            "benchmark": round(float(row["benchmark"]), 2),
+        }
+        for index, row in fallback_frame.tail(126).iterrows()
+    ]
+
+
+def _sector_tracked_index_label(spec: SectorSpec) -> str:
+    symbol = spec.display_symbol or ", ".join(spec.symbols)
+    return f"{symbol} · 추종지수: {spec.tracked_index}"
+
+
+def _sector_comparison_chart(sectors: list[dict[str, object]], benchmark_label: str) -> dict[str, object]:
+    date_set: set[str] = set()
+    benchmark_by_date: dict[str, float] = {}
+    sector_maps: list[tuple[str, str, dict[str, float]]] = []
+    for item in sectors:
+        points = item.get("points")
+        if not isinstance(points, list):
+            continue
+        values: dict[str, float] = {}
+        for point in points:
+            if not isinstance(point, dict):
+                continue
+            date = point.get("date")
+            sector_value = point.get("sector")
+            benchmark_value = point.get("benchmark")
+            if not isinstance(date, str):
+                continue
+            if _is_number(sector_value):
+                values[date] = round(float(sector_value), 2)
+                date_set.add(date)
+            if _is_number(benchmark_value):
+                benchmark_by_date[date] = round(float(benchmark_value), 2)
+                date_set.add(date)
+        if values:
+            sector_maps.append((str(item.get("id", "")), str(item.get("name", "")), values))
+
+    dates = sorted(date_set)[-1260:]
+    series = [
+        {
+            "id": "benchmark",
+            "label": benchmark_label,
+            "values": [benchmark_by_date.get(date) for date in dates],
+        }
+    ]
+    series.extend(
+        {
+            "id": sector_id,
+            "label": label,
+            "values": [values.get(date) for date in dates],
+        }
+        for sector_id, label, values in sector_maps
+    )
+    return {"dates": dates, "series": series}
 
 
 def _sector_flow_summary(
@@ -964,6 +1035,7 @@ def _empty_sector(spec: SectorSpec) -> dict[str, object]:
         "name": spec.name,
         "market": spec.market,
         "benchmark": spec.benchmark,
+        "tracked_index": _sector_tracked_index_label(spec),
         "latest_date": "",
         "sector_return_20d": 0.0,
         "benchmark_return_20d": 0.0,

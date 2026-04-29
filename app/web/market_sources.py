@@ -9,17 +9,6 @@ import yfinance as yf
 
 REQUIRED_HISTORY_COLUMNS = ("date", "open", "high", "low", "close", "volume")
 
-KR_SECTOR_SYMBOLS: dict[str, list[str]] = {
-    "반도체": ["005930.KS", "000660.KS"],
-    "자동차": ["005380.KS", "000270.KS"],
-    "인터넷": ["035420.KS", "035720.KS"],
-    "2차전지": ["051910.KS", "006400.KS", "373220.KS"],
-    "바이오": ["068270.KS", "207940.KS"],
-    "방산": ["012450.KS", "079550.KS"],
-    "전력기기": ["010120.KS", "267260.KS"],
-}
-
-
 @lru_cache(maxsize=256)
 def fetch_symbol_history(symbol: str, period: str = "1y", interval: str = "1d", min_rows: int = 2) -> pd.DataFrame:
     with warnings.catch_warnings():
