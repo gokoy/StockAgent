@@ -9,6 +9,7 @@
 
 <section class="hero-panel">
   <div class="status-pill">{{ dashboard.decision.freshness.latest }}</div>
+  <div class="hero-kicker">오늘의 판단</div>
   <h1>{{ dashboard.ai_summary.headline }}</h1>
   <div class="hero-score" aria-label="투자 적극도">
     <div>
@@ -19,36 +20,32 @@
       <span style="width: {{ dashboard.decision.score }}%"></span>
     </div>
   </div>
-  <p>{{ dashboard.ai_summary.summary }}</p>
-  <div class="hero-action">
-    <span>대응</span>
-    <strong>{{ dashboard.ai_summary.stance }}</strong>
-  </div>
+  <p class="market-brief">{{ dashboard.ai_summary.summary }}</p>
 </section>
 
 <section class="decision-panel">
   <article class="decision-card">
-    <h3>점수 올린 요인</h3>
+    <h3>무엇이 좋아졌나</h3>
     <ul>
-      {% for item in dashboard.decision.score_up_drivers %}
-      <li><strong>+{{ "%.1f"|format(item.points) }}</strong> {{ item.note }}</li>
+      {% for item in dashboard.decision.positive_factors %}
+      <li><strong>{{ item.label }}</strong> {{ item.text }}</li>
       {% else %}
-      <li>점수를 올린 지표가 아직 부족합니다.</li>
+      <li>뚜렷하게 좋아진 조건은 아직 부족합니다.</li>
       {% endfor %}
     </ul>
   </article>
   <article class="decision-card">
-    <h3>점수 낮춘 요인</h3>
+    <h3>무엇이 부담인가</h3>
     <ul>
-      {% for item in dashboard.decision.score_down_drivers %}
-      <li><strong>{{ "%.1f"|format(item.points) }}</strong> {{ item.note }}</li>
+      {% for item in dashboard.decision.negative_factors %}
+      <li><strong>{{ item.label }}</strong> {{ item.text }}</li>
       {% else %}
-      <li>점수를 낮춘 지표는 제한적입니다.</li>
+      <li>현재 점수를 크게 낮추는 부담 요인은 제한적입니다.</li>
       {% endfor %}
     </ul>
   </article>
   <article class="decision-card">
-    <h3>확인할 것</h3>
+    <h3>다음에 확인할 것</h3>
     <ul>
       {% for item in dashboard.ai_summary.watch_points %}
       <li>{{ item }}</li>

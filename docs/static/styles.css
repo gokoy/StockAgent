@@ -185,6 +185,15 @@ a {
   font-weight: 950;
 }
 
+.hero-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto 10px;
+  color: #f4d56b;
+  font-size: 15px;
+  font-weight: 950;
+}
+
 .hero-panel p {
   position: relative;
   z-index: 1;
@@ -239,38 +248,6 @@ a {
   height: 100%;
   border-radius: inherit;
   background: #f4d56b;
-}
-
-.hero-action {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  max-width: 860px;
-  margin: 18px auto 0;
-  padding: 13px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 999px;
-  background: rgba(10, 48, 26, 0.28);
-  text-align: left;
-}
-
-.hero-action span {
-  padding: 5px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
-  color: #f4d56b;
-  font-size: 12px;
-  font-weight: 950;
-}
-
-.hero-action strong {
-  color: #fff;
-  font-size: 15px;
-  font-weight: 950;
-  line-height: 1.5;
 }
 
 .summary-strip {
@@ -1166,14 +1143,6 @@ p {
 
   .hero-score strong {
     font-size: 19px;
-  }
-
-  .hero-action {
-    grid-template-columns: 1fr;
-    gap: 7px;
-    border-radius: 16px;
-    padding: 12px;
-    text-align: center;
   }
 
   .content-frame {

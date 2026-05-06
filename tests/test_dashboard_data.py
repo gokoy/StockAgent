@@ -80,6 +80,35 @@ class DashboardDataTests(unittest.TestCase):
         self.assertEqual(dashboard_data._classify_signal("risk_off", -1.0, -1.0), "매수 부담 감소")
         self.assertEqual(dashboard_data._classify_signal("neutral", 0.01, 0.01), "관망")
 
+    def test_macro_decision_uses_standardized_factor_model(self) -> None:
+        def indicator(item_id: str, name: str, kind: str, values: list[float]) -> dict[str, object]:
+            return {
+                "id": item_id,
+                "name": name,
+                "kind": kind,
+                "latest_date": "2026-05-05",
+                "change_pct": 1.0,
+                "change_abs": 1.0,
+                "signal": "매수 우세",
+                "history_stats": {"percentile": 80.0},
+                "points": [
+                    {"date": f"2026-01-{index + 1:02d}", "value": value}
+                    for index, value in enumerate(values[:31])
+                ],
+            }
+
+        decision = dashboard_data._build_macro_decision(
+            [
+                indicator("sp500", "S&P 500", "risk_on", [100.0 + index for index in range(31)]),
+                indicator("vix", "VIX", "risk_off", [20.0 + index for index in range(31)]),
+            ]
+        )
+
+        self.assertEqual(decision["score_model"], "standardized_factor_v2")
+        factor_scores = {item["id"]: item for item in decision["factor_scores"]}
+        self.assertGreater(factor_scores["equity_momentum"]["points"], 0)
+        self.assertLess(factor_scores["volatility"]["points"], 0)
+
     def test_sector_history_stats_returns_percentile_and_zone(self) -> None:
         history_points = []
         for index in range(22):

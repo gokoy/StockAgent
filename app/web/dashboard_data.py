@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from functools import lru_cache
 from io import StringIO
 import json
+import math
 import os
 from pathlib import Path
 from typing import Literal
@@ -280,6 +281,48 @@ MACRO_SPECS: tuple[IndicatorSpec, ...] = (
     ),
 )
 
+MACRO_FACTOR_BUCKETS: dict[str, dict[str, object]] = {
+    "equity_momentum": {
+        "label": "주식 모멘텀",
+        "weight": 18.0,
+        "indicators": {"sp500", "nasdaq100", "russell_spy", "kospi", "kosdaq"},
+    },
+    "credit": {
+        "label": "신용 리스크",
+        "weight": 15.0,
+        "indicators": {"hy_spread", "hyg_lqd"},
+    },
+    "volatility": {
+        "label": "변동성",
+        "weight": 12.0,
+        "indicators": {"vix"},
+    },
+    "rates": {
+        "label": "금리/정책",
+        "weight": 8.0,
+        "indicators": {"dgs10", "dgs2", "curve_10y2y", "fedfunds"},
+    },
+    "fx_liquidity": {
+        "label": "달러/유동성",
+        "weight": 8.0,
+        "indicators": {"dxy", "usdkrw", "btc"},
+    },
+    "inflation_growth": {
+        "label": "물가/성장",
+        "weight": 6.0,
+        "indicators": {"wti", "gold", "copper", "cpi_yoy", "unemployment"},
+    },
+}
+MACRO_FACTOR_ORDER = tuple(MACRO_FACTOR_BUCKETS.keys())
+MACRO_SCORE_WINDOWS: tuple[tuple[int, float], ...] = ((1, 0.10), (5, 0.25), (20, 0.45), (60, 0.20))
+MACRO_LEVEL_SERIES = {"dgs10", "dgs2", "curve_10y2y", "hy_spread", "fedfunds", "cpi_yoy", "unemployment"}
+MACRO_CUSTOM_DIRECTIONS = {
+    "curve_10y2y": 1.0,
+    "wti": -0.5,
+    "gold": -0.3,
+    "unemployment": -1.0,
+}
+
 
 US_SECTOR_SPECS: tuple[SectorSpec, ...] = (
     SectorSpec("us-tech", "기술", "US", "SPY", ("XLK",), "소프트웨어, 하드웨어, 플랫폼 대형주의 흐름이다.", "시장보다 강하면 성장주 위험선호가 살아있다고 본다.", "Technology Select Sector Index", "XLK"),
@@ -314,7 +357,7 @@ def get_macro_dashboard() -> dict[str, object]:
     if snapshot is not None:
         macro = snapshot.get("macro")
         if isinstance(macro, dict):
-            return macro
+            return _rebuild_macro_snapshot_decision(macro)
     return _get_macro_dashboard_live()
 
 
@@ -327,6 +370,24 @@ def get_sector_dashboard(market: Literal["US", "KR"] = "US") -> dict[str, object
             if isinstance(dashboard, dict):
                 return dashboard
     return _get_sector_dashboard_live(market)
+
+
+def _rebuild_macro_snapshot_decision(macro: dict[str, object]) -> dict[str, object]:
+    groups = macro.get("groups")
+    if not isinstance(groups, dict):
+        return macro
+    indicators: list[dict[str, object]] = []
+    for items in groups.values():
+        if isinstance(items, list):
+            indicators.extend(item for item in items if isinstance(item, dict) and item.get("points"))
+    if not indicators:
+        return macro
+
+    rebuilt = dict(macro)
+    decision = _build_macro_decision(indicators)
+    rebuilt["decision"] = decision
+    rebuilt["ai_summary"] = _fallback_macro_summary(decision)
+    return rebuilt
 
 
 def build_dashboard_snapshot(
@@ -588,43 +649,41 @@ def _attach_macro_history_stats(item: dict[str, object], history_points: list[di
 
 
 def _build_macro_decision(indicators: list[dict[str, object]]) -> dict[str, object]:
-    weights = {
-        "sp500": 9,
-        "nasdaq100": 8,
-        "russell_spy": 6,
-        "vix": 9,
-        "dgs10": 5,
-        "dgs2": 5,
-        "curve_10y2y": 4,
-        "hy_spread": 10,
-        "hyg_lqd": 8,
-        "dxy": 6,
-        "usdkrw": 5,
-        "wti": 2,
-        "gold": 2,
-        "copper": 4,
-        "kospi": 4,
-        "kosdaq": 4,
-        "btc": 3,
-        "fedfunds": 3,
-        "cpi_yoy": 4,
-        "unemployment": 3,
-    }
     score = 50.0
     positive: list[tuple[float, str]] = []
     negative: list[tuple[float, str]] = []
+    factor_scores: list[dict[str, object]] = []
+    scored_by_id = {str(item["id"]): _standardized_macro_indicator_score(item) for item in indicators}
 
-    for item in indicators:
-        item_id = str(item["id"])
-        weight = weights.get(item_id, 3)
-        contribution = _macro_contribution(item)
-        contribution += _history_contribution(item)
-        points = contribution * weight
+    for factor_id in MACRO_FACTOR_ORDER:
+        config = MACRO_FACTOR_BUCKETS[factor_id]
+        bucket_ids = config["indicators"]
+        bucket_scores = [
+            scored
+            for item_id, scored in scored_by_id.items()
+            if item_id in bucket_ids and _is_number(scored.get("score"))
+        ]
+        if not bucket_scores:
+            continue
+        factor_value = sum(float(item["score"]) for item in bucket_scores) / len(bucket_scores)
+        factor_value = _clamp(factor_value, -1.0, 1.0)
+        weight = float(config["weight"])
+        points = factor_value * weight
         score += points
-        note = _decision_note(item)
-        if contribution > 0:
+        leaders = sorted(bucket_scores, key=lambda item: abs(float(item["score"])), reverse=True)[:2]
+        note = _factor_decision_note(str(config["label"]), factor_value, leaders)
+        factor_scores.append(
+            {
+                "id": factor_id,
+                "label": config["label"],
+                "score": round(factor_value, 2),
+                "points": round(points, 1),
+                "leaders": leaders,
+            }
+        )
+        if points > 0:
             positive.append((points, note))
-        elif contribution < 0:
+        elif points < 0:
             negative.append((points, note))
 
     final_score = max(0, min(100, round(score)))
@@ -646,6 +705,10 @@ def _build_macro_decision(indicators: list[dict[str, object]]) -> dict[str, obje
         "supportive_signals": supportive_signals,
         "score_up_drivers": _score_driver_items(positive_sorted[:4]),
         "score_down_drivers": _score_driver_items(negative_sorted[:4]),
+        "positive_factors": _factor_explanation_items(factor_scores, positive_only=True),
+        "negative_factors": _factor_explanation_items(factor_scores, positive_only=False),
+        "factor_scores": factor_scores,
+        "score_model": "standardized_factor_v2",
         "confirm_conditions": confirm_conditions,
         "freshness": {
             "latest": dates[-1] if dates else "",
@@ -694,6 +757,135 @@ def _score_driver_items(items: list[tuple[float, str]]) -> list[dict[str, object
     return [{"points": round(points, 1), "note": note} for points, note in items]
 
 
+def _standardized_macro_indicator_score(item: dict[str, object]) -> dict[str, object]:
+    series = _points_to_series(item.get("points"))
+    item_id = str(item.get("id", ""))
+    use_level_change = item_id in MACRO_LEVEL_SERIES
+    direction = _macro_score_direction(item)
+    window_scores: list[float] = []
+    window_details: list[dict[str, object]] = []
+
+    if len(series) >= 3 and direction:
+        step_changes = series.diff().dropna() if use_level_change else series.pct_change().dropna() * 100
+        volatility = float(step_changes.tail(252).std()) if len(step_changes) >= 2 else 0.0
+        if volatility > 0:
+            for days, weight in MACRO_SCORE_WINDOWS:
+                if len(series) <= days:
+                    continue
+                current = float(series.iloc[-1])
+                base = float(series.iloc[-(days + 1)])
+                raw_change = current - base if use_level_change else _return_between(base, current)
+                normalized = raw_change / (volatility * math.sqrt(days))
+                oriented = _clamp(normalized * direction, -3.0, 3.0)
+                scaled = math.tanh(oriented / 1.25)
+                window_scores.append(scaled * weight)
+                window_details.append(
+                    {
+                        "days": days,
+                        "change": round(raw_change, 3),
+                        "z_score": round(oriented, 2),
+                    }
+                )
+
+    momentum_score = sum(window_scores) / sum(weight for days, weight in MACRO_SCORE_WINDOWS if len(series) > days) if window_scores else 0.0
+    level_score = _history_level_score(item)
+    final_score = _clamp((momentum_score * 0.80) + (level_score * 0.20), -1.0, 1.0)
+    return {
+        "id": item_id,
+        "name": item.get("name", item_id),
+        "score": final_score,
+        "momentum_score": round(momentum_score, 2),
+        "level_score": round(level_score, 2),
+        "windows": window_details,
+    }
+
+
+def _points_to_series(points: object) -> pd.Series:
+    if not isinstance(points, list):
+        return pd.Series(dtype=float)
+    rows = []
+    for point in points:
+        if not isinstance(point, dict) or not _is_number(point.get("value")):
+            continue
+        rows.append((pd.to_datetime(point.get("date"), errors="coerce"), float(point["value"])))
+    clean_rows = [(date, value) for date, value in rows if not pd.isna(date)]
+    if not clean_rows:
+        return pd.Series(dtype=float)
+    series = pd.Series([value for date, value in clean_rows], index=[date for date, value in clean_rows])
+    return _clean_series(series)
+
+
+def _macro_score_direction(item: dict[str, object]) -> float:
+    item_id = str(item.get("id", ""))
+    if item_id in MACRO_CUSTOM_DIRECTIONS:
+        return MACRO_CUSTOM_DIRECTIONS[item_id]
+    kind = str(item.get("kind", "neutral"))
+    if kind == "risk_on":
+        return 1.0
+    if kind == "risk_off":
+        return -1.0
+    return 0.0
+
+
+def _history_level_score(item: dict[str, object]) -> float:
+    stats = item.get("history_stats")
+    if not isinstance(stats, dict) or not _is_number(stats.get("percentile")):
+        return 0.0
+    direction = _macro_score_direction(item)
+    if not direction:
+        return 0.0
+    percentile = float(stats["percentile"])
+    centered = ((percentile - 50.0) / 50.0) * direction
+    return _clamp(centered, -1.0, 1.0)
+
+
+def _factor_decision_note(label: str, factor_value: float, leaders: list[dict[str, object]]) -> str:
+    leader_text = ", ".join(f"{item['name']} {float(item['score']):+.2f}" for item in leaders)
+    if not leader_text:
+        leader_text = "유효 지표 부족"
+    if factor_value > 0:
+        return f"{label} 개선 · {leader_text}"
+    return f"{label} 부담 · {leader_text}"
+
+
+def _factor_explanation_items(factor_scores: list[dict[str, object]], positive_only: bool) -> list[dict[str, str]]:
+    candidates = [
+        item
+        for item in factor_scores
+        if _is_number(item.get("points")) and ((float(item["points"]) > 0) if positive_only else (float(item["points"]) < 0))
+    ]
+    candidates.sort(key=lambda item: abs(float(item["points"])), reverse=True)
+    return [
+        {
+            "label": str(item.get("label", "")),
+            "text": _factor_explanation_text(str(item.get("id", "")), positive_only),
+        }
+        for item in candidates[:4]
+    ]
+
+
+def _factor_explanation_text(factor_id: str, positive: bool) -> str:
+    explanations = {
+        ("equity_momentum", True): "주요 지수와 성장주 흐름이 함께 살아 있어 위험자산 선호가 개선된 상태입니다.",
+        ("equity_momentum", False): "주요 지수와 성장주 흐름이 약해져 시장을 넓게 추격하기 어렵습니다.",
+        ("credit", True): "하이일드 시장 스트레스가 제한적이라 위험자산을 버티는 힘이 남아 있습니다.",
+        ("credit", False): "신용시장이 흔들리면 주식시장도 빠르게 방어적으로 바뀔 수 있습니다.",
+        ("volatility", True): "변동성이 안정되며 단기 공포는 줄어든 상태입니다.",
+        ("volatility", False): "변동성이 높아져 단기 급락과 흔들림을 경계해야 합니다.",
+        ("rates", True): "금리와 정책 부담이 완화되면 성장주와 위험자산에 숨통이 트입니다.",
+        ("rates", False): "금리와 정책 부담이 남아 있어 성장주 무리한 추격은 조심해야 합니다.",
+        ("fx_liquidity", True): "달러와 유동성 흐름이 위험자산에 비교적 우호적입니다.",
+        ("fx_liquidity", False): "달러 강세나 유동성 부담이 커지면 해외 위험자산과 원화자산에 부담이 됩니다.",
+        ("inflation_growth", True): "물가와 성장 관련 지표가 시장 부담을 크게 키우지 않는 상태입니다.",
+        ("inflation_growth", False): "물가나 경기 부담이 커지면 주식 비중 확대의 질이 떨어질 수 있습니다.",
+    }
+    return explanations.get((factor_id, positive), "시장 판단에 영향을 주는 조건입니다.")
+
+
+def _clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
 def _macro_summary_prompt(decision: dict[str, object], indicators: list[dict[str, object]]) -> str:
     compact_indicators = [
         {
@@ -711,7 +903,7 @@ def _macro_summary_prompt(decision: dict[str, object], indicators: list[dict[str
         "indicators": compact_indicators,
         "required_json_schema": {
             "headline": "한 문장 제목",
-            "summary": "2문장 이내 최종 정리",
+            "summary": "숫자를 쓰지 않는 2문장 이내 시장 상황과 대응 방향",
             "stance": "오늘의 대응 방향 한 문장",
             "watch_points": ["확인할 지점 2~3개"],
         },
@@ -747,17 +939,41 @@ def _clean_summary_text(value: object, fallback: object, max_len: int) -> str:
 
 
 def _fallback_macro_summary(decision: dict[str, object]) -> dict[str, object]:
-    risks = decision.get("risk_flags") or []
-    supports = decision.get("supportive_signals") or []
-    risk_text = str(risks[0]) if isinstance(risks, list) and risks else "뚜렷한 방어 신호"
-    support_text = str(supports[0]) if isinstance(supports, list) and supports else "뚜렷한 우호 신호"
+    factor_scores = decision.get("factor_scores")
+    positive: list[str] = []
+    negative: list[str] = []
+    if isinstance(factor_scores, list):
+        for item in factor_scores:
+            if not isinstance(item, dict) or not _is_number(item.get("points")):
+                continue
+            label = str(item.get("label", "")).strip()
+            if not label:
+                continue
+            points = float(item["points"])
+            if points > 0:
+                positive.append(label)
+            elif points < 0:
+                negative.append(label)
+    support_text = _natural_join(positive[:2]) if positive else "뚜렷한 우호 축"
+    risk_text = _natural_join(negative[:2]) if negative else "뚜렷한 부담 축"
     return {
         "headline": str(decision["action_title"]),
-        "summary": f"우호 지표: {support_text}. 부담 지표: {risk_text}. 전체 시장 추격보다 강한 섹터 중심으로 좁게 보는 편이 낫습니다.",
+        "summary": (
+            f"우호적인 축은 {support_text}이고, 부담 요인은 {risk_text}입니다. "
+            "지수 전체를 추격하기보다 강한 섹터와 주도주 중심으로 좁게 접근하는 편이 낫습니다."
+        ),
         "stance": str(decision["posture"]),
         "watch_points": list(decision.get("confirm_conditions") or [])[:3],
         "source": "fallback",
     }
+
+
+def _natural_join(items: list[str]) -> str:
+    if not items:
+        return ""
+    if len(items) == 1:
+        return items[0]
+    return "과 ".join(items)
 
 
 def _macro_contribution(item: dict[str, object]) -> float:
