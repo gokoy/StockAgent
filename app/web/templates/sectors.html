@@ -9,23 +9,6 @@
     <a href="{{ sector_kr_href if sector_kr_href is defined else '/sectors?market=KR' }}" class="{% if dashboard.market == 'KR' %}active{% endif %}">한국</a>
   </div>
   <h1>{{ dashboard.benchmark }}보다 강한 섹터</h1>
-  <p>시장 대비 상대강도가 플러스인 섹터를 먼저 확인해서 지금 돈이 몰리는 방향을 찾습니다.</p>
-</section>
-
-<section class="flow-panel">
-  <article class="flow-card primary">
-    <span>돈이 몰리는 곳</span>
-    <strong>{{ dashboard.flow_summary.leader_text }}</strong>
-  </article>
-  <article class="flow-card">
-    <span>돈이 빠지는 곳</span>
-    <strong>{{ dashboard.flow_summary.laggard_text }}</strong>
-  </article>
-  <article class="flow-card">
-    <span>시장 확산 정도</span>
-    <strong>{{ dashboard.flow_summary.leader_count }}/{{ dashboard.flow_summary.total_count }}개 섹터</strong>
-    <small>{{ dashboard.flow_summary.breadth_label }}</small>
-  </article>
 </section>
 
 <section class="content-frame">

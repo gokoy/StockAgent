@@ -19,6 +19,7 @@ function renderSectorComparisonChart() {
   const config = dashboardData.comparison;
   const canvas = document.getElementById("sector-comparison-chart");
   if (!config || !canvas || !window.Chart) return;
+  let dismissedTooltipKey = null;
   const fullDates = config.dates;
   const fullSeries = config.series;
   const normalizeRangeValues = (values) => {
@@ -65,6 +66,85 @@ function renderSectorComparisonChart() {
     const rankIndex = ranked.findIndex((item) => item.index === datasetIndex);
     return rankIndex >= 0 ? rankIndex + 1 : null;
   };
+  const getOrCreateTooltip = () => {
+    const parent = canvas.parentNode;
+    let tooltipEl = parent.querySelector(".chart-tooltip");
+    if (tooltipEl) return tooltipEl;
+
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "chart-tooltip";
+    tooltipEl.setAttribute("role", "status");
+    tooltipEl.setAttribute("aria-live", "polite");
+
+    const closeButton = document.createElement("button");
+    closeButton.className = "chart-tooltip-close";
+    closeButton.type = "button";
+    closeButton.setAttribute("aria-label", "툴팁 닫기");
+    closeButton.textContent = "x";
+    closeButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      dismissedTooltipKey = tooltipEl.dataset.tooltipKey || dismissedTooltipKey;
+      tooltipEl.classList.remove("visible");
+    });
+
+    const titleEl = document.createElement("strong");
+    titleEl.className = "chart-tooltip-title";
+    const bodyEl = document.createElement("div");
+    bodyEl.className = "chart-tooltip-body";
+
+    tooltipEl.append(closeButton, titleEl, bodyEl);
+    parent.appendChild(tooltipEl);
+    return tooltipEl;
+  };
+  const renderExternalTooltip = ({ chart, tooltip }) => {
+    const tooltipEl = getOrCreateTooltip();
+    if (tooltip.opacity === 0) {
+      tooltipEl.classList.remove("visible");
+      return;
+    }
+
+    const dataIndex = tooltip.dataPoints?.[0]?.dataIndex ?? null;
+    const tooltipKey = dataIndex === null ? "" : `${chart.data.labels[dataIndex]}-${dataIndex}`;
+    if (dismissedTooltipKey === tooltipKey) {
+      tooltipEl.classList.remove("visible");
+      return;
+    }
+
+    const titleEl = tooltipEl.querySelector(".chart-tooltip-title");
+    const bodyEl = tooltipEl.querySelector(".chart-tooltip-body");
+    titleEl.textContent = tooltip.title?.[0] || "";
+    bodyEl.replaceChildren();
+
+    tooltip.dataPoints.forEach((point) => {
+      const value = formatRankValue(point.parsed.y);
+      const rank = sectorRankAt(point.dataIndex, point.datasetIndex);
+      const row = document.createElement("div");
+      row.className = "chart-tooltip-row";
+
+      const marker = document.createElement("span");
+      marker.className = "chart-tooltip-marker";
+      marker.style.backgroundColor = point.dataset.borderColor;
+
+      const label = document.createElement("span");
+      label.textContent =
+        point.datasetIndex === 0
+          ? `${rank ? `${rank}위 ` : ""}${point.dataset.label} 시장: ${value}`
+          : `${rank ? `${rank}위 ` : ""}${point.dataset.label}: ${value}`;
+
+      row.append(marker, label);
+      bodyEl.appendChild(row);
+    });
+
+    const parentRect = chart.canvas.parentNode.getBoundingClientRect();
+    const maxLeft = Math.max(12, parentRect.width - 238);
+    const maxTop = Math.max(12, parentRect.height - 220);
+    const left = Math.min(Math.max(12, tooltip.caretX + 14), maxLeft);
+    const top = Math.min(Math.max(12, tooltip.caretY + 14), maxTop);
+    tooltipEl.dataset.tooltipKey = tooltipKey;
+    tooltipEl.style.left = `${left}px`;
+    tooltipEl.style.top = `${top}px`;
+    tooltipEl.classList.add("visible");
+  };
 
   const chart = new Chart(canvas, {
     type: "line",
@@ -75,24 +155,13 @@ function renderSectorComparisonChart() {
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: {
-          display: true,
-          position: "bottom",
-          labels: { boxWidth: 10, usePointStyle: true },
+          display: false,
         },
         tooltip: {
-          displayColors: true,
+          enabled: false,
+          external: renderExternalTooltip,
           itemSort: (a, b) => {
             return b.parsed.y - a.parsed.y;
-          },
-          callbacks: {
-            label: (context) => {
-              const value = formatRankValue(context.parsed.y);
-              const rank = sectorRankAt(context.dataIndex, context.datasetIndex);
-              if (context.datasetIndex === 0) {
-                return `${rank ? `${rank}위 ` : ""}${context.dataset.label} 시장: ${value}`;
-              }
-              return `${rank ? `${rank}위 ` : ""}${context.dataset.label}: ${value}`;
-            },
           },
         },
       },
