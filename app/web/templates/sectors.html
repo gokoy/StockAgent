@@ -64,16 +64,16 @@
             <span>{{ item.tracked_index }}</span>
             <span>섹터 {{ "%+.2f"|format(item.sector_return_20d) }}%</span>
             <span>시장 {{ "%+.2f"|format(item.benchmark_return_20d) }}%</span>
-            {% if item.history_stats and item.history_stats.percentile is not none %}
+            {%- if item.history_stats and item.history_stats.percentile is not none %}
             <span>{{ item.history_stats.position_label }}</span>
-            {% endif %}
+            {%- endif %}
           </div>
           <p>{{ item.description }}</p>
           <p class="impact">{{ item.market_impact }}</p>
         </div>
       </div>
     </details>
-    {% endfor %}
+    {%- endfor %}
   </div>
 </section>
 

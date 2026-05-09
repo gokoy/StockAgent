@@ -27,29 +27,29 @@
   <article class="decision-card">
     <h3>무엇이 좋아졌나</h3>
     <ul>
-      {% for item in dashboard.decision.positive_factors %}
+      {%- for item in dashboard.decision.positive_factors %}
       <li><strong>{{ item.label }}</strong> {{ item.text }}</li>
-      {% else %}
+      {%- else %}
       <li>뚜렷하게 좋아진 조건은 아직 부족합니다.</li>
-      {% endfor %}
+      {%- endfor %}
     </ul>
   </article>
   <article class="decision-card">
     <h3>무엇이 부담인가</h3>
     <ul>
-      {% for item in dashboard.decision.negative_factors %}
+      {%- for item in dashboard.decision.negative_factors %}
       <li><strong>{{ item.label }}</strong> {{ item.text }}</li>
-      {% else %}
+      {%- else %}
       <li>현재 점수를 크게 낮추는 부담 요인은 제한적입니다.</li>
-      {% endfor %}
+      {%- endfor %}
     </ul>
   </article>
   <article class="decision-card">
     <h3>다음에 확인할 것</h3>
     <ul>
-      {% for item in dashboard.ai_summary.watch_points %}
+      {%- for item in dashboard.ai_summary.watch_points %}
       <li>{{ item }}</li>
-      {% endfor %}
+      {%- endfor %}
     </ul>
   </article>
 </section>

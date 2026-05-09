@@ -339,16 +339,21 @@ US_SECTOR_SPECS: tuple[SectorSpec, ...] = (
 
 
 KR_SECTOR_SPECS: tuple[SectorSpec, ...] = (
-    SectorSpec("kr-semi", "반도체", "KR", "^KS11", ("091160.KS",), "국내 반도체 섹터 지수를 추종하는 ETF 흐름이다.", "코스피보다 강하면 한국 시장의 주도축이 반도체로 모이는지 우선 확인한다.", "KRX 반도체", "KODEX 반도체"),
-    SectorSpec("kr-auto", "자동차", "KR", "^KS11", ("091180.KS",), "국내 자동차 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 수출주와 경기민감 대형주 수급 개선으로 해석할 수 있다.", "KRX 자동차", "KODEX 자동차"),
-    SectorSpec("kr-it", "정보기술", "KR", "^KS11", ("139260.KS",), "코스피 200 정보기술 섹터를 추종하는 ETF 흐름이다.", "반도체 외 IT 전반까지 자금이 확산되는지 확인한다.", "KOSPI 200 정보기술", "TIGER 200 IT"),
-    SectorSpec("kr-battery", "2차전지", "KR", "^KS11", ("305720.KS",), "국내 2차전지 산업 지수를 추종하는 ETF 흐름이다.", "강하면 성장 테마 수급이 회복되는 신호이고, 약하면 고밸류 성장주 부담을 점검한다.", "FnGuide 2차전지 산업", "KODEX 2차전지산업"),
-    SectorSpec("kr-healthcare", "헬스케어", "KR", "^KS11", ("143860.KS",), "국내 헬스케어 섹터 지수를 추종하는 ETF 흐름이다.", "시장보다 강하면 방어 성장주 또는 바이오 이벤트 수급을 확인한다.", "KRX 헬스케어", "TIGER 헬스케어"),
-    SectorSpec("kr-energy-chemical", "에너지화학", "KR", "^KS11", ("117460.KS",), "국내 에너지화학 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 유가, 화학 스프레드, 소재 수요 기대와 함께 해석한다.", "KRX 에너지화학", "KODEX 에너지화학"),
-    SectorSpec("kr-discretionary", "경기소비재", "KR", "^KS11", ("266390.KS",), "국내 경기소비재 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 내수와 소비 경기 민감주로 자금이 이동하는 신호일 수 있다.", "KRX 경기소비재", "KODEX 경기소비재"),
-    SectorSpec("kr-staples", "필수소비재", "KR", "^KS11", ("266410.KS",), "국내 필수소비재 섹터 지수를 추종하는 ETF 흐름이다.", "하락장에서도 강하면 방어적 자금 이동으로 해석한다.", "KRX 필수소비재", "KODEX 필수소비재"),
-    SectorSpec("kr-bank", "은행", "KR", "^KS11", ("091170.KS",), "국내 은행 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 금리, 배당, 경기 신뢰 개선과 함께 본다.", "KRX 은행", "KODEX 은행"),
-    SectorSpec("kr-securities", "증권", "KR", "^KS11", ("102970.KS",), "국내 증권 섹터 지수를 추종하는 ETF 흐름이다.", "강세는 거래대금 증가와 위험선호 개선 가능성을 함께 보여준다.", "KRX 증권", "KODEX 증권"),
+    SectorSpec("kr-semi", "반도체", "KR", "^KS11", ("091160.KS",), "KODEX 반도체 ETF 흐름이다.", "코스피보다 강하면 한국 시장의 주도축이 반도체로 모이는지 우선 확인한다.", "KRX 반도체", "KODEX 반도체"),
+    SectorSpec("kr-it", "IT", "KR", "^KS11", ("266370.KS",), "KODEX IT ETF 흐름이다.", "반도체를 포함한 정보기술 전반으로 자금이 확산되는지 확인한다.", "KRX IT", "KODEX IT"),
+    SectorSpec("kr-auto", "자동차", "KR", "^KS11", ("091180.KS",), "KODEX 자동차 ETF 흐름이다.", "강세는 수출주와 경기민감 대형주 수급 개선으로 해석할 수 있다.", "KRX 자동차", "KODEX 자동차"),
+    SectorSpec("kr-bank", "은행", "KR", "^KS11", ("091170.KS",), "KODEX 은행 ETF 흐름이다.", "강세는 금리, 배당, 경기 신뢰 개선과 함께 본다.", "KRX 은행", "KODEX 은행"),
+    SectorSpec("kr-securities", "증권", "KR", "^KS11", ("102970.KS",), "KODEX 증권 ETF 흐름이다.", "강세는 거래대금 증가와 위험선호 개선 가능성을 함께 보여준다.", "KRX 증권", "KODEX 증권"),
+    SectorSpec("kr-insurance", "보험", "KR", "^KS11", ("140700.KS",), "KODEX 보험 ETF 흐름이다.", "강세는 금리 레벨, 배당 선호, 금융주 방어력을 함께 반영할 수 있다.", "KRX 보험", "KODEX 보험"),
+    SectorSpec("kr-healthcare", "헬스케어", "KR", "^KS11", ("266420.KS",), "KODEX 헬스케어 ETF 흐름이다.", "시장보다 강하면 방어 성장주 또는 바이오 이벤트 수급을 확인한다.", "KRX 헬스케어", "KODEX 헬스케어"),
+    SectorSpec("kr-discretionary", "경기소비재", "KR", "^KS11", ("266390.KS",), "KODEX 경기소비재 ETF 흐름이다.", "강세는 내수와 소비 경기 민감주로 자금이 이동하는 신호일 수 있다.", "KRX 경기소비재", "KODEX 경기소비재"),
+    SectorSpec("kr-staples", "필수소비재", "KR", "^KS11", ("266410.KS",), "KODEX 필수소비재 ETF 흐름이다.", "하락장에서도 강하면 방어적 자금 이동으로 해석한다.", "KRX 필수소비재", "KODEX 필수소비재"),
+    SectorSpec("kr-k-content", "미디어/엔터", "KR", "^KS11", ("266360.KS",), "KODEX K콘텐츠 ETF 흐름이다.", "강세는 콘텐츠, 미디어, 엔터테인먼트 테마 수급 회복으로 해석한다.", "KRX 미디어&엔터테인먼트", "KODEX K콘텐츠"),
+    SectorSpec("kr-energy-chemical", "에너지/화학", "KR", "^KS11", ("117460.KS",), "KODEX 에너지화학 ETF 흐름이다.", "강세는 유가, 화학 스프레드, 소재 수요 기대와 함께 해석한다.", "KRX 에너지화학", "KODEX 에너지화학"),
+    SectorSpec("kr-steel", "철강", "KR", "^KS11", ("117680.KS",), "KODEX 철강 ETF 흐름이다.", "강세는 경기민감 소재와 중국/인프라 수요 기대를 함께 점검한다.", "KRX 철강", "KODEX 철강"),
+    SectorSpec("kr-machinery", "기계/장비", "KR", "^KS11", ("102960.KS",), "KODEX 기계장비 ETF 흐름이다.", "강세는 조선, 기계, 장비 업종으로 경기민감 수급이 확산되는 신호일 수 있다.", "KRX 기계장비", "KODEX 기계장비"),
+    SectorSpec("kr-construction", "건설", "KR", "^KS11", ("117700.KS",), "KODEX 건설 ETF 흐름이다.", "강세는 건설, 인프라, 부동산 정책 기대를 함께 반영할 수 있다.", "KRX 건설", "KODEX 건설"),
+    SectorSpec("kr-transportation", "운송", "KR", "^KS11", ("140710.KS",), "KODEX 운송 ETF 흐름이다.", "강세는 항공, 해운, 물류 수요와 글로벌 교역 기대를 함께 보여준다.", "KRX 운송", "KODEX 운송"),
 )
 
 
