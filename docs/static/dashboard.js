@@ -36,7 +36,7 @@ function renderMacroScoreHistoryChart() {
       labels: activePoints.map((point) => point.date),
       datasets: [
         {
-          label: "투자 적극도",
+          label: "시장 환경 점수",
           data: activePoints.map((point) => point.score),
           borderColor: "#153b25",
           backgroundColor: "transparent",

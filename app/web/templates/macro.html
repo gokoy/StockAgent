@@ -9,16 +9,20 @@
 
 <section class="hero-panel">
   <div class="status-pill">{{ dashboard.decision.freshness.latest }}</div>
-  <div class="hero-kicker">오늘의 판단</div>
-  <h1>{{ dashboard.ai_summary.headline }}</h1>
-  <div class="hero-score" aria-label="투자 적극도">
-    <div>
-      <span>투자 적극도</span>
-      <strong>{{ dashboard.decision.score }}/100</strong>
-    </div>
-    <div class="score-track">
-      <span style="width: {{ dashboard.decision.score }}%"></span>
-    </div>
+  <div class="hero-kicker">시장 환경 점수</div>
+  <h1>{{ dashboard.decision.score }}/100</h1>
+  <div class="score-track hero-score-track" aria-label="시장 환경 점수 막대">
+    <span style="width: {{ dashboard.decision.score }}%"></span>
+  </div>
+  <div class="score-guide" aria-label="시장 환경 점수 해석">
+    <strong>점수 해석 기준</strong>
+    <ul>
+      <li><span>72+</span> 신규 매수 가능. 지수보다 강한 섹터와 주도주 중심.</li>
+      <li><span>58-71</span> 선별 매수. 상대강도 좋은 종목만 좁게 접근.</li>
+      <li><span>45-57</span> 관망 우선. 신규 진입보다 보유 종목 관리.</li>
+      <li><span>32-44</span> 리스크 관리. 매수 축소와 현금 비중 점검.</li>
+      <li><span>&lt;32</span> 방어 우선. 성급한 물타기보다 손실 방어.</li>
+    </ul>
   </div>
   <p class="market-brief">{{ dashboard.ai_summary.summary }}</p>
 </section>
@@ -28,7 +32,8 @@
   <summary>
     <div>
       <p class="eyebrow">Score Trend</p>
-      <h2>투자 적극도 흐름</h2>
+      <h2>시장 환경 점수 흐름</h2>
+      <p class="score-history-note">매매 신호가 아니라 시장 환경을 확인하는 필터입니다.</p>
     </div>
     <div class="indicator-arrow">⌄</div>
   </summary>
