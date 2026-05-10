@@ -24,6 +24,7 @@ MACRO_HISTORY_PATH = ROOT_DIR / "data" / "history" / "macro_history.json"
 SECTOR_HISTORY_PATH = ROOT_DIR / "data" / "history" / "sector_history.json"
 MACRO_HISTORY_YEARS = 5
 SECTOR_HISTORY_YEARS = 5
+FRED_TIMEOUT_SECONDS = 60
 
 
 @dataclass(frozen=True)
@@ -400,7 +401,7 @@ def build_dashboard_snapshot(
     sector_history: dict[str, object] | None = None,
 ) -> dict[str, object]:
     if macro_history is None:
-        macro_history = build_macro_history()
+        macro_history = build_macro_history(previous_history=load_json_file(MACRO_HISTORY_PATH))
     if sector_history is None:
         sector_history = build_sector_history()
     return {
@@ -418,7 +419,8 @@ def refresh_dashboard_snapshot(
     macro_history_path: Path = MACRO_HISTORY_PATH,
     sector_history_path: Path = SECTOR_HISTORY_PATH,
 ) -> dict[str, object]:
-    macro_history = build_macro_history()
+    previous_macro_history = load_json_file(macro_history_path)
+    macro_history = build_macro_history(previous_history=previous_macro_history)
     sector_history = build_sector_history()
     snapshot = build_dashboard_snapshot(macro_history=macro_history, sector_history=sector_history)
     _write_json_atomic(path, snapshot)
@@ -438,10 +440,21 @@ def load_dashboard_snapshot(path: Path = SNAPSHOT_PATH) -> dict[str, object] | N
     return payload
 
 
+def load_json_file(path: Path) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Invalid JSON object: {path}")
+    return payload
+
+
 def _get_macro_dashboard_live(macro_history: dict[str, object] | None = None) -> dict[str, object]:
-    history_by_id = _history_series_by_id(macro_history or build_macro_history(), "indicators")
-    indicators = [_build_indicator(spec) for spec in MACRO_SPECS]
+    history_source = macro_history or build_macro_history()
+    history_by_id = _history_series_by_id(history_source, "indicators")
+    indicators = [_with_history_fallback(_build_indicator(spec), spec, history_by_id.get(spec.id, [])) for spec in MACRO_SPECS]
     valid = [_attach_macro_history_stats(item, history_by_id.get(str(item["id"]), [])) for item in indicators if item["points"]]
+    failed_indicators = [_failed_indicator_item(item) for item in indicators if item.get("error")]
     groups: dict[str, list[dict[str, object]]] = {}
     for item in valid:
         groups.setdefault(str(item["group"]), []).append(item)
@@ -452,8 +465,10 @@ def _get_macro_dashboard_live(macro_history: dict[str, object] | None = None) ->
         "as_of": datetime.now(UTC).isoformat(),
         "decision": decision,
         "ai_summary": ai_summary,
+        "score_history": _build_macro_score_history(history_source),
         "groups": groups,
-        "failed_count": len(indicators) - len(valid),
+        "failed_count": len(failed_indicators),
+        "failed_indicators": failed_indicators,
     }
 
 
@@ -487,8 +502,12 @@ def _live_fallback_enabled() -> bool:
     return raw not in {"0", "false", "no", "off"}
 
 
-def build_macro_history(years: int = MACRO_HISTORY_YEARS) -> dict[str, object]:
+def build_macro_history(
+    years: int = MACRO_HISTORY_YEARS,
+    previous_history: dict[str, object] | None = None,
+) -> dict[str, object]:
     indicators = []
+    previous_by_id = _history_entry_by_id(previous_history, "indicators")
     for spec in MACRO_SPECS:
         try:
             series = _fetch_indicator_series(spec, period=f"{years}y")
@@ -504,17 +523,7 @@ def build_macro_history(years: int = MACRO_HISTORY_YEARS) -> dict[str, object]:
                 }
             )
         except Exception as exc:
-            indicators.append(
-                {
-                    "id": spec.id,
-                    "name": spec.name,
-                    "group": spec.group,
-                    "kind": spec.kind,
-                    "unit": spec.unit,
-                    "error": str(exc),
-                    "points": [],
-                }
-            )
+            indicators.append(_history_failure_entry(spec, str(exc), previous_by_id.get(spec.id)))
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "years": years,
@@ -578,6 +587,50 @@ def _history_series_by_id(history: dict[str, object], key: str) -> dict[str, lis
     return result
 
 
+def _history_entry_by_id(history: dict[str, object] | None, key: str) -> dict[str, dict[str, object]]:
+    if not isinstance(history, dict):
+        return {}
+    entries = history.get(key)
+    if not isinstance(entries, list):
+        return {}
+    result: dict[str, dict[str, object]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        entry_id = entry.get("id")
+        if isinstance(entry_id, str):
+            result[entry_id] = entry
+    return result
+
+
+def _history_failure_entry(
+    spec: IndicatorSpec,
+    error: str,
+    previous_entry: dict[str, object] | None,
+) -> dict[str, object]:
+    if isinstance(previous_entry, dict) and isinstance(previous_entry.get("points"), list) and previous_entry["points"]:
+        return {
+            "id": spec.id,
+            "name": spec.name,
+            "group": spec.group,
+            "kind": spec.kind,
+            "unit": spec.unit,
+            "error": error,
+            "stale": True,
+            "stale_reason": "latest_fetch_failed",
+            "points": previous_entry["points"],
+        }
+    return {
+        "id": spec.id,
+        "name": spec.name,
+        "group": spec.group,
+        "kind": spec.kind,
+        "unit": spec.unit,
+        "error": error,
+        "points": [],
+    }
+
+
 def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp_path = path.with_suffix(f"{path.suffix}.tmp")
@@ -627,10 +680,163 @@ def _build_indicator(spec: IndicatorSpec) -> dict[str, object]:
             "previous_date": "",
             "data_frequency": _data_frequency_label(spec),
             "signal": f"데이터 실패: {exc}",
+            "error": str(exc),
             "description": spec.description,
             "market_impact": spec.market_impact,
             "points": [],
         }
+
+
+def _with_history_fallback(
+    item: dict[str, object],
+    spec: IndicatorSpec,
+    history_points: list[dict[str, object]],
+) -> dict[str, object]:
+    if item.get("points"):
+        return item
+    if not item.get("error"):
+        return item
+    fallback_points = [point for point in history_points if _is_number(point.get("value"))]
+    if not fallback_points:
+        return item
+    series = _points_to_series(fallback_points)
+    if series.empty:
+        return item
+    latest = float(series.iloc[-1])
+    previous = float(series.iloc[-2]) if len(series) >= 2 else latest
+    latest_date = str(series.index[-1].date())
+    previous_date = str(series.index[-2].date()) if len(series) >= 2 else latest_date
+    change_abs = latest - previous
+    change_pct = ((latest / previous) - 1.0) * 100 if previous else 0.0
+    fallback = dict(item)
+    fallback.update(
+        {
+            "value": _round_value(latest),
+            "change_abs": _round_value(change_abs),
+            "change_pct": round(change_pct, 2),
+            "latest_date": latest_date,
+            "previous_date": previous_date,
+            "signal": _classify_signal(spec.kind, change_pct, change_abs),
+            "points": _series_to_points(series.tail(260)),
+            "stale": True,
+            "stale_reason": "latest_fetch_failed",
+        }
+    )
+    return fallback
+
+
+def _failed_indicator_item(item: dict[str, object]) -> dict[str, object]:
+    return {
+        "id": item.get("id", ""),
+        "name": item.get("name", ""),
+        "latest_date": item.get("latest_date", ""),
+        "stale": bool(item.get("stale")),
+        "error": item.get("error", ""),
+    }
+
+
+def _build_macro_score_history(macro_history: dict[str, object]) -> list[dict[str, object]]:
+    history_by_id = _history_series_by_id(macro_history, "indicators")
+    series_by_id = {
+        item_id: _points_to_series(points)
+        for item_id, points in history_by_id.items()
+        if points
+    }
+    dates = sorted({date for series in series_by_id.values() for date in series.index})
+    if not dates:
+        return []
+    history_cutoff = dates[-1] - pd.DateOffset(years=MACRO_HISTORY_YEARS)
+    series_by_id = {item_id: series.loc[series.index >= history_cutoff] for item_id, series in series_by_id.items()}
+    dates = sorted({date for series in series_by_id.values() for date in series.index})
+    if not dates:
+        return []
+    dates = _macro_score_history_dates(dates)
+
+    specs_by_id = {spec.id: spec for spec in MACRO_SPECS}
+    score_points: list[dict[str, object]] = []
+    for date in dates:
+        scored_by_id: dict[str, dict[str, object]] = {}
+        for item_id, series in series_by_id.items():
+            spec = specs_by_id.get(item_id)
+            if spec is None:
+                continue
+            as_of_series = series.loc[:date]
+            if as_of_series.empty:
+                continue
+            latest = float(as_of_series.iloc[-1])
+            percentile = _percentile_rank([float(value) for value in as_of_series if _is_number(value)], latest)
+            scored_by_id[item_id] = _standardized_macro_series_score(spec, as_of_series, percentile)
+        if not scored_by_id:
+            continue
+        score, negative_count = _macro_score_from_standardized_scores(scored_by_id)
+        regime_label, _, _, _ = _decision_labels(score, negative_count)
+        score_points.append(
+            {
+                "date": str(date.date()),
+                "score": score,
+                "regime_label": regime_label,
+                "indicator_count": len(scored_by_id),
+            }
+        )
+    return score_points
+
+
+def _standardized_macro_series_score(spec: IndicatorSpec, series: pd.Series, percentile: float) -> dict[str, object]:
+    use_level_change = spec.id in MACRO_LEVEL_SERIES
+    direction = _macro_score_direction({"id": spec.id, "kind": spec.kind})
+    window_scores: list[float] = []
+    if len(series) >= 3 and direction:
+        step_changes = series.diff().dropna() if use_level_change else series.pct_change().dropna() * 100
+        volatility = float(step_changes.tail(252).std()) if len(step_changes) >= 2 else 0.0
+        if volatility > 0:
+            for days, weight in MACRO_SCORE_WINDOWS:
+                if len(series) <= days:
+                    continue
+                current = float(series.iloc[-1])
+                base = float(series.iloc[-(days + 1)])
+                raw_change = current - base if use_level_change else _return_between(base, current)
+                normalized = raw_change / (volatility * math.sqrt(days))
+                oriented = _clamp(normalized * direction, -3.0, 3.0)
+                window_scores.append(math.tanh(oriented / 1.25) * weight)
+    denominator = sum(weight for days, weight in MACRO_SCORE_WINDOWS if len(series) > days)
+    momentum_score = sum(window_scores) / denominator if window_scores and denominator else 0.0
+    level_score = _macro_level_score_from_percentile(spec, percentile)
+    final_score = _clamp((momentum_score * 0.80) + (level_score * 0.20), -1.0, 1.0)
+    return {"id": spec.id, "name": spec.name, "score": final_score}
+
+
+def _macro_level_score_from_percentile(spec: IndicatorSpec, percentile: float) -> float:
+    direction = _macro_score_direction({"id": spec.id, "kind": spec.kind})
+    if not direction:
+        return 0.0
+    centered = ((percentile - 50.0) / 50.0) * direction
+    return _clamp(centered, -1.0, 1.0)
+
+
+def _macro_score_from_standardized_scores(scored_by_id: dict[str, dict[str, object]]) -> tuple[int, int]:
+    score = 50.0
+    negative_count = 0
+    for factor_id in MACRO_FACTOR_ORDER:
+        config = MACRO_FACTOR_BUCKETS[factor_id]
+        bucket_ids = config["indicators"]
+        bucket_scores = [
+            scored
+            for item_id, scored in scored_by_id.items()
+            if item_id in bucket_ids and _is_number(scored.get("score"))
+        ]
+        if not bucket_scores:
+            continue
+        factor_value = sum(float(item["score"]) for item in bucket_scores) / len(bucket_scores)
+        factor_value = _clamp(factor_value, -1.0, 1.0)
+        points = factor_value * float(config["weight"])
+        score += points
+        if points < 0:
+            negative_count += 1
+    return max(0, min(100, round(score))), negative_count
+
+
+def _macro_score_history_dates(dates: list[pd.Timestamp]) -> list[pd.Timestamp]:
+    return dates
 
 
 def _attach_macro_history_stats(item: dict[str, object], history_points: list[dict[str, object]]) -> dict[str, object]:
@@ -808,15 +1014,18 @@ def _standardized_macro_indicator_score(item: dict[str, object]) -> dict[str, ob
 def _points_to_series(points: object) -> pd.Series:
     if not isinstance(points, list):
         return pd.Series(dtype=float)
-    rows = []
+    dates = []
+    values = []
     for point in points:
         if not isinstance(point, dict) or not _is_number(point.get("value")):
             continue
-        rows.append((pd.to_datetime(point.get("date"), errors="coerce"), float(point["value"])))
-    clean_rows = [(date, value) for date, value in rows if not pd.isna(date)]
-    if not clean_rows:
+        dates.append(point.get("date"))
+        values.append(float(point["value"]))
+    if not values:
         return pd.Series(dtype=float)
-    series = pd.Series([value for date, value in clean_rows], index=[date for date, value in clean_rows])
+    parsed_dates = pd.to_datetime(dates, errors="coerce")
+    series = pd.Series(values, index=parsed_dates)
+    series = series.loc[~pd.isna(series.index)]
     return _clean_series(series)
 
 
@@ -1277,7 +1486,7 @@ def _empty_sector(spec: SectorSpec) -> dict[str, object]:
 
 def _fetch_indicator_series(spec: IndicatorSpec, period: str = "1y") -> pd.Series:
     if spec.source == "fred":
-        return _fetch_fred_series(spec.symbol, spec.fred_transform)
+        return _filter_series_period(_fetch_fred_series(spec.symbol, spec.fred_transform), period)
     if spec.source == "ratio":
         numerator = _fetch_yahoo_close(spec.numerator, period=period)
         denominator = _fetch_yahoo_close(spec.denominator, period=period)
@@ -1307,7 +1516,7 @@ def _fetch_yahoo_close(symbol: str, period: str = "1y") -> pd.Series:
 @lru_cache(maxsize=64)
 def _fetch_fred_series(symbol: str, transform: str = "level") -> pd.Series:
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={symbol}"
-    response = requests.get(url, timeout=15)
+    response = requests.get(url, timeout=FRED_TIMEOUT_SECONDS)
     response.raise_for_status()
     frame = pd.read_csv(StringIO(response.text))
     if frame.empty or symbol not in frame.columns:
@@ -1357,6 +1566,18 @@ def _clean_series(series: pd.Series) -> pd.Series:
 
 def _series_to_points(series: pd.Series) -> list[dict[str, object]]:
     return [{"date": str(index.date()), "value": _round_value(float(value))} for index, value in series.items()]
+
+
+def _filter_series_period(series: pd.Series, period: str) -> pd.Series:
+    clean = _clean_series(series)
+    if clean.empty or not period.endswith("y"):
+        return clean
+    try:
+        years = int(period[:-1])
+    except ValueError:
+        return clean
+    cutoff = clean.index.max() - pd.DateOffset(years=years)
+    return clean.loc[clean.index >= cutoff]
 
 
 def _window_return(series: pd.Series, days: int) -> float:

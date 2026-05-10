@@ -23,6 +23,30 @@
   <p class="market-brief">{{ dashboard.ai_summary.summary }}</p>
 </section>
 
+{% if dashboard.score_history %}
+<details class="score-history-panel" id="score-history-panel">
+  <summary>
+    <div>
+      <p class="eyebrow">Score Trend</p>
+      <h2>투자 적극도 흐름</h2>
+    </div>
+    <div class="indicator-arrow">⌄</div>
+  </summary>
+  <div class="score-history-body">
+    <div class="chart-range-control score-range-control" aria-label="점수 그래프 기간 선택">
+      <button type="button" data-score-days="31">1M</button>
+      <button type="button" data-score-days="92">3M</button>
+      <button type="button" data-score-days="183">6M</button>
+      <button type="button" data-score-days="365" class="active">1Y</button>
+      <button type="button" data-score-days="all">5Y</button>
+    </div>
+    <div class="score-history-chart-wrap">
+      <canvas id="macro-score-history-chart"></canvas>
+    </div>
+  </div>
+</details>
+{% endif %}
+
 <section class="decision-panel">
   <article class="decision-card">
     <h3>무엇이 좋아졌나</h3>
@@ -53,6 +77,24 @@
     </ul>
   </article>
 </section>
+
+{%- if dashboard.failed_indicators %}
+<section class="data-quality-panel">
+  <div>
+    <p class="eyebrow">Data Quality</p>
+    <h2>일부 지표 갱신 지연</h2>
+    <p>아래 지표는 최신 수집에 실패했습니다. 기존 히스토리가 있는 항목은 마지막 정상값으로 표시됩니다.</p>
+  </div>
+  <ul>
+    {% for item in dashboard.failed_indicators %}
+    <li>
+      <strong>{{ item.name }}</strong>
+      <span>{% if item.stale %}기존값 사용{% else %}표시 제외{% endif %}{% if item.latest_date %} · {{ item.latest_date }}{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{%- endif %}
 
 <section class="content-frame">
   <div class="indicator-header">
@@ -109,6 +151,7 @@
 <script id="chart-data" type="application/json">
 {
   "type": "macro",
+  "scoreHistory": {{ dashboard.score_history|tojson }},
   "charts": {
     {% set comma = joiner(",") %}
     {% for group, indicators in dashboard.groups.items() %}

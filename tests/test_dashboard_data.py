@@ -109,6 +109,118 @@ class DashboardDataTests(unittest.TestCase):
         self.assertGreater(factor_scores["equity_momentum"]["points"], 0)
         self.assertLess(factor_scores["volatility"]["points"], 0)
 
+    def test_build_macro_history_preserves_previous_points_on_fetch_failure(self) -> None:
+        spec = dashboard_data.IndicatorSpec(
+            id="dgs10",
+            name="미국 10년 금리",
+            group="금리/할인율",
+            source="fred",
+            symbol="DGS10",
+            unit="%",
+            kind="risk_off",
+        )
+        previous_points = [{"date": "2026-05-01", "value": 4.5}]
+        previous_history = {
+            "generated_at": "old",
+            "years": 5,
+            "indicators": [
+                {
+                    "id": "dgs10",
+                    "name": "미국 10년 금리",
+                    "group": "금리/할인율",
+                    "kind": "risk_off",
+                    "unit": "%",
+                    "points": previous_points,
+                }
+            ],
+        }
+
+        with (
+            patch.object(dashboard_data, "MACRO_SPECS", (spec,)),
+            patch.object(dashboard_data, "_fetch_indicator_series", side_effect=TimeoutError("timed out")),
+        ):
+            history = dashboard_data.build_macro_history(previous_history=previous_history)
+
+        item = history["indicators"][0]
+        self.assertEqual(item["points"], previous_points)
+        self.assertTrue(item["stale"])
+        self.assertIn("timed out", item["error"])
+
+    def test_macro_dashboard_uses_history_fallback_for_failed_indicator(self) -> None:
+        spec = dashboard_data.IndicatorSpec(
+            id="dgs10",
+            name="미국 10년 금리",
+            group="금리/할인율",
+            source="fred",
+            symbol="DGS10",
+            unit="%",
+            kind="risk_off",
+        )
+        macro_history = {
+            "generated_at": "old",
+            "years": 5,
+            "indicators": [
+                {
+                    "id": "dgs10",
+                    "name": "미국 10년 금리",
+                    "group": "금리/할인율",
+                    "kind": "risk_off",
+                    "unit": "%",
+                    "points": [
+                        {"date": "2026-05-01", "value": 4.5},
+                        {"date": "2026-05-02", "value": 4.4},
+                    ],
+                }
+            ],
+        }
+
+        with (
+            patch.object(dashboard_data, "MACRO_SPECS", (spec,)),
+            patch.object(dashboard_data, "_fetch_indicator_series", side_effect=TimeoutError("timed out")),
+        ):
+            dashboard = dashboard_data._get_macro_dashboard_live(macro_history=macro_history)
+
+        item = dashboard["groups"]["금리/할인율"][0]
+        self.assertEqual(item["value"], 4.4)
+        self.assertTrue(item["stale"])
+        self.assertEqual(dashboard["failed_count"], 1)
+        self.assertEqual(dashboard["failed_indicators"][0]["name"], "미국 10년 금리")
+
+    def test_macro_score_history_rebuilds_scores_from_history_points(self) -> None:
+        spec = dashboard_data.IndicatorSpec(
+            id="sp500",
+            name="S&P 500",
+            group="주식 위험선호",
+            source="yahoo",
+            symbol="^GSPC",
+            kind="risk_on",
+        )
+        macro_history = {
+            "generated_at": "test",
+            "years": 5,
+            "indicators": [
+                {
+                    "id": "sp500",
+                    "name": "S&P 500",
+                    "group": "주식 위험선호",
+                    "kind": "risk_on",
+                    "unit": "pt",
+                    "points": [
+                        {"date": f"2026-01-{index + 1:02d}", "value": 100.0 + index}
+                        for index in range(28)
+                    ],
+                }
+            ],
+        }
+
+        with patch.object(dashboard_data, "MACRO_SPECS", (spec,)):
+            score_history = dashboard_data._build_macro_score_history(macro_history)
+
+        self.assertEqual(len(score_history), 28)
+        self.assertEqual(score_history[-1]["date"], "2026-01-28")
+        self.assertIn("score", score_history[-1])
+        self.assertEqual(score_history[-1]["indicator_count"], 1)
+
     def test_sector_history_stats_returns_percentile_and_zone(self) -> None:
         history_points = []
         for index in range(22):

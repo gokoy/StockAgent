@@ -15,6 +15,92 @@ const sectorPalette = [
   "#475569",
 ];
 
+function renderMacroScoreHistoryChart() {
+  const points = dashboardData.scoreHistory || [];
+  const canvas = document.getElementById("macro-score-history-chart");
+  if (!points.length || !canvas || !window.Chart || renderedCharts.has("macro-score-history")) return;
+
+  const normalizeRange = (days) => {
+    if (days === "all") return points;
+    const parsedDays = Number.parseInt(days || "365", 10);
+    const lastDate = new Date(points[points.length - 1].date);
+    const cutoff = new Date(lastDate);
+    cutoff.setDate(lastDate.getDate() - (Number.isFinite(parsedDays) ? parsedDays : 365));
+    return points.filter((point) => new Date(point.date) >= cutoff);
+  };
+  const defaultRange = "365";
+  let activePoints = normalizeRange(defaultRange);
+  const chart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: activePoints.map((point) => point.date),
+      datasets: [
+        {
+          label: "투자 적극도",
+          data: activePoints.map((point) => point.score),
+          borderColor: "#153b25",
+          backgroundColor: "transparent",
+          borderWidth: 3,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: "#f4d56b",
+          pointHoverBorderColor: "#153b25",
+          pointHoverBorderWidth: 2,
+          tension: 0.22,
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      animation: {
+        duration: 650,
+        easing: "easeOutQuart",
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          displayColors: false,
+          callbacks: {
+            label: (context) => {
+              const point = activePoints[context.dataIndex];
+              const label = point?.regime_label ? ` · ${point.regime_label}` : "";
+              return `${context.parsed.y}/100${label}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 7 }, grid: { display: false } },
+        y: {
+          min: 0,
+          max: 100,
+          ticks: { stepSize: 20 },
+          grid: { color: "rgba(148, 163, 184, 0.18)" },
+        },
+      },
+    },
+  });
+  canvas.dataset.activeRange = defaultRange;
+  renderedCharts.set("macro-score-history", chart);
+
+  document.querySelectorAll(".score-range-control button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const range = button.dataset.scoreDays || defaultRange;
+      canvas.dataset.activeRange = range;
+      activePoints = normalizeRange(range);
+      chart.data.labels = activePoints.map((point) => point.date);
+      chart.data.datasets[0].data = activePoints.map((point) => point.score);
+      chart.update();
+      document.querySelectorAll(".score-range-control button").forEach((item) => {
+        item.classList.toggle("active", item === button);
+      });
+    });
+  });
+}
+
 function renderSectorComparisonChart() {
   const config = dashboardData.comparison;
   const canvas = document.getElementById("sector-comparison-chart");
@@ -259,6 +345,13 @@ document.querySelectorAll(".history-panel").forEach((panel) => {
     if (panel.open) ensureChart(panel.dataset.chartId);
   });
 });
+
+const scoreHistoryPanel = document.getElementById("score-history-panel");
+if (scoreHistoryPanel) {
+  scoreHistoryPanel.addEventListener("toggle", () => {
+    if (scoreHistoryPanel.open) renderMacroScoreHistoryChart();
+  });
+}
 
 if (dashboardData.type === "sector") {
   renderSectorComparisonChart();
