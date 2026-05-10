@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-10T09:13:20.596811+00:00",
+  "generated_at": "2026-05-10T22:41:45.473591+00:00",
   "macro": {
-    "as_of": "2026-05-10T09:13:23.374954+00:00",
+    "as_of": "2026-05-10T22:41:51.947399+00:00",
     "decision": {
       "score": 67,
       "regime_label": "좋은 종목만 매수 구간",
@@ -14,7 +14,7 @@
       "supportive_signals": [
         "주식 모멘텀 개선 · Nasdaq 100 +0.97, KOSPI +0.90",
         "신용 리스크 개선 · 하이일드 스프레드 +0.31, 하이일드 / 우량채 +0.16",
-        "달러/유동성 개선 · Bitcoin +0.36, 달러 인덱스 +0.32",
+        "달러/유동성 개선 · Bitcoin +0.46, 달러 인덱스 +0.16",
         "변동성 개선 · VIX 변동성 +0.11"
       ],
       "score_up_drivers": [
@@ -27,8 +27,8 @@
           "note": "신용 리스크 개선 · 하이일드 스프레드 +0.31, 하이일드 / 우량채 +0.16"
         },
         {
-          "points": 1.5,
-          "note": "달러/유동성 개선 · Bitcoin +0.36, 달러 인덱스 +0.32"
+          "points": 1.6,
+          "note": "달러/유동성 개선 · Bitcoin +0.46, 달러 인덱스 +0.16"
         },
         {
           "points": 1.3,
@@ -170,7 +170,7 @@
             {
               "id": "hyg_lqd",
               "name": "하이일드 / 우량채",
-              "score": 0.16380637810016208,
+              "score": 0.1638063781001621,
               "momentum_score": -0.0,
               "level_score": 0.82,
               "windows": [
@@ -294,64 +294,64 @@
         {
           "id": "fx_liquidity",
           "label": "달러/유동성",
-          "score": 0.19,
-          "points": 1.5,
+          "score": 0.2,
+          "points": 1.6,
           "leaders": [
             {
               "id": "btc",
               "name": "Bitcoin",
-              "score": 0.35887684793183305,
-              "momentum_score": 0.32,
+              "score": 0.4617044095403695,
+              "momentum_score": 0.45,
               "level_score": 0.52,
               "windows": [
                 {
                   "days": 1,
-                  "change": 0.228,
-                  "z_score": 0.09
+                  "change": 1.511,
+                  "z_score": 0.62
                 },
                 {
                   "days": 5,
-                  "change": -0.097,
-                  "z_score": -0.02
+                  "change": 1.181,
+                  "z_score": 0.22
                 },
                 {
                   "days": 20,
-                  "change": 6.559,
-                  "z_score": 0.6
+                  "change": 7.922,
+                  "z_score": 0.73
                 },
                 {
                   "days": 60,
-                  "change": 15.161,
-                  "z_score": 0.81
+                  "change": 16.635,
+                  "z_score": 0.88
                 }
               ]
             },
             {
               "id": "dxy",
               "name": "달러 인덱스",
-              "score": 0.32468928563016686,
-              "momentum_score": 0.26,
-              "level_score": 0.58,
+              "score": 0.16222789569326063,
+              "momentum_score": 0.07,
+              "level_score": 0.55,
               "windows": [
                 {
                   "days": 1,
-                  "change": -0.417,
-                  "z_score": 1.08
+                  "change": 0.204,
+                  "z_score": -0.53
                 },
                 {
                   "days": 5,
-                  "change": -0.377,
-                  "z_score": 0.43
+                  "change": -0.437,
+                  "z_score": 0.5
                 },
                 {
                   "days": 20,
-                  "change": -0.821,
-                  "z_score": 0.47
+                  "change": -0.335,
+                  "z_score": 0.19
                 },
                 {
                   "days": 60,
-                  "change": 1.043,
-                  "z_score": -0.35
+                  "change": 1.145,
+                  "z_score": -0.38
                 }
               ]
             }
@@ -360,35 +360,35 @@
         {
           "id": "inflation_growth",
           "label": "물가/성장",
-          "score": 0.03,
-          "points": 0.2,
+          "score": 0.01,
+          "points": 0.1,
           "leaders": [
             {
               "id": "copper",
               "name": "구리",
-              "score": 0.6250557484845236,
-              "momentum_score": 0.53,
+              "score": 0.5672622223533605,
+              "momentum_score": 0.46,
               "level_score": 1.0,
               "windows": [
                 {
                   "days": 1,
-                  "change": 2.758,
-                  "z_score": 1.17
+                  "change": 0.368,
+                  "z_score": 0.16
                 },
                 {
                   "days": 5,
-                  "change": 6.153,
-                  "z_score": 1.17
+                  "change": 8.231,
+                  "z_score": 1.56
                 },
                 {
                   "days": 20,
-                  "change": 7.256,
-                  "z_score": 0.69
+                  "change": 4.953,
+                  "z_score": 0.47
                 },
                 {
                   "days": 60,
-                  "change": 5.85,
-                  "z_score": 0.32
+                  "change": 8.681,
+                  "z_score": 0.48
                 }
               ]
             },
@@ -426,15 +426,15 @@
       }
     },
     "ai_summary": {
-      "headline": "좋은 종목만 매수",
-      "summary": "우호적인 축은 주식 모멘텀과 신용 리스크이고, 부담 요인은 금리/정책입니다. 지수 전체를 추격하기보다 강한 섹터와 주도주 중심으로 좁게 접근하는 편이 낫습니다.",
-      "stance": "전체 시장 추격보다 상대강도 상위 섹터와 주도주만 선별합니다.",
+      "headline": "일부 강한 섹터 중심 매수 전략 권고",
+      "summary": "시장은 전반적으로 혼재된 모습이나, 나스닥100과 코스피 등 강한 모멘텀을 보이는 자산에 자금이 집중되고 있습니다. 금리 부담은 존재하나 신용 리스크와 변동성 안정으로 위험자산 선호가 개선된 상태입니다.",
+      "stance": "전체 시장 추격보다는 상대강도 상위 섹터와 주도주 중심으로 선별 매수하는 전략이 적합합니다.",
       "watch_points": [
-        "강한 섹터만 추적하고 약한 섹터 추격은 피하기",
-        "S&P 500과 Nasdaq 100이 함께 상승하는지 확인",
-        "매도 우세 신호가 2개 이상 추가되면 신규 비중 확대 보류"
+        "금리 및 정책 변화에 따른 성장주 부담 지속 여부",
+        "S&P 500과 Nasdaq 100의 동반 상승 추세 유지 여부",
+        "신용 리스크 및 변동성 지표의 추가 악화 신호 발생 여부"
       ],
-      "source": "fallback"
+      "source": "openai:gpt-4.1-mini"
     },
     "score_history": [
       {
@@ -20735,13 +20735,13 @@
           "group": "환율/글로벌 자금",
           "kind": "risk_off",
           "unit": "pt",
-          "value": 97.84,
-          "change_abs": -0.41,
-          "change_pct": -0.42,
-          "latest_date": "2026-05-08",
-          "previous_date": "2026-05-07",
+          "value": 98.04,
+          "change_abs": 0.2,
+          "change_pct": 0.2,
+          "latest_date": "2026-05-10",
+          "previous_date": "2026-05-08",
           "data_frequency": "일간",
-          "signal": "매수 부담 감소",
+          "signal": "매수 부담 증가",
           "description": "달러 강세 여부를 보여준다. 글로벌 유동성과 신흥국 자금 흐름에 중요하다.",
           "market_impact": "달러 급등은 해외 위험자산과 원화자산에 부담이고, 달러 약세는 위험선호에 우호적이다.",
           "points": [
@@ -21748,16 +21748,20 @@
             {
               "date": "2026-05-08",
               "value": 97.84
+            },
+            {
+              "date": "2026-05-10",
+              "value": 98.04
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 21.2,
-            "position_label": "5년 중 하위 21% 수준",
+            "percentile": 22.6,
+            "position_label": "5년 중 하위 23% 수준",
             "zone": "장기 중립권",
             "min": 89.64,
             "max": 114.11,
-            "observations": 1258
+            "observations": 1259
           }
         },
         {
@@ -21766,20 +21770,16 @@
           "group": "환율/글로벌 자금",
           "kind": "risk_off",
           "unit": "KRW",
-          "value": 1461.5,
-          "change_abs": 17.03,
-          "change_pct": 1.18,
-          "latest_date": "2026-05-08",
-          "previous_date": "2026-05-07",
+          "value": 1461.4,
+          "change_abs": 6.64,
+          "change_pct": 0.46,
+          "latest_date": "2026-05-10",
+          "previous_date": "2026-05-08",
           "data_frequency": "일간",
           "signal": "매수 부담 증가",
           "description": "원화 약세/강세를 직접 보여준다. 한국 주식 외국인 수급과 연결된다.",
           "market_impact": "달러/원 상승은 외국인 매도 압력과 수입물가 부담으로 이어질 수 있다.",
           "points": [
-            {
-              "date": "2025-05-08",
-              "value": 1397.3
-            },
             {
               "date": "2025-05-09",
               "value": 1403.8
@@ -22814,7 +22814,11 @@
             },
             {
               "date": "2026-05-08",
-              "value": 1461.5
+              "value": 1454.8
+            },
+            {
+              "date": "2026-05-10",
+              "value": 1461.4
             }
           ],
           "history_stats": {
@@ -22824,7 +22828,7 @@
             "zone": "장기 상단 위험권",
             "min": 1107.0,
             "max": 1516.1,
-            "observations": 1300
+            "observations": 1301
           }
         }
       ],
@@ -22835,11 +22839,11 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 95.42,
-          "change_abs": 0.61,
-          "change_pct": 0.64,
-          "latest_date": "2026-05-08",
-          "previous_date": "2026-05-07",
+          "value": 97.89,
+          "change_abs": 2.47,
+          "change_pct": 2.59,
+          "latest_date": "2026-05-10",
+          "previous_date": "2026-05-08",
           "data_frequency": "일간",
           "signal": "가격 상승",
           "description": "에너지 가격과 인플레이션 압력을 같이 보여준다.",
@@ -23848,16 +23852,20 @@
             {
               "date": "2026-05-08",
               "value": 95.42
+            },
+            {
+              "date": "2026-05-10",
+              "value": 97.89
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 89.8,
-            "position_label": "5년 중 상위 10% 수준",
+            "percentile": 91.5,
+            "position_label": "5년 중 상위 8% 수준",
             "zone": "장기 상단 강세권",
             "min": 55.27,
             "max": 123.7,
-            "observations": 1258
+            "observations": 1259
           }
         },
         {
@@ -23866,13 +23874,13 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 4730.7,
-          "change_abs": 30.9,
-          "change_pct": 0.66,
-          "latest_date": "2026-05-08",
-          "previous_date": "2026-05-07",
+          "value": 4699.0,
+          "change_abs": -21.4,
+          "change_pct": -0.45,
+          "latest_date": "2026-05-10",
+          "previous_date": "2026-05-08",
           "data_frequency": "일간",
-          "signal": "가격 상승",
+          "signal": "가격 하락",
           "description": "실질금리, 달러, 안전자산 수요를 함께 반영한다.",
           "market_impact": "금이 강하면 인플레이션 헤지나 안전자산 선호가 커졌는지 확인해야 한다.",
           "points": [
@@ -24878,17 +24886,21 @@
             },
             {
               "date": "2026-05-08",
-              "value": 4730.7
+              "value": 4720.4
+            },
+            {
+              "date": "2026-05-10",
+              "value": 4699.0
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 96.0,
+            "percentile": 95.6,
             "position_label": "5년 중 상위 4% 수준",
             "zone": "장기 상단 강세권",
             "min": 1623.3,
             "max": 5318.4,
-            "observations": 1258
+            "observations": 1259
           }
         }
       ],
@@ -24899,11 +24911,11 @@
           "group": "원자재/경기",
           "kind": "risk_on",
           "unit": "$",
-          "value": 6.297,
-          "change_abs": 0.169,
-          "change_pct": 2.76,
-          "latest_date": "2026-05-08",
-          "previous_date": "2026-05-07",
+          "value": 6.272,
+          "change_abs": 0.023,
+          "change_pct": 0.36,
+          "latest_date": "2026-05-10",
+          "previous_date": "2026-05-08",
           "data_frequency": "일간",
           "signal": "매수 우세",
           "description": "제조업과 인프라 수요에 민감해 경기 민감 지표로 자주 본다.",
@@ -25911,7 +25923,11 @@
             },
             {
               "date": "2026-05-08",
-              "value": 6.297
+              "value": 6.249
+            },
+            {
+              "date": "2026-05-10",
+              "value": 6.272
             }
           ],
           "history_stats": {
@@ -25920,8 +25936,8 @@
             "position_label": "5년 중 상위 1% 수준",
             "zone": "장기 상단 강세권",
             "min": 3.211,
-            "max": 6.297,
-            "observations": 1259
+            "max": 6.272,
+            "observations": 1260
           }
         }
       ],
@@ -27948,9 +27964,9 @@
           "group": "고베타/유동성",
           "kind": "risk_on",
           "unit": "$",
-          "value": 80848.6,
-          "change_abs": 184.2,
-          "change_pct": 0.23,
+          "value": 81883.2,
+          "change_abs": 1218.9,
+          "change_pct": 1.51,
           "latest_date": "2026-05-10",
           "previous_date": "2026-05-09",
           "data_frequency": "일간",
@@ -28996,12 +29012,12 @@
             },
             {
               "date": "2026-05-10",
-              "value": 80848.6
+              "value": 81883.2
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 75.8,
+            "percentile": 76.0,
             "position_label": "5년 중 상위 24% 수준",
             "zone": "장기 중립권",
             "min": 15787.3,
@@ -29249,7 +29265,7 @@
     "US": {
       "market": "US",
       "benchmark": "S&P 500",
-      "as_of": "2026-05-10T09:13:32.955857+00:00",
+      "as_of": "2026-05-10T22:42:23.759801+00:00",
       "leaders": [
         {
           "id": "us-semi",
@@ -151606,7 +151622,7 @@
     "KR": {
       "market": "KR",
       "benchmark": "KOSPI",
-      "as_of": "2026-05-10T09:13:36.914800+00:00",
+      "as_of": "2026-05-10T22:42:25.867248+00:00",
       "leaders": [
         {
           "id": "kr-it",
