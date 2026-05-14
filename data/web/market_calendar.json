@@ -1,0 +1,5 @@
+{
+  "deprecated": true,
+  "message": "Monthly fixed events now live under data/web/calendar/YYYY-MM.json.",
+  "events": []
+}

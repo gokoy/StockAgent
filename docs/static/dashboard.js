@@ -356,3 +356,100 @@ if (scoreHistoryPanel) {
 if (dashboardData.type === "sector") {
   renderSectorComparisonChart();
 }
+
+function setupCalendarPage() {
+  const calendarDataEl = document.getElementById("calendar-data");
+  if (!calendarDataEl) return;
+  const eventsByDate = JSON.parse(calendarDataEl.textContent || "{}");
+  const dialog = document.getElementById("calendar-day-dialog");
+  const dialogTitle = document.getElementById("calendar-dialog-title");
+  const dialogBody = document.getElementById("calendar-dialog-body");
+  const closeButton = document.querySelector("[data-calendar-close]");
+
+  document.querySelectorAll("[data-calendar-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const tab = button.dataset.calendarTab;
+      document.querySelectorAll("[data-calendar-tab]").forEach((item) => {
+        item.classList.toggle("active", item === button);
+      });
+      document.querySelectorAll("[data-calendar-panel]").forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.calendarPanel === tab);
+      });
+    });
+  });
+
+  const renderEvent = (event) => {
+    const item = document.createElement("article");
+    item.className = `calendar-list-item importance-${event.importance || "medium"}`;
+
+    const date = document.createElement("div");
+    date.className = "calendar-list-date";
+    const strong = document.createElement("strong");
+    strong.textContent = event.time_kst || "TBD";
+    const market = document.createElement("span");
+    market.textContent = event.market || "GLOBAL";
+    date.append(strong);
+    if (event.event_end_date) {
+      const end = document.createElement("span");
+      end.textContent = `~ ${event.event_end_date}`;
+      date.appendChild(end);
+    }
+    if (event.published_date) {
+      const published = document.createElement("span");
+      published.textContent = `보도 ${event.published_date}`;
+      date.appendChild(published);
+    }
+    date.appendChild(market);
+
+    const copy = document.createElement("div");
+    copy.className = "calendar-list-copy";
+    const meta = document.createElement("div");
+    meta.className = "calendar-list-meta";
+    [event.category, event.source_name, event.importance].forEach((value) => {
+      if (value === "high") value = "중요";
+      if (value === "medium" || value === "low") return;
+      const span = document.createElement("span");
+      span.textContent = value || "";
+      if (value === "중요") span.className = "importance-label";
+      meta.appendChild(span);
+    });
+    const title = document.createElement("h3");
+    title.textContent = event.title || "";
+    const description = document.createElement("p");
+    description.textContent = event.why_it_matters || "";
+    copy.append(meta, title, description);
+    if (event.source_url) {
+      const link = document.createElement("a");
+      link.href = event.source_url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = event.source_name || "source";
+      copy.appendChild(link);
+    }
+
+    item.append(date, copy);
+    return item;
+  };
+
+  document.querySelectorAll("[data-calendar-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const date = button.dataset.calendarDate;
+      const events = eventsByDate[date] || [];
+      if (!events.length || !dialog || !dialogTitle || !dialogBody) return;
+      dialogTitle.textContent = `${date} 발표 전체`;
+      dialogBody.replaceChildren(...events.map(renderEvent));
+      if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute("open", "");
+      }
+    });
+  });
+
+  closeButton?.addEventListener("click", () => dialog?.close());
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
+setupCalendarPage();

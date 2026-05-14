@@ -1,0 +1,53 @@
+{
+  "month": "2026-10",
+  "events": [
+    {
+      "date": "2026-10-06",
+      "time_kst": "21:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 무역수지 - U.S. International Trade in Goods and Services, August 2026",
+      "importance": "medium",
+      "source_name": "BEA",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "why_it_matters": "무역수지는 달러, 글로벌 수요, 경기민감 섹터 해석에 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-10-28",
+      "time_kst": "03:00",
+      "market": "US",
+      "category": "정책",
+      "title": "FOMC 기준금리 결정",
+      "importance": "high",
+      "source_name": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "why_it_matters": "연준 정책금리와 기자회견은 미국 금리 기대, 달러, 성장주 밸류에이션에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-10-29",
+      "time_kst": "21:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 GDP (Advance Estimate), 3rd Quarter 2026",
+      "importance": "high",
+      "source_name": "BEA",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "why_it_matters": "미국 성장률은 경기 둔화/확장 기대와 주식시장 위험선호에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-10-29",
+      "time_kst": "21:30",
+      "market": "US",
+      "category": "소비",
+      "title": "미국 PCE/개인소득 - Personal Income and Outlays, September 2026",
+      "importance": "high",
+      "source_name": "BEA",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "why_it_matters": "개인소득과 PCE 물가는 소비 경기와 연준 금리 기대를 함께 움직인다.",
+      "source_type": "auto_fixed"
+    }
+  ]
+}

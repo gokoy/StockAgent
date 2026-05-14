@@ -17,6 +17,10 @@ StockAgent는 개인 투자자가 `언제 공격하고 언제 방어할지`, `�
   - 20일 상대강도가 시장보다 강한 섹터를 상단에 보여준다.
   - 각 섹터는 최근 흐름과 5년 기준 상대강도 백분위를 제공한다.
 
+- `/calendar`
+  - 미국/한국 주식시장에 영향을 주는 공식/정형 고정 이벤트를 보여준다.
+  - 월간 달력에는 공식/정형 고정 발표만 표시하고, 하루 4개 이상이면 `+N`으로 접은 뒤 날짜 클릭 시 전체를 보여준다.
+
 ## 데이터 구조
 
 웹 요청 시 외부 API를 매번 호출하지 않는다. GitHub Actions가 하루에 한 번 JSON 데이터를 만들고, FastAPI 서버는 이 파일을 읽어서 화면을 렌더링한다.
@@ -26,6 +30,20 @@ StockAgent는 개인 투자자가 `언제 공격하고 언제 방어할지`, `�
   - 최근 차트 데이터
   - 매크로 판단 결과
   - LLM 또는 fallback 최종 정리
+
+- [data/web/calendar](/Users/young/PycharmProjects/StockAgent/data/web/calendar)
+  - 월별 고정 발표 달력 데이터
+  - 파일명은 `YYYY-MM.json`
+  - 공식 발표 일정, 시장, 중요도, 출처, 시장 영향 설명
+
+- [data/web/floating_event_candidates.json](/Users/young/PycharmProjects/StockAgent/data/web/floating_event_candidates.json)
+  - NewsData.io에서 매일 KST 07:00에 수집하는 유동 이벤트 후보
+  - 화면에는 바로 노출하지 않는다.
+
+- [data/web/floating_events](/Users/young/PycharmProjects/StockAgent/data/web/floating_events)
+  - 수동 관리하는 월별 유동 이벤트
+  - 파일명은 `YYYY-MM.json`
+  - 현재 `/calendar` 화면에는 노출하지 않는다.
 
 - [data/history/macro_history.json](/Users/young/PycharmProjects/StockAgent/data/history/macro_history.json)
   - 매크로 5년 장기 히스토리
@@ -40,9 +58,10 @@ StockAgent는 개인 투자자가 `언제 공격하고 언제 방어할지`, `�
 1. `scripts/refresh_web_data.py`가 실행된다.
 2. [app/web/dashboard_data.py](/Users/young/PycharmProjects/StockAgent/app/web/dashboard_data.py)가 yfinance와 FRED 데이터를 수집한다.
 3. [app/web/market_sources.py](/Users/young/PycharmProjects/StockAgent/app/web/market_sources.py)가 가격 데이터 정규화와 한국 섹터 바스켓 정의를 담당한다.
-4. 매크로 5년 히스토리와 섹터 5년 히스토리를 저장한다.
-5. 화면용 `dashboard_snapshot.json`을 생성한다.
-6. FastAPI 서버 [app/web/server.py](/Users/young/PycharmProjects/StockAgent/app/web/server.py)가 JSON을 읽어 `/macro`, `/sectors`를 렌더링한다.
+4. NewsData.io API로 미국/한국 유동 이벤트 후보를 수집한다.
+5. 매크로 5년 히스토리와 섹터 5년 히스토리를 저장한다.
+6. 화면용 `dashboard_snapshot.json`을 생성한다.
+7. FastAPI 서버 [app/web/server.py](/Users/young/PycharmProjects/StockAgent/app/web/server.py)가 JSON을 읽어 `/macro`, `/sectors`, `/calendar`를 렌더링한다.
 
 ## GitHub Actions
 
@@ -67,6 +86,13 @@ workflow가 하는 일:
 - `OPENAI_API_KEY`: 매크로 최종 정리 LLM 생성용
 - `OPENAI_MODEL_MACRO_SUMMARY`: 기본값 `gpt-4.1-mini`
 - `STOCKAGENT_LIVE_FALLBACK=0`: 운영에서 스냅샷 누락을 오류로 확인
+- `NEWSDATA_API_KEY`: 유동 이벤트 후보 수집 1차 소스
+- `NEWSDATA_MIN_REQUEST_INTERVAL_SECONDS`: 기본값 `3`
+- `NEWSDATA_MAX_QUERIES_PER_REFRESH`: 기본값 `15`
+- `NEWSDATA_TIMEOUT_SECONDS`: 기본값 `30`
+- `STOCKAGENT_NEWS_COLLECTION_ENABLED=0`: 유동 이벤트 후보 수집 비활성화
+- `STOCKAGENT_FIXED_CALENDAR_ENABLED=0`: 고정 이벤트 자동 수집 비활성화
+- `FIXED_CALENDAR_TIMEOUT_SECONDS`: 기본값 `30`
 
 ## 로컬 실행
 
@@ -82,6 +108,7 @@ python -m uvicorn app.web.server:app --reload --port 8000
 
 - [http://127.0.0.1:8000/macro](http://127.0.0.1:8000/macro)
 - [http://127.0.0.1:8000/sectors](http://127.0.0.1:8000/sectors)
+- [http://127.0.0.1:8000/calendar](http://127.0.0.1:8000/calendar)
 
 ## 검증
 

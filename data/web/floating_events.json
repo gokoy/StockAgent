@@ -1,0 +1,5 @@
+{
+  "deprecated": true,
+  "message": "Monthly approved floating events now live under data/web/floating_events/YYYY-MM.json.",
+  "events": []
+}

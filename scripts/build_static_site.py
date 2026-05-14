@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.web.dashboard_data import ROOT_DIR, get_macro_dashboard, get_sector_dashboard
+from app.web.dashboard_data import ROOT_DIR, get_macro_dashboard, get_market_calendar, get_sector_dashboard
 
 
 TEMPLATE_DIR = ROOT_DIR / "app" / "web" / "templates"
@@ -39,6 +39,7 @@ def build_static_site(output_dir: Path) -> None:
     macro_dashboard = get_macro_dashboard()
     us_dashboard = get_sector_dashboard("US")
     kr_dashboard = get_sector_dashboard("KR")
+    calendar = get_market_calendar()
 
     _write_page(
         output_dir / "index.html",
@@ -49,6 +50,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix=".",
             macro_href="./",
             sectors_href="sectors/",
+            calendar_href="calendar/",
         ),
     )
     _write_page(
@@ -60,6 +62,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="..",
             macro_href="./",
             sectors_href="../sectors/",
+            calendar_href="../calendar/",
         ),
     )
     _write_page(
@@ -71,6 +74,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="..",
             macro_href="../macro/",
             sectors_href="./",
+            calendar_href="../calendar/",
             sector_us_href="./",
             sector_kr_href="kr/",
         ),
@@ -84,8 +88,21 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="../..",
             macro_href="../../macro/",
             sectors_href="../",
+            calendar_href="../../calendar/",
             sector_us_href="../",
             sector_kr_href="./",
+        ),
+    )
+    _write_page(
+        output_dir / "calendar" / "index.html",
+        env.get_template("calendar.html"),
+        _context(
+            active_page="calendar",
+            calendar=calendar,
+            static_prefix="..",
+            macro_href="../macro/",
+            sectors_href="../sectors/",
+            calendar_href="./",
         ),
     )
 

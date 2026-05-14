@@ -8,7 +8,13 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from app.web.dashboard_data import MACRO_HISTORY_PATH, SECTOR_HISTORY_PATH, SNAPSHOT_PATH, refresh_dashboard_snapshot
+from app.web.dashboard_data import (
+    FLOATING_EVENT_CANDIDATES_PATH,
+    MACRO_HISTORY_PATH,
+    SECTOR_HISTORY_PATH,
+    SNAPSHOT_PATH,
+    refresh_dashboard_snapshot,
+)
 
 
 def main() -> int:
@@ -31,12 +37,19 @@ def main() -> int:
         default=SECTOR_HISTORY_PATH,
         help="Sector history JSON path. Defaults to data/history/sector_history.json.",
     )
+    parser.add_argument(
+        "--floating-candidates-output",
+        type=Path,
+        default=FLOATING_EVENT_CANDIDATES_PATH,
+        help="Floating event candidate JSON path. Defaults to data/web/floating_event_candidates.json.",
+    )
     args = parser.parse_args()
 
     snapshot = refresh_dashboard_snapshot(
         args.output,
         macro_history_path=args.macro_history_output,
         sector_history_path=args.sector_history_output,
+        floating_candidates_path=args.floating_candidates_output,
     )
     macro_count = sum(len(items) for items in snapshot["macro"]["groups"].values())
     sector_count = sum(len(snapshot["sectors"][market]["sectors"]) for market in ("US", "KR"))
@@ -46,6 +59,7 @@ def main() -> int:
     print(f"output={args.output}")
     print(f"macro_history_output={args.macro_history_output}")
     print(f"sector_history_output={args.sector_history_output}")
+    print(f"floating_candidates_output={args.floating_candidates_output}")
     return 0
 
 

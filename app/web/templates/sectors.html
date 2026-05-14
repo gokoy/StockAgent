@@ -8,7 +8,6 @@
     <a href="{{ sector_us_href if sector_us_href is defined else '/sectors?market=US' }}" class="{% if dashboard.market == 'US' %}active{% endif %}">미국</a>
     <a href="{{ sector_kr_href if sector_kr_href is defined else '/sectors?market=KR' }}" class="{% if dashboard.market == 'KR' %}active{% endif %}">한국</a>
   </div>
-  <h1>{{ dashboard.benchmark }}보다 강한 섹터</h1>
 </section>
 
 <section class="content-frame">

@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from functools import lru_cache
+import html
 from io import StringIO
 import json
 import math
 import os
 from pathlib import Path
+import re
+import time
 from typing import Literal
 import warnings
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import requests
@@ -20,11 +24,38 @@ from app.web.market_sources import fetch_symbol_history
 SeriesKind = Literal["risk_on", "risk_off", "neutral"]
 ROOT_DIR = Path(__file__).resolve().parents[2]
 SNAPSHOT_PATH = ROOT_DIR / "data" / "web" / "dashboard_snapshot.json"
+MARKET_CALENDAR_PATH = ROOT_DIR / "data" / "web" / "market_calendar.json"
+MARKET_CALENDAR_DIR = ROOT_DIR / "data" / "web" / "calendar"
+FLOATING_EVENTS_PATH = ROOT_DIR / "data" / "web" / "floating_events.json"
+FLOATING_EVENTS_DIR = ROOT_DIR / "data" / "web" / "floating_events"
+FLOATING_EVENT_CANDIDATES_PATH = ROOT_DIR / "data" / "web" / "floating_event_candidates.json"
 MACRO_HISTORY_PATH = ROOT_DIR / "data" / "history" / "macro_history.json"
 SECTOR_HISTORY_PATH = ROOT_DIR / "data" / "history" / "sector_history.json"
 MACRO_HISTORY_YEARS = 5
 SECTOR_HISTORY_YEARS = 5
 FRED_TIMEOUT_SECONDS = 60
+KST = ZoneInfo("Asia/Seoul")
+NEWSDATA_LATEST_API_URL = "https://newsdata.io/api/1/latest"
+FED_FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+BEA_RELEASE_SCHEDULE_URL = "https://www.bea.gov/news/schedule"
+AUTO_FIXED_SOURCE_TYPE = "auto_fixed"
+
+
+def load_local_env(path: Path = ROOT_DIR / ".env") -> None:
+    if not path.exists():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+load_local_env()
 
 
 @dataclass(frozen=True)
@@ -324,6 +355,81 @@ MACRO_CUSTOM_DIRECTIONS = {
     "unemployment": -1.0,
 }
 
+NEWSDATA_QUERIES: tuple[dict[str, object], ...] = (
+    {"market": "US", "query": "Trump Xi", "language": "en", "country": "us", "canonical": "us_china_summit", "axis": ("trade", "policy"), "required_any": ("trump xi", "trump-xi", "trump and xi", "xi meeting", "summit")},
+    {"market": "US", "query": "US China summit", "language": "en", "country": "us", "canonical": "us_china_summit", "axis": ("trade", "policy"), "required_any": ("us china summit", "u.s. china summit", "china summit", "trump xi", "trump-xi")},
+    {"market": "US", "query": "export controls", "language": "en", "country": "us", "canonical": "export_controls", "axis": ("trade", "semiconductor"), "required_any": ("export control", "export controls", "export restriction", "export restrictions")},
+    {"market": "US", "query": "semiconductor sanctions", "language": "en", "country": "us", "canonical": "semiconductor_sanctions", "axis": ("semiconductor", "policy"), "required_any": ("semiconductor sanction", "semiconductor sanctions", "chip sanction", "chip sanctions")},
+    {"market": "US", "query": "OPEC meeting", "language": "en", "country": "us", "canonical": "opec_meeting", "axis": ("oil", "geopolitics"), "required_any": ("opec meeting", "opec+", "oil output", "production cut")},
+    {"market": "US", "query": "Federal Reserve", "language": "en", "country": "us", "canonical": "federal_reserve", "axis": ("rates", "policy"), "required_any": ("federal reserve", "fomc", "powell", "fed rate", "rate decision")},
+    {"market": "KR", "query": "Bank of Korea", "language": "en", "country": "kr", "canonical": "bank_of_korea", "axis": ("rates", "policy"), "required_any": ("bank of korea", "bok rate", "rate decision", "monetary policy")},
+    {"market": "KR", "query": "Korea exports", "language": "en", "country": "kr", "canonical": "korea_exports", "axis": ("growth", "fx"), "required_any": ("korea exports", "south korea exports", "export data", "trade data")},
+    {"market": "KR", "query": "Korea short selling", "language": "en", "country": "kr", "canonical": "korea_short_selling", "axis": ("flow", "policy"), "required_any": ("short selling", "short-sale", "short sale")},
+    {"market": "KR", "query": "MSCI Korea", "language": "en", "country": "kr", "canonical": "msci_korea", "axis": ("flow", "index"), "required_any": ("msci korea", "msci rebalancing", "msci rebalance")},
+    {"market": "KR", "query": "South Korea semiconductor", "language": "en", "country": "kr", "canonical": "korea_semiconductor", "axis": ("semiconductor", "growth"), "required_any": ("south korea semiconductor", "korea semiconductor", "chip export", "memory chip")},
+    {"market": "KR", "query": "미중 정상회담", "language": "ko", "country": "kr", "canonical": "us_china_summit", "axis": ("trade", "policy"), "required_any": ("미중 정상회담", "미·중 정상회담", "트럼프 시진핑")},
+    {"market": "KR", "query": "관세", "language": "ko", "country": "kr", "canonical": "tariffs", "axis": ("trade", "policy"), "required_any": ("관세", "상호관세", "무역협상")},
+    {"market": "KR", "query": "수출통제", "language": "ko", "country": "kr", "canonical": "export_controls", "axis": ("trade", "semiconductor"), "required_any": ("수출통제", "수출 규제", "수출규제")},
+    {"market": "KR", "query": "금통위", "language": "ko", "country": "kr", "canonical": "bank_of_korea", "axis": ("rates", "policy"), "required_any": ("금통위", "한국은행", "기준금리")},
+)
+FLOATING_EVENT_BLOCKLIST = {"stock picks", "analyst says", "opinion", "사설", "추천주"}
+FLOATING_EVENT_NOISE_TERMS = {
+    "roadway",
+    "roadways",
+    "closed in",
+    "armed robbery",
+    "server rack",
+    "casino",
+    "covered call etf",
+    "yield calculations",
+    "deadline alert",
+    "class action",
+    "class actions",
+    "law offices",
+    "shareholders",
+    "securities fraud",
+    "reminds investors",
+    "investors of",
+    "lead plaintiff",
+    "lawsuit",
+}
+HIGH_IMPACT_TERMS = {
+    "summit",
+    "tariff",
+    "sanction",
+    "export control",
+    "fomc",
+    "opec",
+    "금통위",
+    "공매도",
+    "리밸런싱",
+    "관세",
+    "제재",
+    "수출통제",
+}
+MARKET_AXIS_TERMS = {
+    "rate",
+    "fed",
+    "fomc",
+    "oil",
+    "opec",
+    "tariff",
+    "sanction",
+    "export",
+    "semiconductor",
+    "china",
+    "korea",
+    "msci",
+    "금리",
+    "환율",
+    "유가",
+    "관세",
+    "제재",
+    "반도체",
+    "금통위",
+    "공매도",
+}
+
 
 US_SECTOR_SPECS: tuple[SectorSpec, ...] = (
     SectorSpec("us-tech", "기술", "US", "SPY", ("XLK",), "소프트웨어, 하드웨어, 플랫폼 대형주의 흐름이다.", "시장보다 강하면 성장주 위험선호가 살아있다고 본다.", "Technology Select Sector Index", "XLK"),
@@ -378,6 +484,60 @@ def get_sector_dashboard(market: Literal["US", "KR"] = "US") -> dict[str, object
     return _get_sector_dashboard_live(market)
 
 
+def get_market_calendar(
+    calendar_path: Path = MARKET_CALENDAR_DIR,
+    floating_events_path: Path = FLOATING_EVENTS_DIR,
+    floating_candidates_path: Path = FLOATING_EVENT_CANDIDATES_PATH,
+    today: date | None = None,
+    month: str | None = None,
+) -> dict[str, object]:
+    today_kst = today or datetime.now(KST).date()
+    month_start = _month_start_from_key(month) if month else today_kst.replace(day=1)
+    month_key = month_start.strftime("%Y-%m")
+    fixed_events = _load_monthly_event_list(calendar_path, month_key, legacy_path=MARKET_CALENDAR_PATH)
+    # Floating event collection is still kept for future tuning, but the
+    # calendar page currently exposes only fixed releases.
+    floating_events: list[dict[str, object]] = []
+    normalized_fixed = sorted((_normalize_calendar_event(item) for item in fixed_events), key=_event_sort_key)
+    normalized_floating = sorted((_normalize_floating_event(item) for item in floating_events), key=_event_sort_key)
+    next_month = _add_months(month_start, 1)
+    month_events = [item for item in normalized_fixed if month_start <= _parse_event_date(item["date"]) < next_month]
+    month_floating_events = [
+        item
+        for item in normalized_floating
+        if item["date"] == "날짜 미확정" or month_start <= _parse_event_date(item["date"]) < next_month
+    ]
+    events_by_date = _events_by_date(month_events)
+    dated_floating_events = [item for item in month_floating_events if item["date"] != "날짜 미확정"]
+    floating_by_date = _events_by_date(dated_floating_events)
+    all_events_by_date = _events_by_date([*month_events, *dated_floating_events])
+    calendar_days = _calendar_days(month_start, events_by_date, floating_by_date, today_kst)
+    upcoming = [item for item in normalized_fixed if _parse_event_date(item["date"]) >= today_kst][:12]
+
+    return {
+        "today": today_kst.isoformat(),
+        "month": {
+            "label": f"{month_start.year}년 {month_start.month}월",
+            "start": month_start.isoformat(),
+            "key": month_key,
+            "previous_key": _add_months(month_start, -1).strftime("%Y-%m"),
+            "next_key": next_month.strftime("%Y-%m"),
+            "is_current": month_key == today_kst.strftime("%Y-%m"),
+        },
+        "fixed_events": normalized_fixed,
+        "floating_events": month_floating_events,
+        "month_events": month_events,
+        "events_by_date": all_events_by_date,
+        "calendar_days": calendar_days,
+        "upcoming_fixed": upcoming,
+        "stats": {
+            "fixed_total": len(month_events),
+            "floating_total": len(month_floating_events),
+            "high_total": sum(1 for item in month_events if item["importance"] == "high"),
+        },
+    }
+
+
 def _rebuild_macro_snapshot_decision(macro: dict[str, object]) -> dict[str, object]:
     groups = macro.get("groups")
     if not isinstance(groups, dict):
@@ -418,10 +578,13 @@ def refresh_dashboard_snapshot(
     path: Path = SNAPSHOT_PATH,
     macro_history_path: Path = MACRO_HISTORY_PATH,
     sector_history_path: Path = SECTOR_HISTORY_PATH,
+    floating_candidates_path: Path = FLOATING_EVENT_CANDIDATES_PATH,
 ) -> dict[str, object]:
     previous_macro_history = load_json_file(macro_history_path)
     macro_history = build_macro_history(previous_history=previous_macro_history)
     sector_history = build_sector_history()
+    refresh_fixed_calendar_events()
+    refresh_floating_event_candidates(path=floating_candidates_path)
     snapshot = build_dashboard_snapshot(macro_history=macro_history, sector_history=sector_history)
     _write_json_atomic(path, snapshot)
     _write_json_atomic(macro_history_path, macro_history)
@@ -447,6 +610,1020 @@ def load_json_file(path: Path) -> dict[str, object] | None:
     if not isinstance(payload, dict):
         raise ValueError(f"Invalid JSON object: {path}")
     return payload
+
+
+def refresh_floating_event_candidates(path: Path = FLOATING_EVENT_CANDIDATES_PATH) -> dict[str, object]:
+    if not _news_collection_enabled():
+        payload = _floating_candidates_status("disabled", "News collection disabled by environment.", [])
+        _write_json_atomic(path, payload)
+        return payload
+
+    previous = load_json_file(path)
+    previous_candidates = previous.get("candidates", []) if isinstance(previous, dict) else []
+    try:
+        payload = _collect_news_candidates()
+    except Exception as exc:
+        kept = previous_candidates if isinstance(previous_candidates, list) else []
+        payload = _floating_candidates_status("failed", str(exc), kept)
+    else:
+        status = payload.get("collection_status") if isinstance(payload, dict) else {}
+        kept = previous_candidates if isinstance(previous_candidates, list) else []
+        if kept and _should_keep_previous_candidates(status):
+            payload = _floating_candidates_status("failed", _collection_status_message(status), kept)
+    _write_json_atomic(path, payload)
+    return payload
+
+
+def refresh_fixed_calendar_events(calendar_dir: Path = MARKET_CALENDAR_DIR, year: int | None = None) -> dict[str, object]:
+    target_year = year or datetime.now(KST).year
+    if not _fixed_calendar_collection_enabled():
+        return {"status": "disabled", "events": []}
+    events: list[dict[str, object]] = []
+    errors: list[dict[str, str]] = []
+    for collector in (_collect_fomc_events, _collect_bea_events):
+        try:
+            events.extend(collector(target_year))
+        except Exception as exc:
+            errors.append({"source": collector.__name__, "error": str(exc)})
+    events = _dedupe_calendar_events(events)
+    _write_monthly_auto_events(calendar_dir, target_year, events)
+    return {
+        "status": "ok" if events else "empty",
+        "year": target_year,
+        "events": events,
+        "errors": errors,
+    }
+
+
+def _collect_fomc_events(year: int) -> list[dict[str, object]]:
+    response = requests.get(FED_FOMC_CALENDAR_URL, timeout=_env_int("FIXED_CALENDAR_TIMEOUT_SECONDS", 30))
+    response.raise_for_status()
+    text = response.text
+    panel_match = re.search(rf'{year} FOMC Meetings</a>.*?(?=<div class="panel panel-default"|<div class="panel-footer")', text, re.S)
+    if not panel_match:
+        return []
+    panel = panel_match.group(0)
+    pattern = re.compile(
+        r'fomc-meeting[^>]*month[^>]*>\s*<strong>(?P<month>[A-Za-z]+)</strong>.*?'
+        r'fomc-meeting__date[^>]*>(?P<days>[^<]+)</div>',
+        re.S,
+    )
+    events = []
+    for match in pattern.finditer(panel):
+        month_name = match.group("month")
+        days_text = html.unescape(match.group("days")).strip().replace("*", "")
+        day = int(days_text.split("-")[-1])
+        event_date = date(year, _month_number(month_name), day)
+        has_projection = "*" in match.group("days")
+        events.append(
+            {
+                "date": event_date.isoformat(),
+                "time_kst": "03:00",
+                "market": "US",
+                "category": "정책",
+                "title": "FOMC 기준금리 결정",
+                "importance": "high",
+                "source_name": "Federal Reserve",
+                "source_url": FED_FOMC_CALENDAR_URL,
+                "why_it_matters": "연준 정책금리와 기자회견은 미국 금리 기대, 달러, 성장주 밸류에이션에 직접 영향을 준다.",
+                "source_type": AUTO_FIXED_SOURCE_TYPE,
+            }
+        )
+        if has_projection:
+            events[-1]["title"] = "FOMC 기준금리 결정 및 점도표"
+    return events
+
+
+def _collect_bea_events(year: int) -> list[dict[str, object]]:
+    response = requests.get(BEA_RELEASE_SCHEDULE_URL, timeout=_env_int("FIXED_CALENDAR_TIMEOUT_SECONDS", 30))
+    response.raise_for_status()
+    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", response.text, flags=re.S)
+    events = []
+    for row in rows:
+        date_match = re.search(r'<div class="release-date">([^<]+)</div>\s*<small[^>]*>([^<]+)</small>', row, re.S)
+        title_match = re.search(r'class="release-title[^"]*"[^>]*>(.*?)</td>', row, re.S)
+        if not date_match or not title_match:
+            continue
+        title = _clean_html(title_match.group(1))
+        if not _is_tracked_bea_release(title):
+            continue
+        release_date = _parse_month_day(year, date_match.group(1))
+        time_kst = _us_eastern_to_kst(release_date, date_match.group(2))
+        category = "성장" if "GDP" in title or "Trade" in title else "소비"
+        importance = "high" if "GDP" in title or "Personal Income and Outlays" in title else "medium"
+        events.append(
+            {
+                "date": release_date.isoformat(),
+                "time_kst": time_kst,
+                "market": "US",
+                "category": category,
+                "title": _bea_display_title(title),
+                "importance": importance,
+                "source_name": "BEA",
+                "source_url": BEA_RELEASE_SCHEDULE_URL,
+                "why_it_matters": _bea_market_note(title),
+                "source_type": AUTO_FIXED_SOURCE_TYPE,
+            }
+        )
+    return events
+
+
+def _write_monthly_auto_events(calendar_dir: Path, year: int, auto_events: list[dict[str, object]]) -> None:
+    by_month: dict[str, list[dict[str, object]]] = {}
+    for event in auto_events:
+        by_month.setdefault(str(event["date"])[:7], []).append(event)
+    calendar_dir.mkdir(parents=True, exist_ok=True)
+    for month in [f"{year}-{month:02d}" for month in range(1, 13)]:
+        path = calendar_dir / f"{month}.json"
+        existing = _load_event_list(path)
+        manual_events = [event for event in existing if event.get("source_type") != AUTO_FIXED_SOURCE_TYPE]
+        merged = sorted([*manual_events, *by_month.get(month, [])], key=_event_sort_key)
+        _write_json_atomic(path, {"month": month, "events": merged})
+
+
+def _dedupe_calendar_events(events: list[dict[str, object]]) -> list[dict[str, object]]:
+    seen: set[tuple[str, str, str]] = set()
+    result = []
+    for event in events:
+        key = (str(event.get("date", "")), str(event.get("title", "")), str(event.get("source_name", "")))
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(event)
+    return sorted(result, key=_event_sort_key)
+
+
+def _month_number(month_name: str) -> int:
+    return datetime.strptime(month_name[:3], "%b").month
+
+
+def _parse_month_day(year: int, value: str) -> date:
+    parsed = datetime.strptime(f"{value.strip()} {year}", "%B %d %Y")
+    return date(parsed.year, parsed.month, parsed.day)
+
+
+def _us_eastern_to_kst(release_date: date, time_text: str) -> str:
+    eastern = ZoneInfo("America/New_York")
+    parsed_time = datetime.strptime(time_text.strip(), "%I:%M %p").time()
+    release_dt = datetime.combine(release_date, parsed_time, tzinfo=eastern)
+    return release_dt.astimezone(KST).strftime("%H:%M")
+
+
+def _clean_html(value: str) -> str:
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", value))).strip()
+
+
+def _is_tracked_bea_release(title: str) -> bool:
+    return any(
+        token in title
+        for token in (
+            "GDP",
+            "Personal Income and Outlays",
+            "U.S. International Trade in Goods and Services",
+        )
+    )
+
+
+def _bea_display_title(title: str) -> str:
+    if title.startswith("GDP"):
+        return f"미국 {title}"
+    if title.startswith("Personal Income and Outlays"):
+        return f"미국 PCE/개인소득 - {title}"
+    if title.startswith("U.S. International Trade"):
+        return f"미국 무역수지 - {title}"
+    return title
+
+
+def _bea_market_note(title: str) -> str:
+    if title.startswith("GDP"):
+        return "미국 성장률은 경기 둔화/확장 기대와 주식시장 위험선호에 직접 영향을 준다."
+    if title.startswith("Personal Income and Outlays"):
+        return "개인소득과 PCE 물가는 소비 경기와 연준 금리 기대를 함께 움직인다."
+    if title.startswith("U.S. International Trade"):
+        return "무역수지는 달러, 글로벌 수요, 경기민감 섹터 해석에 영향을 준다."
+    return "미국 경제 지표 발표는 금리 기대와 시장 위험선호에 영향을 줄 수 있다."
+
+
+def _collect_news_candidates() -> dict[str, object]:
+    api_key = os.getenv("NEWSDATA_API_KEY", "").strip()
+    if not api_key:
+        return _floating_candidates_status("disabled", "NEWSDATA_API_KEY is not configured.", [])
+    return _collect_newsdata_candidates(api_key)
+
+
+def _collect_newsdata_candidates(api_key: str) -> dict[str, object]:
+    max_queries = _env_int("NEWSDATA_MAX_QUERIES_PER_REFRESH", 15)
+    timeout = _env_int("NEWSDATA_TIMEOUT_SECONDS", 30)
+    min_interval = _env_float("NEWSDATA_MIN_REQUEST_INTERVAL_SECONDS", 3.0)
+    candidates_by_key: dict[str, dict[str, object]] = {}
+    queries_run: list[str] = []
+    errors: list[dict[str, str]] = []
+
+    for index, config in enumerate(NEWSDATA_QUERIES[:max_queries]):
+        if index:
+            time.sleep(min_interval)
+        query = str(config["query"])
+        try:
+            payload = _fetch_newsdata_articles(api_key, config, timeout=timeout)
+        except Exception as exc:
+            error = str(exc)
+            errors.append({"query": query, "error": error})
+            if _is_newsdata_rate_limit_error(error):
+                break
+            continue
+        articles = payload.get("results", [])
+        if not isinstance(articles, list):
+            continue
+        queries_run.append(query)
+        for article in articles:
+            if not isinstance(article, dict):
+                continue
+            candidate = _newsdata_article_candidate(article, config)
+            if candidate is None:
+                continue
+            key = str(candidate["canonical_key"])
+            existing = candidates_by_key.get(key)
+            if existing is None:
+                candidates_by_key[key] = candidate
+            else:
+                _merge_candidate(existing, candidate)
+
+    candidates = sorted(candidates_by_key.values(), key=lambda item: (-int(item["score"]), str(item["title"])))
+    return {
+        "collection_status": {
+            "status": "ok" if candidates else "empty",
+            "generated_at": datetime.now(UTC).isoformat(),
+            "source": "newsdata_io",
+            "queries_run": queries_run,
+            "query_count": len(queries_run),
+            "errors": errors[:10],
+        },
+        "candidates": candidates,
+    }
+
+
+def _fetch_newsdata_articles(api_key: str, config: dict[str, object], timeout: int) -> dict[str, object]:
+    params = {
+        "apikey": api_key,
+        "q": str(config["query"]),
+        "language": str(config.get("language", "")),
+        "country": str(config.get("country", "")),
+    }
+    response = requests.get(NEWSDATA_LATEST_API_URL, params=params, timeout=timeout)
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise RuntimeError(f"NewsData.io returned non-JSON response: {response.text[:120]}") from exc
+    if response.status_code >= 400:
+        raise RuntimeError(str(payload.get("message") or payload.get("results") or response.status_code))
+    if payload.get("status") == "error":
+        raise RuntimeError(str(payload.get("results") or payload.get("message") or "NewsData.io error"))
+    if not isinstance(payload, dict):
+        raise RuntimeError("NewsData.io returned an invalid payload.")
+    return payload
+
+
+def _should_keep_previous_candidates(status: object) -> bool:
+    if not isinstance(status, dict):
+        return False
+    errors = status.get("errors")
+    query_count = int(status.get("query_count", 0) or 0)
+    if query_count > 0 or not isinstance(errors, list) or not errors:
+        return False
+    return any(_is_newsdata_rate_limit_error(str(item.get("error", ""))) for item in errors if isinstance(item, dict))
+
+
+def _collection_status_message(status: object) -> str:
+    if not isinstance(status, dict):
+        return "NewsData.io collection failed; kept previous candidates."
+    errors = status.get("errors")
+    if isinstance(errors, list) and errors and isinstance(errors[0], dict):
+        return f"NewsData.io collection failed; kept previous candidates. First error: {errors[0].get('error', '')}"
+    return "NewsData.io collection failed; kept previous candidates."
+
+
+def _is_newsdata_rate_limit_error(message: str) -> bool:
+    lowered = message.lower()
+    return "rate limit" in lowered or "ratelimitexceeded" in lowered
+
+
+def _load_event_list(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if isinstance(payload, dict):
+        events = payload.get("events")
+        if isinstance(events, list):
+            return [item for item in events if isinstance(item, dict)]
+    raise ValueError(f"Invalid event JSON: {path}")
+
+
+def _load_monthly_event_list(path: Path, month_key: str, legacy_path: Path | None = None) -> list[dict[str, object]]:
+    if path.is_dir() or path.suffix == "":
+        monthly_path = path / f"{month_key}.json"
+        events = _load_event_list(monthly_path)
+        if events:
+            return events
+        if legacy_path is not None:
+            return [
+                item
+                for item in _load_event_list(legacy_path)
+                if str(item.get("date", "")).startswith(month_key)
+            ]
+        return []
+    return [
+        item
+        for item in _load_event_list(path)
+        if str(item.get("date", "")).startswith(month_key)
+    ]
+
+
+def _candidate_events_for_month(path: Path, month_key: str) -> list[dict[str, object]]:
+    payload = load_json_file(path)
+    if not isinstance(payload, dict):
+        return []
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, list):
+        return []
+    events = []
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        event_date = _candidate_event_date(candidate)
+        if not event_date:
+            event_date = "날짜 미확정"
+        if event_date != "날짜 미확정" and not event_date.startswith(month_key):
+            continue
+        if event_date == "날짜 미확정" and not _candidate_published_date(candidate).startswith(month_key):
+            continue
+        sources = candidate.get("sources")
+        first_source = sources[0] if isinstance(sources, list) and sources and isinstance(sources[0], dict) else {}
+        events.append(
+            {
+                "date": event_date,
+                "published_date": _candidate_published_date(candidate),
+                "event_date": event_date if event_date != "날짜 미확정" else "",
+                "event_end_date": _candidate_event_end_date(candidate),
+                "date_confidence": _candidate_date_confidence(candidate),
+                "time_kst": "",
+                "status": _candidate_event_status(candidate),
+                "market": _normalize_choice(candidate.get("market"), {"US", "KR", "GLOBAL"}, "GLOBAL"),
+                "category": _candidate_event_category(candidate),
+                "title": str(candidate.get("title", "")),
+                "short_label": _candidate_short_label(candidate),
+                "importance": "high" if int(candidate.get("score", 0)) >= 25 else "medium",
+                "source_name": str(first_source.get("domain", "NewsData.io")),
+                "source_url": str(first_source.get("url", "")),
+                "why_it_matters": _candidate_market_note(candidate),
+            }
+        )
+    return events
+
+
+def _candidate_event_date(candidate: dict[str, object]) -> str:
+    event_date = str(candidate.get("event_date", ""))
+    if event_date:
+        return event_date
+    inferred = _infer_candidate_date(
+        title=str(candidate.get("title", "")),
+        description=" ".join(
+            str(source.get("title", ""))
+            for source in candidate.get("sources", [])
+            if isinstance(source, dict)
+        )
+        if isinstance(candidate.get("sources"), list)
+        else "",
+        canonical_key=str(candidate.get("canonical_key", "")),
+        published_date=_candidate_published_date(candidate),
+    )
+    return inferred["event_date"]
+
+
+def _candidate_published_date(candidate: dict[str, object]) -> str:
+    published_date = str(candidate.get("published_date", ""))
+    if published_date:
+        return published_date
+    sources = candidate.get("sources")
+    if isinstance(sources, list):
+        for source in sources:
+            if not isinstance(source, dict):
+                continue
+            seen = str(source.get("seendate", ""))
+            if len(seen) >= 10:
+                return seen[:10]
+    seen = str(candidate.get("last_seen", ""))
+    return seen[:10] if len(seen) >= 10 else datetime.now(KST).date().isoformat()
+
+
+def _candidate_event_end_date(candidate: dict[str, object]) -> str:
+    if candidate.get("event_end_date"):
+        return str(candidate.get("event_end_date", ""))
+    inferred = _infer_candidate_date(
+        title=str(candidate.get("title", "")),
+        description="",
+        canonical_key=str(candidate.get("canonical_key", "")),
+        published_date=_candidate_published_date(candidate),
+    )
+    return inferred["event_end_date"]
+
+
+def _candidate_date_confidence(candidate: dict[str, object]) -> str:
+    if candidate.get("date_confidence"):
+        return str(candidate.get("date_confidence", "low"))
+    inferred = _infer_candidate_date(
+        title=str(candidate.get("title", "")),
+        description="",
+        canonical_key=str(candidate.get("canonical_key", "")),
+        published_date=_candidate_published_date(candidate),
+    )
+    return inferred["date_confidence"]
+
+
+def _candidate_event_status(candidate: dict[str, object]) -> str:
+    score = int(candidate.get("score", 0))
+    if score >= 25:
+        return "예정"
+    return "관측"
+
+
+def _candidate_event_category(candidate: dict[str, object]) -> str:
+    axes = {str(axis) for axis in candidate.get("axis", []) if str(axis)}
+    key = str(candidate.get("canonical_key", ""))
+    if "rates" in axes:
+        return "정책"
+    if "oil" in axes:
+        return "원자재"
+    if "flow" in axes or "index" in axes:
+        return "금리/수급"
+    if "semiconductor" in axes or "trade" in axes or key in {"us_china_summit", "export_controls", "tariffs"}:
+        return "정책"
+    return "정책"
+
+
+def _candidate_market_note(candidate: dict[str, object]) -> str:
+    key = str(candidate.get("canonical_key", ""))
+    if key == "us_china_summit":
+        return "미중 협상 의제는 관세, 대만, AI/반도체 정책 기대를 통해 지수와 섹터 변동성을 키울 수 있다."
+    if key == "bank_of_korea":
+        return "한국은행 관련 뉴스는 기준금리 기대, 금융 안정, 원화와 한국 증시 수급에 영향을 줄 수 있다."
+    if key == "federal_reserve":
+        return "연준 관련 뉴스는 미국 금리 기대와 성장주 밸류에이션에 영향을 줄 수 있다."
+    if key in {"export_controls", "semiconductor_policy", "semiconductor_sanctions"}:
+        return "수출통제와 반도체 정책 뉴스는 AI/반도체 공급망과 관련 섹터 심리에 영향을 줄 수 있다."
+    return "뉴스 흐름에 따라 시장 심리와 관련 섹터 변동성에 영향을 줄 수 있다."
+
+
+def _candidate_short_label(candidate: dict[str, object]) -> str:
+    key = str(candidate.get("canonical_key", ""))
+    if key == "us_china_summit":
+        return "미중"
+    if key == "bank_of_korea":
+        return "BOK"
+    if key == "federal_reserve":
+        return "Fed"
+    if key in {"export_controls", "semiconductor_policy", "semiconductor_sanctions"}:
+        return "수출통제"
+    if key == "opec_meeting":
+        return "OPEC"
+    return _compact_label(str(candidate.get("title", "")))
+
+
+def _event_short_label(event: dict[str, object]) -> str:
+    title = str(event.get("title", ""))
+    lowered = title.lower()
+    if "fomc" in lowered:
+        return "FOMC"
+    if "pce" in lowered or "personal income and outlays" in lowered:
+        return "PCE"
+    if "gdp" in lowered:
+        return "GDP"
+    if "trade" in lowered or "무역" in title:
+        return "무역"
+    if "cpi" in lowered:
+        return "CPI"
+    if "employment" in lowered or "고용" in title:
+        return "고용"
+    if "bank of korea" in lowered or "금통위" in title or "한국은행" in title:
+        return "BOK"
+    return _compact_label(title)
+
+
+def _compact_label(title: str) -> str:
+    words = re.findall(r"[A-Za-z0-9가-힣]+", title)
+    if not words:
+        return "이벤트"
+    if len(words[0]) >= 2:
+        return words[0][:8]
+    return " ".join(words[:2])[:8]
+
+
+def _normalize_calendar_event(item: dict[str, object]) -> dict[str, object]:
+    event = {
+        "date": str(item.get("date", "")),
+        "time_kst": str(item.get("time_kst", "")),
+        "market": _normalize_choice(item.get("market"), {"US", "KR", "GLOBAL"}, "GLOBAL"),
+        "category": str(item.get("category", "정책")),
+        "title": str(item.get("title", "")),
+        "importance": _normalize_choice(item.get("importance"), {"high", "medium", "low"}, "medium"),
+        "source_name": str(item.get("source_name", "")),
+        "source_url": str(item.get("source_url", "")),
+        "why_it_matters": str(item.get("why_it_matters", "")),
+    }
+    for optional_key in ("published_date", "event_date", "event_end_date", "date_confidence"):
+        if item.get(optional_key):
+            event[optional_key] = str(item.get(optional_key, ""))
+    event["short_label"] = str(item.get("short_label") or _event_short_label(event))
+    return event
+
+
+def _normalize_floating_event(item: dict[str, object]) -> dict[str, object]:
+    event = _normalize_calendar_event(item)
+    event["status"] = _normalize_choice(item.get("status"), {"확정", "예정", "관측"}, "예정")
+    event["short_label"] = str(item.get("short_label") or _event_short_label(event))
+    return event
+
+
+def _normalize_choice(value: object, allowed: set[str], default: str) -> str:
+    text = str(value or "").strip()
+    return text if text in allowed else default
+
+
+def _event_sort_key(item: dict[str, object]) -> tuple[str, str, str]:
+    return (str(item.get("date", "")), str(item.get("time_kst", "")), str(item.get("title", "")))
+
+
+def _parse_event_date(value: object) -> date:
+    if str(value) == "날짜 미확정":
+        return date.max
+    try:
+        return date.fromisoformat(str(value))
+    except ValueError:
+        return date.max
+
+
+def _add_months(value: date, months: int) -> date:
+    month_index = (value.month - 1) + months
+    year = value.year + (month_index // 12)
+    month = (month_index % 12) + 1
+    return date(year, month, 1)
+
+
+def _month_start_from_key(value: str | None) -> date:
+    if not value:
+        return datetime.now(KST).date().replace(day=1)
+    try:
+        parsed = datetime.strptime(value, "%Y-%m")
+    except ValueError:
+        return datetime.now(KST).date().replace(day=1)
+    return date(parsed.year, parsed.month, 1)
+
+
+def _events_by_date(events: list[dict[str, object]]) -> dict[str, list[dict[str, object]]]:
+    grouped: dict[str, list[dict[str, object]]] = {}
+    for item in events:
+        grouped.setdefault(str(item["date"]), []).append(item)
+    return grouped
+
+
+def _calendar_days(
+    month_start: date,
+    events_by_date: dict[str, list[dict[str, object]]],
+    floating_by_date: dict[str, list[dict[str, object]]],
+    today: date,
+) -> list[dict[str, object]]:
+    next_month = _add_months(month_start, 1)
+    first_day = month_start - timedelta(days=month_start.weekday())
+    last_month_day = next_month - timedelta(days=1)
+    last_day = last_month_day + timedelta(days=6 - last_month_day.weekday())
+    days = []
+    current = first_day
+    while current <= last_day:
+        events = events_by_date.get(current.isoformat(), [])
+        floating_events = floating_by_date.get(current.isoformat(), [])
+        visible_events = [*events, *floating_events]
+        all_events = visible_events
+        days.append(
+            {
+                "date": current.isoformat(),
+                "day": current.day,
+                "in_month": current.month == month_start.month,
+                "is_today": current == today,
+                "events": events[:3],
+                "all_events": all_events,
+                "floating_events": floating_events[: max(0, 3 - len(events[:3]))],
+                "fixed_count": len(events),
+                "floating_count": len(floating_events),
+                "total_count": len(all_events),
+                "hidden_count": max(0, len(visible_events) - 3),
+                "has_high": any(item["importance"] == "high" for item in all_events),
+            }
+        )
+        current += timedelta(days=1)
+    return days
+
+
+def _newsdata_article_candidate(article: dict[str, object], config: dict[str, object]) -> dict[str, object] | None:
+    title = str(article.get("title", "")).strip()
+    if not title:
+        return None
+    description = str(article.get("description") or "")
+    haystack = " ".join([title, description, str(article.get("source_id", "")), str(article.get("country", ""))]).lower()
+    if any(blocked in haystack for blocked in FLOATING_EVENT_BLOCKLIST | FLOATING_EVENT_NOISE_TERMS):
+        return None
+    if str(config.get("canonical", "")) == "opec_meeting" and not any(
+        term in title.lower() for term in ("opec", "opec+", "production cut", "oil output")
+    ):
+        return None
+    if not _article_matches_query_gate(haystack, config):
+        return None
+    canonical_key = _canonical_event_key(f"{title} {description}", str(config.get("canonical", "")), strict=True)
+    axes = tuple(str(axis) for axis in config.get("axis", ()) if str(axis))
+    article_date = str(article.get("pubDate", "")).split(" ")[0] or datetime.now(KST).date().isoformat()
+    date_info = _infer_candidate_date(
+        title=title,
+        description=description,
+        canonical_key=canonical_key,
+        published_date=article_date,
+    )
+    source = str(article.get("source_id") or article.get("source_name") or "")
+    market = str(config.get("market", "GLOBAL"))
+    score = _floating_keyword_score(
+        title=f"{title} {description}",
+        axes=axes,
+        source_count=1 if source else 0,
+        article_count=1,
+        bilingual_match=False,
+    )
+    return {
+        "canonical_key": canonical_key,
+        "title": title,
+        "market": market,
+        "axis": list(axes),
+        "score": score,
+        "hit_count": 1,
+        "source_count": 1 if source else 0,
+        "first_seen": article_date,
+        "last_seen": article_date,
+        "published_date": article_date,
+        "event_date": date_info["event_date"],
+        "event_end_date": date_info["event_end_date"],
+        "date_confidence": date_info["date_confidence"],
+        "expires_at": (datetime.now(KST).date() + timedelta(days=14)).isoformat(),
+        "status": "candidate",
+        "sources": [
+            {
+                "title": title,
+                "url": str(article.get("link", "")),
+                "domain": source,
+                "language": str(article.get("language", "")),
+                "sourcecountry": ",".join(str(item) for item in article.get("country", []) if item) if isinstance(article.get("country"), list) else str(article.get("country", "")),
+                "seendate": str(article.get("pubDate", "")),
+            }
+        ],
+    }
+
+
+def _canonical_event_key(title: str, fallback: str, strict: bool = False) -> str:
+    lowered = title.lower()
+    if any(token in lowered for token in ("trump xi", "trump-xi", "미중 정상회담", "미·중 정상회담", "트럼프 시진핑")):
+        return "us_china_summit"
+    if "export control" in lowered or "수출통제" in title:
+        return "export_controls"
+    if "semiconductor" in lowered or "반도체" in title:
+        return "semiconductor_policy"
+    if "opec" in lowered:
+        return "opec_meeting"
+    if "bank of korea" in lowered or "금통위" in title:
+        return "bank_of_korea"
+    return fallback or re.sub(r"[^a-z0-9가-힣]+", "_", lowered).strip("_")[:80]
+
+
+def _article_matches_query_gate(haystack: str, config: dict[str, object]) -> bool:
+    required_any = tuple(str(item).lower() for item in config.get("required_any", ()) if str(item))
+    if required_any and not any(term in haystack for term in required_any):
+        return False
+    canonical = str(config.get("canonical", ""))
+    if canonical == "export_controls":
+        policy_terms = ("export control", "export controls", "export restriction", "export restrictions", "수출통제", "수출 규제", "수출규제")
+        market_terms = ("china", "semiconductor", "chip", "ai", "중국", "반도체")
+        return any(term in haystack for term in policy_terms) and any(term in haystack for term in market_terms)
+    if canonical == "federal_reserve":
+        return any(term in haystack for term in ("federal reserve", "fomc", "powell", "fed rate", "rate decision", "inflation", "treasury yield"))
+    if canonical == "bank_of_korea":
+        return any(term in haystack for term in ("bank of korea", "bok", "금통위", "한국은행", "기준금리", "monetary policy"))
+    if canonical == "korea_exports":
+        return any(term in haystack for term in ("export", "exports", "trade data", "수출", "무역"))
+    if canonical == "us_china_summit":
+        return any(term in haystack for term in ("trump xi", "trump-xi", "summit", " 정상회담", "시진핑"))
+    return True
+
+
+def _merge_candidate(existing: dict[str, object], incoming: dict[str, object]) -> None:
+    sources = existing.setdefault("sources", [])
+    if isinstance(sources, list):
+        seen_urls = {str(item.get("url", "")) for item in sources if isinstance(item, dict)}
+        for source in incoming.get("sources", []):
+            if isinstance(source, dict) and str(source.get("url", "")) not in seen_urls:
+                sources.append(source)
+    existing["hit_count"] = int(existing.get("hit_count", 0)) + int(incoming.get("hit_count", 0))
+    domains = {
+        str(source.get("domain", ""))
+        for source in existing.get("sources", [])
+        if isinstance(source, dict) and source.get("domain")
+    }
+    existing["source_count"] = len(domains)
+    existing["first_seen"] = min(str(existing.get("first_seen", "")), str(incoming.get("first_seen", "")))
+    existing["last_seen"] = max(str(existing.get("last_seen", "")), str(incoming.get("last_seen", "")))
+    _merge_candidate_date_info(existing, incoming)
+    markets = {str(existing.get("market", "")), str(incoming.get("market", ""))}
+    existing["market"] = "GLOBAL" if {"US", "KR"}.issubset(markets) else str(existing.get("market") or incoming.get("market"))
+    existing["score"] = _floating_keyword_score(
+        title=str(existing.get("title", "")),
+        axes=tuple(str(axis) for axis in existing.get("axis", []) if str(axis)),
+        source_count=int(existing["source_count"]),
+        article_count=int(existing["hit_count"]),
+        bilingual_match=existing["market"] == "GLOBAL",
+    )
+
+
+def _merge_candidate_date_info(existing: dict[str, object], incoming: dict[str, object]) -> None:
+    confidence_rank = {"": 0, "low": 1, "medium": 2, "high": 3}
+    existing_confidence = str(existing.get("date_confidence", ""))
+    incoming_confidence = str(incoming.get("date_confidence", ""))
+    if confidence_rank.get(incoming_confidence, 0) > confidence_rank.get(existing_confidence, 0):
+        existing["event_date"] = incoming.get("event_date", "")
+        existing["event_end_date"] = incoming.get("event_end_date", "")
+        existing["date_confidence"] = incoming_confidence
+    if not existing.get("published_date"):
+        existing["published_date"] = incoming.get("published_date", "")
+
+
+def _floating_keyword_score(
+    title: str,
+    axes: tuple[str, ...],
+    source_count: int,
+    article_count: int,
+    bilingual_match: bool,
+) -> int:
+    lowered = title.lower()
+    market_axis_bonus = 3 if axes or any(term in lowered for term in MARKET_AXIS_TERMS) else 0
+    high_impact_term_bonus = 3 if any(term in lowered or term in title for term in HIGH_IMPACT_TERMS) else 0
+    date_detected_bonus = 2 if _contains_date_expression(title) else 0
+    bilingual_match_bonus = 2 if bilingual_match else 0
+    noise_penalty = 4 if any(term in lowered for term in FLOATING_EVENT_BLOCKLIST) else 0
+    stale_penalty = 0
+    return (
+        (source_count * 3)
+        + article_count
+        + market_axis_bonus
+        + date_detected_bonus
+        + high_impact_term_bonus
+        + bilingual_match_bonus
+        - stale_penalty
+        - noise_penalty
+    )
+
+
+def _contains_date_expression(text: str) -> bool:
+    return bool(re.search(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}월|\d{4}-\d{2}-\d{2})\b", text, re.IGNORECASE))
+
+
+def _infer_candidate_date(title: str, description: str, canonical_key: str, published_date: str) -> dict[str, str]:
+    text = f"{title} {description}"
+    published = _safe_date_fromiso(published_date) or datetime.now(KST).date()
+    explicit = _infer_explicit_month_day(text, published.year)
+    if explicit and _has_event_date_context(text, canonical_key):
+        start, end = explicit
+        confidence = "high" if end else "medium"
+        return {"event_date": start.isoformat(), "event_end_date": end.isoformat() if end else "", "date_confidence": confidence}
+    weekday_date = _infer_weekday_date(text, published)
+    if weekday_date and _has_event_date_context(text, canonical_key):
+        end_date = weekday_date + timedelta(days=1) if canonical_key == "us_china_summit" else None
+        confidence = "high" if canonical_key == "us_china_summit" else "medium"
+        return {"event_date": weekday_date.isoformat(), "event_end_date": end_date.isoformat() if end_date else "", "date_confidence": confidence}
+    return {"event_date": "", "event_end_date": "", "date_confidence": "low"}
+
+
+def _infer_explicit_month_day(text: str, default_year: int) -> tuple[date, date | None] | None:
+    english_months = "|".join(
+        [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ]
+    )
+    match = re.search(rf"\b(?P<month>{english_months})\.?\s+(?P<start>\d{{1,2}})(?:\s*[-–~]\s*(?P<end>\d{{1,2}}))?", text, re.I)
+    if match:
+        month = _month_number(match.group("month"))
+        start = date(default_year, month, int(match.group("start")))
+        end = date(default_year, month, int(match.group("end"))) if match.group("end") else None
+        return start, end
+    korean_match = re.search(r"(?:(?P<month>\d{1,2})월\s*)?(?P<start>\d{1,2})\s*(?:일)?\s*(?:[-–~]\s*(?P<end>\d{1,2})\s*일?)?", text)
+    if korean_match and ("월" in korean_match.group(0) or "일" in korean_match.group(0)):
+        month = int(korean_match.group("month") or datetime.now(KST).month)
+        start = date(default_year, month, int(korean_match.group("start")))
+        end = date(default_year, month, int(korean_match.group("end"))) if korean_match.group("end") else None
+        return start, end
+    return None
+
+
+def _infer_weekday_date(text: str, published: date) -> date | None:
+    weekday_map = {
+        "monday": 0,
+        "tuesday": 1,
+        "wednesday": 2,
+        "thursday": 3,
+        "friday": 4,
+        "saturday": 5,
+        "sunday": 6,
+        "월요일": 0,
+        "화요일": 1,
+        "수요일": 2,
+        "목요일": 3,
+        "금요일": 4,
+        "토요일": 5,
+        "일요일": 6,
+    }
+    lowered = text.lower()
+    if not _has_weekday_event_context(lowered, text):
+        return None
+    for label, weekday in weekday_map.items():
+        if label in lowered or label in text:
+            days_ahead = (weekday - published.weekday()) % 7
+            if days_ahead == 0:
+                days_ahead = 7 if any(token in lowered for token in ("next", "ahead", "set to", "to meet")) else 0
+            return published + timedelta(days=days_ahead)
+    return None
+
+
+def _has_event_date_context(text: str, canonical_key: str) -> bool:
+    lowered = text.lower()
+    if canonical_key == "opec_meeting":
+        return any(
+            token in lowered or token in text
+            for token in (
+                "opec meeting",
+                "opec+ meeting",
+                "meeting",
+                "scheduled",
+                "set for",
+                "decision",
+                "output decision",
+                "production decision",
+                "회의",
+                "예정",
+                "개최",
+            )
+        )
+    if canonical_key in {"us_china_summit", "bank_of_korea", "federal_reserve"}:
+        return any(
+            token in lowered or token in text
+            for token in (
+                "summit",
+                "meeting",
+                "meet",
+                "talks",
+                "scheduled",
+                "set for",
+                "to meet",
+                "decision",
+                "fomc",
+                "정상회담",
+                "회담",
+                "회의",
+                "예정",
+                "열리는",
+                "개최",
+            )
+        )
+    if canonical_key in {"export_controls", "semiconductor_sanctions", "semiconductor_policy", "korea_semiconductor"}:
+        return any(
+            token in lowered or token in text
+            for token in (
+                "announce",
+                "announced",
+                "scheduled",
+                "set for",
+                "deadline",
+                "takes effect",
+                "effective",
+                "export control",
+                "export restriction",
+                "sanction",
+                "발표",
+                "시행",
+                "예정",
+                "수출통제",
+                "수출 규제",
+                "제재",
+            )
+        )
+    return True
+
+
+def _has_weekday_event_context(lowered: str, text: str) -> bool:
+    return any(
+        token in lowered or token in text
+        for token in (
+            "to meet",
+            "will meet",
+            "set to",
+            "set for",
+            "scheduled",
+            "on monday",
+            "on tuesday",
+            "on wednesday",
+            "on thursday",
+            "on friday",
+            "on saturday",
+            "on sunday",
+            "this monday",
+            "this tuesday",
+            "this wednesday",
+            "this thursday",
+            "this friday",
+            "next monday",
+            "next tuesday",
+            "next wednesday",
+            "next thursday",
+            "next friday",
+            "목요일",
+            "월요일",
+            "화요일",
+            "수요일",
+            "금요일",
+            "토요일",
+            "일요일",
+            "열리는",
+            "예정",
+            "개최",
+        )
+    )
+
+
+def _safe_date_fromiso(value: str) -> date | None:
+    try:
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return None
+
+
+def _floating_candidates_status(status: str, message: str, candidates: list[object]) -> dict[str, object]:
+    return {
+        "collection_status": {
+            "status": status,
+            "generated_at": datetime.now(UTC).isoformat(),
+            "source": "newsdata_io",
+            "message": message,
+        },
+        "candidates": candidates,
+    }
+
+
+def _news_collection_enabled() -> bool:
+    raw = os.getenv("STOCKAGENT_NEWS_COLLECTION_ENABLED", "1").strip().lower()
+    return raw not in {"0", "false", "no", "off"}
+
+
+def _fixed_calendar_collection_enabled() -> bool:
+    raw = os.getenv("STOCKAGENT_FIXED_CALENDAR_ENABLED", "1").strip().lower()
+    return raw not in {"0", "false", "no", "off"}
+
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        return int(os.getenv(name, str(default)))
+    except ValueError:
+        return default
+
+
+def _env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except ValueError:
+        return default
 
 
 def _get_macro_dashboard_live(macro_history: dict[str, object] | None = None) -> dict[str, object]:

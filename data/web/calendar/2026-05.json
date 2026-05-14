@@ -1,0 +1,29 @@
+{
+  "month": "2026-05",
+  "events": [
+    {
+      "date": "2026-05-28",
+      "time_kst": "21:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 GDP (Second Estimate) and Corporate Profits, 1st Quarter 2026",
+      "importance": "high",
+      "source_name": "BEA",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "why_it_matters": "미국 성장률은 경기 둔화/확장 기대와 주식시장 위험선호에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-05-28",
+      "time_kst": "21:30",
+      "market": "US",
+      "category": "소비",
+      "title": "미국 PCE/개인소득 - Personal Income and Outlays, April 2026",
+      "importance": "high",
+      "source_name": "BEA",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "why_it_matters": "개인소득과 PCE 물가는 소비 경기와 연준 금리 기대를 함께 움직인다.",
+      "source_type": "auto_fixed"
+    }
+  ]
+}

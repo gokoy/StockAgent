@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.web.dashboard_data import get_macro_dashboard, get_sector_dashboard
+from app.web.dashboard_data import get_macro_dashboard, get_market_calendar, get_sector_dashboard
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -48,3 +48,15 @@ def sectors_page(request: Request, market: Literal["US", "KR"] = Query(default="
         },
     )
 
+
+@app.get("/calendar")
+def calendar_page(request: Request, month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$")):
+    calendar = get_market_calendar(month=month)
+    return templates.TemplateResponse(
+        "calendar.html",
+        {
+            "request": request,
+            "active_page": "calendar",
+            "calendar": calendar,
+        },
+    )

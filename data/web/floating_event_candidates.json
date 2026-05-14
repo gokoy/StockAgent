@@ -1,0 +1,52 @@
+{
+  "collection_status": {
+    "status": "empty",
+    "generated_at": "2026-05-13T05:00:17.583373+00:00",
+    "source": "newsdata_io",
+    "queries_run": [],
+    "query_count": 0,
+    "errors": [
+      {
+        "query": "Trump Xi",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "US China summit",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "export controls",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "semiconductor sanctions",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "OPEC meeting",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "Federal Reserve",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "Bank of Korea",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "Korea exports",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "Korea short selling",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      },
+      {
+        "query": "MSCI Korea",
+        "error": "{'message': 'Rate limit exceeded. Please try your request again later. For further details, please refer to our documentation at: https://newsdata.io/documentation/#rate-limit', 'code': 'RateLimitExceeded'}"
+      }
+    ]
+  },
+  "candidates": []
+}

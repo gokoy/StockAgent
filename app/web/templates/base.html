@@ -16,6 +16,7 @@
         <nav class="nav">
           <a href="{{ macro_href if macro_href is defined else '/macro' }}" class="{% if active_page == 'macro' %}active{% endif %}">매크로</a>
           <a href="{{ sectors_href if sectors_href is defined else '/sectors' }}" class="{% if active_page == 'sectors' %}active{% endif %}">섹터</a>
+          <a href="{{ calendar_href if calendar_href is defined else '/calendar' }}" class="{% if active_page == 'calendar' %}active{% endif %}">달력</a>
         </nav>
       </header>
       <main class="page">

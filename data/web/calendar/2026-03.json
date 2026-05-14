@@ -1,0 +1,17 @@
+{
+  "month": "2026-03",
+  "events": [
+    {
+      "date": "2026-03-18",
+      "time_kst": "03:00",
+      "market": "US",
+      "category": "정책",
+      "title": "FOMC 기준금리 결정 및 점도표",
+      "importance": "high",
+      "source_name": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "why_it_matters": "연준 정책금리와 기자회견은 미국 금리 기대, 달러, 성장주 밸류에이션에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    }
+  ]
+}
