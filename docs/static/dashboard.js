@@ -2,17 +2,17 @@ const dataEl = document.getElementById("chart-data");
 const dashboardData = dataEl ? JSON.parse(dataEl.textContent) : { charts: {} };
 const renderedCharts = new Map();
 const sectorPalette = [
-  "#153b25",
+  "#111827",
   "#2563eb",
-  "#dc2626",
-  "#f59e0b",
-  "#7c3aed",
-  "#0f766e",
-  "#db2777",
-  "#0891b2",
-  "#65a30d",
-  "#ea580c",
-  "#475569",
+  "#10b981",
+  "#f97316",
+  "#8b5cf6",
+  "#06b6d4",
+  "#ef4444",
+  "#84cc16",
+  "#ec4899",
+  "#14b8a6",
+  "#64748b",
 ];
 
 function renderMacroScoreHistoryChart() {
@@ -38,13 +38,13 @@ function renderMacroScoreHistoryChart() {
         {
           label: "시장 환경 점수",
           data: activePoints.map((point) => point.score),
-          borderColor: "#153b25",
+          borderColor: "#2563eb",
           backgroundColor: "transparent",
           borderWidth: 3,
           pointRadius: 0,
           pointHoverRadius: 4,
-          pointHoverBackgroundColor: "#f4d56b",
-          pointHoverBorderColor: "#153b25",
+          pointHoverBackgroundColor: "#38bdf8",
+          pointHoverBorderColor: "#2563eb",
           pointHoverBorderWidth: 2,
           tension: 0.22,
           spanGaps: true,
@@ -311,8 +311,8 @@ function ensureChart(chartId) {
           {
             label: config.label,
             data: config.points.map((point) => point.value),
-            borderColor: "#0f766e",
-            backgroundColor: "rgba(15, 118, 110, 0.10)",
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37, 99, 235, 0.10)",
             borderWidth: 2,
             pointRadius: 0,
             fill: true,

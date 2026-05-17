@@ -3,12 +3,30 @@
 
 {% block content %}
 <section class="hero-panel sector-hero">
-  <div class="status-pill">{{ dashboard.as_of[:10] }}</div>
+  <div class="hero-copy">
+    <div class="hero-chips">
+      <span>Updated {{ dashboard.as_of[:10] }}</span>
+      <span>{{ dashboard.benchmark }} 기준</span>
+    </div>
+    <p class="hero-kicker">Sector rotation</p>
+    <h1>{{ dashboard.benchmark }}보다 강한 섹터</h1>
+  </div>
   <div class="segmented">
     <a href="{{ sector_us_href if sector_us_href is defined else '/sectors?market=US' }}" class="{% if dashboard.market == 'US' %}active{% endif %}">미국</a>
     <a href="{{ sector_kr_href if sector_kr_href is defined else '/sectors?market=KR' }}" class="{% if dashboard.market == 'KR' %}active{% endif %}">한국</a>
   </div>
-  <h1>{{ dashboard.benchmark }}보다 강한 섹터</h1>
+</section>
+
+<section class="leader-strip" aria-label="상위 상대강도 섹터">
+  {% for item in dashboard.sectors %}
+  {% if loop.index <= 3 %}
+  <article>
+    <span>Rank {{ loop.index }}</span>
+    <strong>{{ item.name }}</strong>
+    <small>{{ "%+.2f"|format(item.relative_strength) }}%p · {{ item.trend_label }}</small>
+  </article>
+  {% endif %}
+  {% endfor %}
 </section>
 
 <section class="content-frame">

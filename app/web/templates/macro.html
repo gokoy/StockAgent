@@ -7,24 +7,36 @@
   {% set ns.total = ns.total + indicators|length %}
 {% endfor %}
 
-<section class="hero-panel">
-  <div class="status-pill">{{ dashboard.decision.freshness.latest }}</div>
-  <div class="hero-kicker">시장 환경 점수</div>
-  <h1>{{ dashboard.decision.score }}/100</h1>
-  <div class="score-track hero-score-track" aria-label="시장 환경 점수 막대">
-    <span style="width: {{ dashboard.decision.score }}%"></span>
+<section class="hero-panel macro-hero">
+  <div class="hero-copy">
+    <div class="hero-chips">
+      <span>Updated {{ dashboard.decision.freshness.latest }}</span>
+      <span>Daily 07:00 KST</span>
+    </div>
+    <p class="hero-kicker">Market posture</p>
+    <h1>{{ dashboard.decision.action_title }}</h1>
+    <p class="market-brief">{{ dashboard.ai_summary.summary }}</p>
   </div>
-  <div class="score-guide" aria-label="시장 환경 점수 해석">
-    <strong>점수 해석 기준</strong>
-    <ul>
-      <li><span>72+</span> 신규 매수 가능. 지수보다 강한 섹터와 주도주 중심.</li>
-      <li><span>58-71</span> 선별 매수. 상대강도 좋은 종목만 좁게 접근.</li>
-      <li><span>45-57</span> 관망 우선. 신규 진입보다 보유 종목 관리.</li>
-      <li><span>32-44</span> 리스크 관리. 매수 축소와 현금 비중 점검.</li>
-      <li><span>&lt;32</span> 방어 우선. 성급한 물타기보다 손실 방어.</li>
-    </ul>
-  </div>
-  <p class="market-brief">{{ dashboard.ai_summary.summary }}</p>
+  <aside class="score-card" aria-label="시장 환경 점수">
+    <span>시장 환경 점수</span>
+    <strong>{{ dashboard.decision.score }}</strong>
+    <small>/ 100</small>
+    <div class="score-track hero-score-track">
+      <span style="width: {{ dashboard.decision.score }}%"></span>
+    </div>
+    <p>{{ dashboard.decision.regime_description }}</p>
+  </aside>
+</section>
+
+<section class="score-guide" aria-label="시장 환경 점수 해석">
+  <strong>점수 해석 기준</strong>
+  <ul>
+    <li><span>72+</span> 신규 매수 가능</li>
+    <li><span>58-71</span> 선별 매수</li>
+    <li><span>45-57</span> 관망 우선</li>
+    <li><span>32-44</span> 리스크 관리</li>
+    <li><span>&lt;32</span> 방어 우선</li>
+  </ul>
 </section>
 
 {% if dashboard.score_history %}
@@ -138,7 +150,6 @@
               {{ item.history_stats.position_label }} · {{ item.history_stats.zone }}
             </div>
             {% endif %}
-            <div class="data-badge">{{ item.data_frequency }} 데이터</div>
             <p>{{ item.description }}</p>
             <p class="impact">{{ item.market_impact }}</p>
           </div>

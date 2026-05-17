@@ -10,9 +10,14 @@
   </head>
   <body>
     <div class="app-shell">
-      <div class="notice-bar">데이터는 매일 오전 7시(KST)에 갱신됩니다.</div>
       <header class="topbar">
-        <a class="brand" href="./">StockAgent</a>
+        <a class="brand" href="./">
+          <span class="brand-mark">SA</span>
+          <span>
+            <strong>StockAgent</strong>
+            <small>Market decision dashboard</small>
+          </span>
+        </a>
         <nav class="nav">
           <a href="./" class="active">매크로</a>
           <a href="../sectors/" class="">섹터</a>
@@ -43,24 +48,36 @@
   
 
 
-<section class="hero-panel">
-  <div class="status-pill">2026-05-16</div>
-  <div class="hero-kicker">시장 환경 점수</div>
-  <h1>53/100</h1>
-  <div class="score-track hero-score-track" aria-label="시장 환경 점수 막대">
-    <span style="width: 53%"></span>
+<section class="hero-panel macro-hero">
+  <div class="hero-copy">
+    <div class="hero-chips">
+      <span>Updated 2026-05-16</span>
+      <span>Daily 07:00 KST</span>
+    </div>
+    <p class="hero-kicker">Market posture</p>
+    <h1>확인 후 진입</h1>
+    <p class="market-brief">우호적인 축은 주식 모멘텀과 신용 리스크이고, 부담 요인은 변동성과 금리/정책입니다. 지수 전체를 추격하기보다 강한 섹터와 주도주 중심으로 좁게 접근하는 편이 낫습니다.</p>
   </div>
-  <div class="score-guide" aria-label="시장 환경 점수 해석">
-    <strong>점수 해석 기준</strong>
-    <ul>
-      <li><span>72+</span> 신규 매수 가능. 지수보다 강한 섹터와 주도주 중심.</li>
-      <li><span>58-71</span> 선별 매수. 상대강도 좋은 종목만 좁게 접근.</li>
-      <li><span>45-57</span> 관망 우선. 신규 진입보다 보유 종목 관리.</li>
-      <li><span>32-44</span> 리스크 관리. 매수 축소와 현금 비중 점검.</li>
-      <li><span>&lt;32</span> 방어 우선. 성급한 물타기보다 손실 방어.</li>
-    </ul>
-  </div>
-  <p class="market-brief">우호적인 축은 주식 모멘텀과 신용 리스크이고, 부담 요인은 변동성과 금리/정책입니다. 지수 전체를 추격하기보다 강한 섹터와 주도주 중심으로 좁게 접근하는 편이 낫습니다.</p>
+  <aside class="score-card" aria-label="시장 환경 점수">
+    <span>시장 환경 점수</span>
+    <strong>53</strong>
+    <small>/ 100</small>
+    <div class="score-track hero-score-track">
+      <span style="width: 53%"></span>
+    </div>
+    <p>공격과 방어 신호가 섞여 있어 결론을 서두르기 어려운 상태입니다.</p>
+  </aside>
+</section>
+
+<section class="score-guide" aria-label="시장 환경 점수 해석">
+  <strong>점수 해석 기준</strong>
+  <ul>
+    <li><span>72+</span> 신규 매수 가능</li>
+    <li><span>58-71</span> 선별 매수</li>
+    <li><span>45-57</span> 관망 우선</li>
+    <li><span>32-44</span> 리스크 관리</li>
+    <li><span>&lt;32</span> 방어 우선</li>
+  </ul>
 </section>
 
 
@@ -152,7 +169,6 @@
               5년 중 상위 1% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>미국 대형주 전반의 방향성이다. 글로벌 위험자산의 기준선으로 본다.</p>
             <p class="impact">상승은 공격적 포지션에 유리하고, 하락은 현금/방어 섹터 비중을 높여야 한다는 신호가 된다.</p>
           </div>
@@ -186,7 +202,6 @@
               5년 중 상위 1% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>성장주와 빅테크 선호를 보여준다. 금리와 유동성 변화에 민감하다.</p>
             <p class="impact">나스닥이 시장을 이끌면 성장주/AI/반도체 쪽으로 자금이 붙는 경우가 많다.</p>
           </div>
@@ -220,7 +235,6 @@
               5년 중 하위 23% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>소형주가 대형주보다 강한지 보는 상대강도다.</p>
             <p class="impact">상승하면 시장 참여 폭이 넓어지는 신호이고, 하락하면 대형 우량주 쏠림 또는 방어적 장세로 해석한다.</p>
           </div>
@@ -261,7 +275,6 @@
               5년 중 상위 46% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>S&amp;P 500 옵션시장이 반영하는 단기 변동성 기대치다.</p>
             <p class="impact">급등하면 주식 비중 확대보다 리스크 관리가 우선이고, 하락 안정화는 공격 재개 조건이 된다.</p>
           </div>
@@ -302,7 +315,6 @@
               5년 중 상위 9% 수준 · 장기 상단 위험권
             </div>
             
-            <div class="data-badge">일간·지연 가능 데이터</div>
             <p>주식 가치평가의 할인율 기준이다. 특히 성장주 멀티플에 큰 영향을 준다.</p>
             <p class="impact">금리 상승은 성장주와 장기채에 부담이고, 금리 하락은 기술주/성장주 반등에 우호적이다.</p>
           </div>
@@ -336,7 +348,6 @@
               5년 중 상위 44% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간·지연 가능 데이터</div>
             <p>연준 정책금리 기대를 가장 민감하게 반영하는 구간이다.</p>
             <p class="impact">2년 금리 상승은 긴축 우려를 키우고, 하락은 정책 부담 완화로 해석한다.</p>
           </div>
@@ -370,7 +381,6 @@
               5년 중 상위 32% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간·지연 가능 데이터</div>
             <p>장단기 금리차다. 경기 기대와 침체 우려를 함께 읽는다.</p>
             <p class="impact">역전이 깊어지면 경기 둔화 위험을 경계하고, 정상화는 경기 회복 기대와도 연결된다.</p>
           </div>
@@ -411,7 +421,6 @@
               5년 중 하위 11% 수준 · 장기 하단 안정권
             </div>
             
-            <div class="data-badge">일간·지연 가능 데이터</div>
             <p>투기등급 회사채가 국채 대비 요구하는 추가 금리다.</p>
             <p class="impact">스프레드 확대는 신용 스트레스와 위험회피를 뜻하고, 축소는 위험자산에 우호적이다.</p>
           </div>
@@ -445,7 +454,6 @@
               5년 중 상위 5% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>위험한 회사채가 우량 회사채보다 강한지 보는 시장 내부 신호다.</p>
             <p class="impact">상승하면 신용시장이 위험을 받아들이고 있다는 뜻이라 주식에도 우호적이다.</p>
           </div>
@@ -486,7 +494,6 @@
               5년 중 하위 34% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>달러 강세 여부를 보여준다. 글로벌 유동성과 신흥국 자금 흐름에 중요하다.</p>
             <p class="impact">달러 급등은 해외 위험자산과 원화자산에 부담이고, 달러 약세는 위험선호에 우호적이다.</p>
           </div>
@@ -520,7 +527,6 @@
               5년 중 상위 1% 수준 · 장기 상단 위험권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>원화 약세/강세를 직접 보여준다. 한국 주식 외국인 수급과 연결된다.</p>
             <p class="impact">달러/원 상승은 외국인 매도 압력과 수입물가 부담으로 이어질 수 있다.</p>
           </div>
@@ -561,7 +567,6 @@
               5년 중 상위 5% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>에너지 가격과 인플레이션 압력을 같이 보여준다.</p>
             <p class="impact">완만한 상승은 경기 수요를 뜻할 수 있지만, 급등은 물가와 마진 부담으로 시장에 부정적이다.</p>
           </div>
@@ -595,7 +600,6 @@
               5년 중 상위 6% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>실질금리, 달러, 안전자산 수요를 함께 반영한다.</p>
             <p class="impact">금이 강하면 인플레이션 헤지나 안전자산 선호가 커졌는지 확인해야 한다.</p>
           </div>
@@ -636,7 +640,6 @@
               5년 중 상위 1% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>제조업과 인프라 수요에 민감해 경기 민감 지표로 자주 본다.</p>
             <p class="impact">구리 강세는 경기민감주와 산업재에 우호적이고, 약세는 수요 둔화 신호가 될 수 있다.</p>
           </div>
@@ -677,7 +680,6 @@
               5년 중 상위 1% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>한국 대형주 시장의 기준 지수다.</p>
             <p class="impact">코스피가 강하면 반도체/자동차/금융 등 한국 주도 섹터 추적이 필요하다.</p>
           </div>
@@ -711,7 +713,6 @@
               5년 중 상위 4% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>한국 성장주와 중소형주 위험선호를 보여준다.</p>
             <p class="impact">코스닥이 코스피보다 강하면 바이오, 2차전지, 테마 성장주로 수급이 이동했는지 본다.</p>
           </div>
@@ -752,7 +753,6 @@
               5년 중 상위 26% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">일간 데이터</div>
             <p>고베타 유동성 자산의 대표 신호다.</p>
             <p class="impact">강세는 투기적 위험선호 회복 신호일 수 있고, 급락은 고베타 자산 축소 압력으로 본다.</p>
           </div>
@@ -793,7 +793,6 @@
               5년 중 하위 38% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">월간·지연 발표 데이터</div>
             <p>연준 정책금리의 실제 레벨이다.</p>
             <p class="impact">높은 정책금리는 현금의 기회비용을 높이고, 금리 인하 국면은 위험자산에 유동성 기대를 만든다.</p>
           </div>
@@ -827,7 +826,6 @@
               5년 중 상위 43% 수준 · 장기 중립권
             </div>
             
-            <div class="data-badge">월간·지연 발표 데이터</div>
             <p>미국 소비자물가의 전년 대비 상승률이다.</p>
             <p class="impact">높게 유지되면 금리 인하 기대를 낮추고, 둔화되면 밸류에이션 부담을 줄인다.</p>
           </div>
@@ -861,7 +859,6 @@
               5년 중 상위 18% 수준 · 장기 상단 강세권
             </div>
             
-            <div class="data-badge">월간·지연 발표 데이터</div>
             <p>미국 고용시장의 둔화 여부를 보여준다.</p>
             <p class="impact">완만한 상승은 긴축 완화 기대를 만들 수 있지만, 급등은 경기침체 리스크로 해석한다.</p>
           </div>
