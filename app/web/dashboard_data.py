@@ -38,6 +38,8 @@ KST = ZoneInfo("Asia/Seoul")
 NEWSDATA_LATEST_API_URL = "https://newsdata.io/api/1/latest"
 FED_FOMC_CALENDAR_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
 BEA_RELEASE_SCHEDULE_URL = "https://www.bea.gov/news/schedule"
+CENSUS_RELEASE_SCHEDULE_URL = "https://www.census.gov/economic-indicators/calendar-listview.html"
+ISM_RELEASE_CALENDAR_URL = "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
 AUTO_FIXED_SOURCE_TYPE = "auto_fixed"
 
 
@@ -430,6 +432,45 @@ MARKET_AXIS_TERMS = {
     "공매도",
 }
 
+CENSUS_RELEASE_SPECS: dict[str, dict[str, str]] = {
+    "Advance Monthly Sales for Retail and Food Services": {
+        "display": "미국 소매판매",
+        "category": "소비",
+        "importance": "high",
+        "why_it_matters": "소매판매는 미국 소비 경기와 기업 매출 기대, 금리 민감 섹터 흐름에 직접 영향을 준다.",
+    },
+    "Advance Report on Durable Goods--Manufacturers' Shipments, Inventories, and Orders": {
+        "display": "미국 내구재 주문",
+        "category": "성장",
+        "importance": "medium",
+        "why_it_matters": "내구재 주문은 설비투자와 제조업 수요 방향을 보여주는 경기 선행 지표다.",
+    },
+    "New Residential Construction (Building Permits, Housing Starts, and Housing Completions)": {
+        "display": "미국 주택착공/건축허가",
+        "category": "성장",
+        "importance": "medium",
+        "why_it_matters": "주택착공과 건축허가는 금리 민감 경기와 주택 관련 업종 흐름을 확인하는 지표다.",
+    },
+    "New Residential Sales": {
+        "display": "미국 신규주택판매",
+        "category": "소비",
+        "importance": "medium",
+        "why_it_matters": "신규주택판매는 주택 수요와 금리 부담, 소비 심리 변화를 보여준다.",
+    },
+    "Construction Spending (Construction Put in Place)": {
+        "display": "미국 건설지출",
+        "category": "성장",
+        "importance": "medium",
+        "why_it_matters": "건설지출은 민간/공공 투자와 경기민감 업종의 수요를 해석하는 데 사용된다.",
+    },
+    "Advance Economic Indicators Report (International Trade, Retail, & Wholesale)": {
+        "display": "미국 선행 경제지표(무역/재고)",
+        "category": "성장",
+        "importance": "medium",
+        "why_it_matters": "무역, 도매, 재고 흐름은 GDP 세부 항목과 경기 모멘텀 전망에 영향을 준다.",
+    },
+}
+
 
 US_SECTOR_SPECS: tuple[SectorSpec, ...] = (
     SectorSpec("us-tech", "기술", "US", "SPY", ("XLK",), "소프트웨어, 하드웨어, 플랫폼 대형주의 흐름이다.", "시장보다 강하면 성장주 위험선호가 살아있다고 본다.", "Technology Select Sector Index", "XLK"),
@@ -490,50 +531,69 @@ def get_market_calendar(
     floating_candidates_path: Path = FLOATING_EVENT_CANDIDATES_PATH,
     today: date | None = None,
     month: str | None = None,
+    week: str | None = None,
+    start: str | None = None,
 ) -> dict[str, object]:
     today_kst = today or datetime.now(KST).date()
-    month_start = _month_start_from_key(month) if month else today_kst.replace(day=1)
-    month_key = month_start.strftime("%Y-%m")
-    fixed_events = _load_monthly_event_list(calendar_path, month_key, legacy_path=MARKET_CALENDAR_PATH)
-    # Floating event collection is still kept for future tuning, but the
-    # calendar page currently exposes only fixed releases.
-    floating_events: list[dict[str, object]] = []
+    window_start = _window_start_from_key(start, today_kst)
+    min_window_start = today_kst - timedelta(days=60)
+    max_window_start = today_kst + timedelta(days=180)
+    window_start = min(max(window_start, min_window_start), max_window_start)
+    window_end = window_start + timedelta(days=29)
+    fixed_events = _load_fixed_events_for_range(calendar_path, window_start, window_end)
     normalized_fixed = sorted((_normalize_calendar_event(item) for item in fixed_events), key=_event_sort_key)
-    normalized_floating = sorted((_normalize_floating_event(item) for item in floating_events), key=_event_sort_key)
-    next_month = _add_months(month_start, 1)
-    month_events = [item for item in normalized_fixed if month_start <= _parse_event_date(item["date"]) < next_month]
-    month_floating_events = [
-        item
-        for item in normalized_floating
-        if item["date"] == "날짜 미확정" or month_start <= _parse_event_date(item["date"]) < next_month
-    ]
-    events_by_date = _events_by_date(month_events)
-    dated_floating_events = [item for item in month_floating_events if item["date"] != "날짜 미확정"]
-    floating_by_date = _events_by_date(dated_floating_events)
-    all_events_by_date = _events_by_date([*month_events, *dated_floating_events])
-    calendar_days = _calendar_days(month_start, events_by_date, floating_by_date, today_kst)
+    window_events = [item for item in normalized_fixed if window_start <= _parse_event_date(item["date"]) <= window_end]
+    events_by_date = _events_by_date(window_events)
+    window_days = _calendar_window_days(window_start, window_end, events_by_date, today_kst)
     upcoming = [item for item in normalized_fixed if _parse_event_date(item["date"]) >= today_kst][:12]
+    previous_window_start = window_start - timedelta(days=30)
+    next_window_start = window_start + timedelta(days=30)
 
     return {
         "today": today_kst.isoformat(),
+        "window": {
+            "label": _window_label(window_start, window_end, today_kst),
+            "range_label": f"{window_start.strftime('%Y.%m.%d')} - {window_end.strftime('%Y.%m.%d')}",
+            "start": window_start.isoformat(),
+            "end": window_end.isoformat(),
+            "key": window_start.isoformat(),
+            "previous_key": previous_window_start.isoformat(),
+            "next_key": next_window_start.isoformat(),
+            "can_go_previous": previous_window_start >= min_window_start,
+            "can_go_next": next_window_start <= max_window_start,
+            "days": window_days,
+        },
+        "week": {
+            "label": _window_label(window_start, window_end, today_kst),
+            "range_label": f"{window_start.strftime('%Y.%m.%d')} - {window_end.strftime('%Y.%m.%d')}",
+            "start": window_start.isoformat(),
+            "end": window_end.isoformat(),
+            "key": window_start.isoformat(),
+            "previous_key": previous_window_start.isoformat(),
+            "next_key": next_window_start.isoformat(),
+            "can_go_previous": previous_window_start >= min_window_start,
+            "can_go_next": next_window_start <= max_window_start,
+            "days": window_days,
+        },
         "month": {
-            "label": f"{month_start.year}년 {month_start.month}월",
-            "start": month_start.isoformat(),
-            "key": month_key,
-            "previous_key": _add_months(month_start, -1).strftime("%Y-%m"),
-            "next_key": next_month.strftime("%Y-%m"),
-            "is_current": month_key == today_kst.strftime("%Y-%m"),
+            "label": f"{window_start.year}년 {window_start.month}월",
+            "start": window_start.replace(day=1).isoformat(),
+            "key": window_start.strftime("%Y-%m"),
+            "previous_key": _add_months(window_start.replace(day=1), -1).strftime("%Y-%m"),
+            "next_key": _add_months(window_start.replace(day=1), 1).strftime("%Y-%m"),
+            "is_current": window_start.strftime("%Y-%m") == today_kst.strftime("%Y-%m"),
         },
         "fixed_events": normalized_fixed,
-        "floating_events": month_floating_events,
-        "month_events": month_events,
-        "events_by_date": all_events_by_date,
-        "calendar_days": calendar_days,
+        "floating_events": [],
+        "month_events": window_events,
+        "week_events": window_events,
+        "events_by_date": events_by_date,
+        "calendar_days": window_days,
         "upcoming_fixed": upcoming,
         "stats": {
-            "fixed_total": len(month_events),
-            "floating_total": len(month_floating_events),
-            "high_total": sum(1 for item in month_events if item["importance"] == "high"),
+            "fixed_total": len(window_events),
+            "floating_total": 0,
+            "high_total": sum(1 for item in window_events if item["importance"] == "high"),
         },
     }
 
@@ -640,7 +700,7 @@ def refresh_fixed_calendar_events(calendar_dir: Path = MARKET_CALENDAR_DIR, year
         return {"status": "disabled", "events": []}
     events: list[dict[str, object]] = []
     errors: list[dict[str, str]] = []
-    for collector in (_collect_fomc_events, _collect_bea_events):
+    for collector in (_collect_fomc_events, _collect_bea_events, _collect_census_events, _collect_ism_events):
         try:
             events.extend(collector(target_year))
         except Exception as exc:
@@ -728,6 +788,84 @@ def _collect_bea_events(year: int) -> list[dict[str, object]]:
     return events
 
 
+def _collect_census_events(year: int) -> list[dict[str, object]]:
+    response = requests.get(
+        CENSUS_RELEASE_SCHEDULE_URL,
+        timeout=_env_int("FIXED_CALENDAR_TIMEOUT_SECONDS", 30),
+        headers={"User-Agent": "StockAgent/1.0"},
+    )
+    response.raise_for_status()
+    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", response.text, flags=re.S)
+    events = []
+    tracked_titles = sorted(CENSUS_RELEASE_SPECS, key=len, reverse=True)
+    for row in rows:
+        text = _clean_html(row)
+        if "Suspended" in text:
+            continue
+        title = next((item for item in tracked_titles if text.startswith(item)), "")
+        if not title:
+            continue
+        remainder = text[len(title) :].strip()
+        match = re.match(r"(?P<date>[A-Za-z]+ \d{1,2}, \d{4})\s+(?P<time>\d{1,2}:\d{2} [AP]M)\s+(?P<period>.+?)\s+A\d{12}", remainder)
+        if not match:
+            continue
+        release_date = datetime.strptime(match.group("date"), "%B %d, %Y").date()
+        if release_date.year != year:
+            continue
+        spec = CENSUS_RELEASE_SPECS[title]
+        events.append(
+            {
+                "date": release_date.isoformat(),
+                "time_kst": _us_eastern_to_kst(release_date, match.group("time")),
+                "market": "US",
+                "category": spec["category"],
+                "title": f"{spec['display']} - {match.group('period')}",
+                "importance": spec["importance"],
+                "source_name": "Census",
+                "source_url": CENSUS_RELEASE_SCHEDULE_URL,
+                "why_it_matters": spec["why_it_matters"],
+                "source_type": AUTO_FIXED_SOURCE_TYPE,
+            }
+        )
+    return events
+
+
+def _collect_ism_events(year: int) -> list[dict[str, object]]:
+    events = []
+    for month in range(1, 13):
+        manufacturing_date = _nth_business_day(year, month, 1)
+        services_date = _nth_business_day(year, month, 3)
+        events.append(
+            {
+                "date": manufacturing_date.isoformat(),
+                "time_kst": _us_eastern_to_kst(manufacturing_date, "10:00 AM"),
+                "market": "US",
+                "category": "성장",
+                "title": f"미국 ISM 제조업 PMI - {manufacturing_date.strftime('%B %Y')}",
+                "importance": "high",
+                "source_name": "ISM",
+                "source_url": ISM_RELEASE_CALENDAR_URL,
+                "why_it_matters": "ISM 제조업 PMI는 미국 제조업 경기와 주문/고용/가격 압력을 빠르게 보여준다.",
+                "source_type": AUTO_FIXED_SOURCE_TYPE,
+            }
+        )
+        events.append(
+            {
+                "date": services_date.isoformat(),
+                "time_kst": _us_eastern_to_kst(services_date, "10:00 AM"),
+                "market": "US",
+                "category": "성장",
+                "title": f"미국 ISM 서비스업 PMI - {services_date.strftime('%B %Y')}",
+                "importance": "high",
+                "source_name": "ISM",
+                "source_url": ISM_RELEASE_CALENDAR_URL,
+                "why_it_matters": "ISM 서비스업 PMI는 미국 내수와 서비스 물가 압력, 경기 확장 여부를 확인하는 핵심 선행지표다.",
+                "source_type": AUTO_FIXED_SOURCE_TYPE,
+            }
+        )
+    return events
+
+
 def _write_monthly_auto_events(calendar_dir: Path, year: int, auto_events: list[dict[str, object]]) -> None:
     by_month: dict[str, list[dict[str, object]]] = {}
     for event in auto_events:
@@ -769,11 +907,43 @@ def _us_eastern_to_kst(release_date: date, time_text: str) -> str:
     return release_dt.astimezone(KST).strftime("%H:%M")
 
 
+def _nth_business_day(year: int, month: int, nth: int) -> date:
+    holidays = _observed_us_fixed_holidays(year)
+    current = date(year, month, 1)
+    seen = 0
+    while current.month == month:
+        if current.weekday() < 5 and current not in holidays:
+            seen += 1
+            if seen == nth:
+                return current
+        current += timedelta(days=1)
+    raise ValueError(f"No {nth} business day for {year}-{month:02d}")
+
+
+def _observed_us_fixed_holidays(year: int) -> set[date]:
+    return {
+        _observed_holiday(date(year, 1, 1)),
+        _observed_holiday(date(year, 6, 19)),
+        _observed_holiday(date(year, 7, 4)),
+        _observed_holiday(date(year, 12, 25)),
+    }
+
+
+def _observed_holiday(value: date) -> date:
+    if value.weekday() == 5:
+        return value - timedelta(days=1)
+    if value.weekday() == 6:
+        return value + timedelta(days=1)
+    return value
+
+
 def _clean_html(value: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", value))).strip()
 
 
 def _is_tracked_bea_release(title: str) -> bool:
+    if "Annual Update" in title:
+        return False
     return any(
         token in title
         for token in (
@@ -1180,11 +1350,140 @@ def _month_start_from_key(value: str | None) -> date:
     return date(parsed.year, parsed.month, 1)
 
 
+def _week_start(value: date) -> date:
+    return value - timedelta(days=value.weekday())
+
+
+def _week_start_from_key(value: str | None, fallback: date) -> date:
+    if not value:
+        return _week_start(fallback)
+    try:
+        parsed = date.fromisoformat(value[:10])
+    except ValueError:
+        return _week_start(fallback)
+    return _week_start(parsed)
+
+
+def _week_label(week_start: date, week_end: date, current_week_start: date) -> str:
+    if week_start == current_week_start:
+        return "이번 주 주요 일정"
+    return f"{week_start.strftime('%Y.%m.%d')} - {week_end.strftime('%Y.%m.%d')} 주요 일정"
+
+
+def _window_start_from_key(value: str | None, fallback: date) -> date:
+    if not value:
+        return fallback
+    try:
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return fallback
+
+
+def _window_label(window_start: date, window_end: date, today: date) -> str:
+    if window_start == today:
+        return "다가오는 주요 일정"
+    return f"{window_start.strftime('%Y.%m.%d')} - {window_end.strftime('%Y.%m.%d')} 주요 일정"
+
+
+def _month_keys_between(start_date: date, end_date: date) -> list[str]:
+    current = start_date.replace(day=1)
+    end_month = end_date.replace(day=1)
+    keys = []
+    while current <= end_month:
+        keys.append(current.strftime("%Y-%m"))
+        current = _add_months(current, 1)
+    return keys
+
+
+def _load_fixed_events_for_range(path: Path, start_date: date, end_date: date) -> list[dict[str, object]]:
+    events: list[dict[str, object]] = []
+    for month_key in _month_keys_between(start_date, end_date):
+        events.extend(_load_monthly_event_list(path, month_key, legacy_path=MARKET_CALENDAR_PATH))
+    seen: set[tuple[str, str, str]] = set()
+    unique_events = []
+    for event in events:
+        event_date = str(event.get("date", ""))
+        key = (event_date, str(event.get("title", "")), str(event.get("time_kst", "")))
+        if key in seen:
+            continue
+        seen.add(key)
+        parsed_date = _parse_event_date(event_date)
+        if start_date <= parsed_date <= end_date:
+            unique_events.append(event)
+    return unique_events
+
+
+def _load_weekly_fixed_events(path: Path, week_start: date, week_end: date) -> list[dict[str, object]]:
+    return _load_fixed_events_for_range(path, week_start, week_end)
+
+
 def _events_by_date(events: list[dict[str, object]]) -> dict[str, list[dict[str, object]]]:
     grouped: dict[str, list[dict[str, object]]] = {}
     for item in events:
         grouped.setdefault(str(item["date"]), []).append(item)
     return grouped
+
+
+def _calendar_week_days(
+    week_start: date,
+    events_by_date: dict[str, list[dict[str, object]]],
+    today: date,
+) -> list[dict[str, object]]:
+    weekday_labels = ("월", "화", "수", "목", "금", "토", "일")
+    days = []
+    for index in range(7):
+        current = week_start + timedelta(days=index)
+        events = events_by_date.get(current.isoformat(), [])
+        days.append(
+            {
+                "date": current.isoformat(),
+                "day": current.day,
+                "weekday": weekday_labels[index],
+                "weekday_index": index,
+                "is_today": current == today,
+                "events": events,
+                "all_events": events,
+                "fixed_count": len(events),
+                "floating_count": 0,
+                "total_count": len(events),
+                "hidden_count": 0,
+                "has_high": any(item["importance"] == "high" for item in events),
+            }
+        )
+    return days
+
+
+def _calendar_window_days(
+    window_start: date,
+    window_end: date,
+    events_by_date: dict[str, list[dict[str, object]]],
+    today: date,
+) -> list[dict[str, object]]:
+    weekday_labels = ("월", "화", "수", "목", "금", "토", "일")
+    days = []
+    current = window_start
+    while current <= window_end:
+        events = events_by_date.get(current.isoformat(), [])
+        if events:
+            weekday_index = current.weekday()
+            days.append(
+                {
+                    "date": current.isoformat(),
+                    "day": current.day,
+                    "weekday": weekday_labels[weekday_index],
+                    "weekday_index": weekday_index,
+                    "is_today": current == today,
+                    "events": events,
+                    "all_events": events,
+                    "fixed_count": len(events),
+                    "floating_count": 0,
+                    "total_count": len(events),
+                    "hidden_count": 0,
+                    "has_high": any(item["importance"] == "high" for item in events),
+                }
+            )
+        current += timedelta(days=1)
+    return days
 
 
 def _calendar_days(

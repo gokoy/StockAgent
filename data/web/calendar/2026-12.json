@@ -2,6 +2,30 @@
   "month": "2026-12",
   "events": [
     {
+      "date": "2026-12-01",
+      "time_kst": "00:00",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 ISM 제조업 PMI - December 2026",
+      "importance": "high",
+      "source_name": "ISM",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "why_it_matters": "ISM 제조업 PMI는 미국 제조업 경기와 주문/고용/가격 압력을 빠르게 보여준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-01",
+      "time_kst": "00:00",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 건설지출 - October 2026",
+      "importance": "medium",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "건설지출은 민간/공공 투자와 경기민감 업종의 수요를 해석하는 데 사용된다.",
+      "source_type": "auto_fixed"
+    },
+    {
       "date": "2026-12-02",
       "time_kst": "22:30",
       "market": "US",
@@ -11,6 +35,18 @@
       "source_name": "BEA",
       "source_url": "https://www.bea.gov/news/schedule",
       "why_it_matters": "미국 성장률은 경기 둔화/확장 기대와 주식시장 위험선호에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-03",
+      "time_kst": "00:00",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 ISM 서비스업 PMI - December 2026",
+      "importance": "high",
+      "source_name": "ISM",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "why_it_matters": "ISM 서비스업 PMI는 미국 내수와 서비스 물가 압력, 경기 확장 여부를 확인하는 핵심 선행지표다.",
       "source_type": "auto_fixed"
     },
     {
@@ -38,6 +74,42 @@
       "source_type": "auto_fixed"
     },
     {
+      "date": "2026-12-16",
+      "time_kst": "22:30",
+      "market": "US",
+      "category": "소비",
+      "title": "미국 소매판매 - November 2026",
+      "importance": "high",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "소매판매는 미국 소비 경기와 기업 매출 기대, 금리 민감 섹터 흐름에 직접 영향을 준다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-17",
+      "time_kst": "22:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 주택착공/건축허가 - November 2026",
+      "importance": "medium",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "주택착공과 건축허가는 금리 민감 경기와 주택 관련 업종 흐름을 확인하는 지표다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-23",
+      "time_kst": "00:00",
+      "market": "US",
+      "category": "소비",
+      "title": "미국 신규주택판매 - November 2026",
+      "importance": "medium",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "신규주택판매는 주택 수요와 금리 부담, 소비 심리 변화를 보여준다.",
+      "source_type": "auto_fixed"
+    },
+    {
       "date": "2026-12-23",
       "time_kst": "22:30",
       "market": "US",
@@ -59,6 +131,30 @@
       "source_name": "BEA",
       "source_url": "https://www.bea.gov/news/schedule",
       "why_it_matters": "개인소득과 PCE 물가는 소비 경기와 연준 금리 기대를 함께 움직인다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-23",
+      "time_kst": "22:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 내구재 주문 - November 2026",
+      "importance": "medium",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "내구재 주문은 설비투자와 제조업 수요 방향을 보여주는 경기 선행 지표다.",
+      "source_type": "auto_fixed"
+    },
+    {
+      "date": "2026-12-28",
+      "time_kst": "22:30",
+      "market": "US",
+      "category": "성장",
+      "title": "미국 선행 경제지표(무역/재고) - November 2026",
+      "importance": "medium",
+      "source_name": "Census",
+      "source_url": "https://www.census.gov/economic-indicators/calendar-listview.html",
+      "why_it_matters": "무역, 도매, 재고 흐름은 GDP 세부 항목과 경기 모멘텀 전망에 영향을 준다.",
       "source_type": "auto_fixed"
     }
   ]

@@ -1,74 +1,72 @@
 {% extends "base.html" %}
-{% block title %}시장 발표 달력 - StockAgent{% endblock %}
+{% block title %}주요 일정 - StockAgent{% endblock %}
 
 {% block content %}
 <section class="hero-panel calendar-hero">
   <div class="status-pill">{{ calendar.today }}</div>
   <h1>Market Calendar</h1>
-  <p class="market-brief">공식 일정 기반 고정 이벤트만 월간 달력과 목록에 표시합니다.</p>
+  <p class="market-brief">앞으로 30일 동안 시장에 영향을 줄 공식 일정입니다.</p>
   <div class="calendar-stats">
-    <span>고정 이벤트 {{ calendar.stats.fixed_total }}</span>
+    <span>주요 일정 {{ calendar.stats.fixed_total }}</span>
   </div>
 </section>
 
 <section class="content-frame calendar-frame">
   <div class="indicator-header">
     <div>
-      <p class="eyebrow">Fixed Releases</p>
-      <h2>{{ calendar.month.label }} 발표 달력</h2>
+      <p class="eyebrow">Upcoming Schedule</p>
+      <h2>{{ calendar.window.label }}</h2>
+      <p class="section-note">{{ calendar.window.range_label }}</p>
     </div>
-    <div class="calendar-month-nav" aria-label="월 이동">
-      <a href="{{ calendar_href if calendar_href is defined else '/calendar' }}{% if '?' in (calendar_href if calendar_href is defined else '/calendar') %}&{% else %}?{% endif %}month={{ calendar.month.previous_key }}" aria-label="이전 달">‹</a>
-      <span>셀 최대 3개 표시 · 클릭하면 전체 보기</span>
-      <a href="{{ calendar_href if calendar_href is defined else '/calendar' }}{% if '?' in (calendar_href if calendar_href is defined else '/calendar') %}&{% else %}?{% endif %}month={{ calendar.month.next_key }}" aria-label="다음 달">›</a>
+    <div class="calendar-week-nav" aria-label="일정 기간 이동">
+      {% if calendar.window.can_go_previous %}
+      <a href="{{ calendar_href if calendar_href is defined else '/calendar' }}{% if '?' in (calendar_href if calendar_href is defined else '/calendar') %}&{% else %}?{% endif %}start={{ calendar.window.previous_key }}" aria-label="이전 30일">‹</a>
+      {% else %}
+      <span class="disabled" aria-disabled="true">‹</span>
+      {% endif %}
+      <span>30일 단위</span>
+      {% if calendar.window.can_go_next %}
+      <a href="{{ calendar_href if calendar_href is defined else '/calendar' }}{% if '?' in (calendar_href if calendar_href is defined else '/calendar') %}&{% else %}?{% endif %}start={{ calendar.window.next_key }}" aria-label="다음 30일">›</a>
+      {% else %}
+      <span class="disabled" aria-disabled="true">›</span>
+      {% endif %}
     </div>
   </div>
-  <div class="calendar-board">
-    <div class="calendar-weekdays" aria-hidden="true">
-      <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="saturday">토</span><span class="sunday">일</span>
-    </div>
-    <div class="calendar-grid">
-      {% for day in calendar.calendar_days %}
-      <button
-        type="button"
-        class="calendar-day weekday-{{ loop.index0 % 7 }} {% if not day.in_month %}muted{% endif %} {% if day.is_today %}today{% endif %} {% if day.has_high %}has-high{% endif %}"
-        data-calendar-date="{{ day.date }}"
-        {% if not day.all_events %}disabled{% endif %}
-      >
-        <span class="calendar-day-number">{{ day.day }}</span>
-        <span class="calendar-event-stack">
-          {% for event in day.events %}
-          <span class="calendar-event-chip importance-{{ event.importance }} market-{{ event.market|lower }}">
-            <span class="calendar-event-marker" aria-hidden="true"></span>
-            <span class="calendar-event-text">
-              {% if event.importance == "high" %}<strong>중요</strong>{% endif %}{{ event.title }}
-            </span>
-          </span>
-          {% endfor %}
-          {% if day.hidden_count %}
-          <span class="calendar-more">+{{ day.hidden_count }}개</span>
-          {% endif %}
-        </span>
-      </button>
-      {% endfor %}
-    </div>
+
+  <div class="calendar-week-list">
+    {% for day in calendar.window.days %}
+    <section class="calendar-week-day weekday-{{ day.weekday_index }} {% if day.is_today %}today{% endif %} {% if day.has_high %}has-high{% endif %}">
+      <div class="calendar-week-day-head">
+        <strong>{{ day.weekday }} <span>{{ day.date }}</span></strong>
+        {% if day.is_today %}<em>오늘</em>{% endif %}
+      </div>
+      <div class="calendar-week-events">
+        {% for event in day.events %}
+        <article class="calendar-schedule-item importance-{{ event.importance }} market-{{ event.market|lower }}">
+          <div class="calendar-schedule-time">{{ event.time_kst or "TBD" }}</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>{{ event.market }}</span>
+              <span>{{ event.category }}</span>
+              {% if event.source_name %}<span>{{ event.source_name }}</span>{% endif %}
+              {% if event.importance == "high" %}<span class="importance-label">중요</span>{% endif %}
+            </div>
+            <h3>{{ event.title }}</h3>
+            {% if event.why_it_matters %}<p>{{ event.why_it_matters }}</p>{% endif %}
+            {% if event.source_url %}
+            <a href="{{ event.source_url }}" target="_blank" rel="noreferrer">{{ event.source_name or "source" }}</a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% else %}
+    <p class="calendar-empty-window">표시할 주요 일정이 없습니다.</p>
+    {% endfor %}
   </div>
 </section>
 
-<dialog class="calendar-dialog" id="calendar-day-dialog">
-  <div class="calendar-dialog-head">
-    <div>
-      <p class="eyebrow">Daily Releases</p>
-      <h2 id="calendar-dialog-title">발표 상세</h2>
-    </div>
-    <button type="button" class="calendar-dialog-close" data-calendar-close aria-label="닫기">x</button>
-  </div>
-  <div class="calendar-dialog-body" id="calendar-dialog-body"></div>
-</dialog>
-
-<script id="calendar-data" type="application/json">
-{{ calendar.events_by_date|tojson }}
-</script>
 <script id="chart-data" type="application/json">
 {"type": "calendar", "charts": {}}
 </script>

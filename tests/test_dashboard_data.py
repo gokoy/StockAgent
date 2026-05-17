@@ -9,6 +9,14 @@ from unittest.mock import call, patch
 from app.web import dashboard_data
 
 
+class FakeResponse:
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+    def raise_for_status(self) -> None:
+        return None
+
+
 class DashboardDataTests(unittest.TestCase):
     def test_refresh_dashboard_snapshot_reuses_built_histories(self) -> None:
         macro_history = {"generated_at": "test", "years": 5, "indicators": []}
@@ -243,7 +251,7 @@ class DashboardDataTests(unittest.TestCase):
         self.assertEqual(stats["percentile"], 50.0)
         self.assertEqual(stats["zone"], "5년 기준 보통 구간")
 
-    def test_market_calendar_limits_cell_events_but_preserves_daily_detail(self) -> None:
+    def test_market_calendar_default_window_starts_today_and_hides_empty_days(self) -> None:
         events = {
             "events": [
                 {
@@ -276,12 +284,15 @@ class DashboardDataTests(unittest.TestCase):
             )
 
         day = next(item for item in calendar["calendar_days"] if item["date"] == "2026-05-14")
-        self.assertEqual(len(day["events"]), 3)
+        self.assertEqual(len(day["events"]), 4)
         self.assertEqual(len(day["all_events"]), 4)
-        self.assertEqual(day["hidden_count"], 1)
+        self.assertEqual(day["hidden_count"], 0)
         self.assertTrue(day["has_high"])
         self.assertEqual(day["fixed_count"], 4)
         self.assertEqual(day["floating_count"], 0)
+        self.assertEqual(calendar["window"]["start"], "2026-05-11")
+        self.assertEqual(calendar["window"]["end"], "2026-06-09")
+        self.assertEqual([item["date"] for item in calendar["window"]["days"]], ["2026-05-14"])
 
     def test_market_calendar_loads_monthly_fixed_event_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -333,6 +344,7 @@ class DashboardDataTests(unittest.TestCase):
                 calendar_path=calendar_dir,
                 floating_events_path=floating_dir,
                 today=dashboard_data.date(2026, 5, 11),
+                start="2026-05-20",
             )
 
         self.assertEqual(calendar["stats"]["fixed_total"], 1)
@@ -340,7 +352,7 @@ class DashboardDataTests(unittest.TestCase):
         self.assertEqual(calendar["month_events"][0]["title"], "monthly event")
         self.assertEqual(calendar["floating_events"], [])
 
-    def test_market_calendar_supports_requested_month_navigation(self) -> None:
+    def test_market_calendar_supports_requested_window_navigation(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             calendar_dir = Path(temp_dir) / "calendar"
             floating_dir = Path(temp_dir) / "floating_events"
@@ -356,13 +368,62 @@ class DashboardDataTests(unittest.TestCase):
                 calendar_path=calendar_dir,
                 floating_events_path=floating_dir,
                 today=dashboard_data.date(2026, 5, 11),
-                month="2026-06",
+                start="2026-06-01",
             )
 
-        self.assertEqual(calendar["month"]["key"], "2026-06")
-        self.assertEqual(calendar["month"]["previous_key"], "2026-05")
-        self.assertEqual(calendar["month"]["next_key"], "2026-07")
+        self.assertEqual(calendar["window"]["key"], "2026-06-01")
+        self.assertEqual(calendar["window"]["previous_key"], "2026-05-02")
+        self.assertEqual(calendar["window"]["next_key"], "2026-07-01")
         self.assertEqual(calendar["month_events"][0]["title"], "june")
+
+    def test_market_calendar_loads_cross_month_window_events(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            calendar_dir = Path(temp_dir) / "calendar"
+            calendar_dir.mkdir()
+            (calendar_dir / "2026-06.json").write_text(
+                json.dumps({"month": "2026-06", "events": [{"date": "2026-06-30", "title": "june event"}]}),
+                encoding="utf-8",
+            )
+            (calendar_dir / "2026-07.json").write_text(
+                json.dumps({"month": "2026-07", "events": [{"date": "2026-07-01", "title": "july event"}]}),
+                encoding="utf-8",
+            )
+
+            calendar = dashboard_data.get_market_calendar(
+                calendar_path=calendar_dir,
+                today=dashboard_data.date(2026, 5, 17),
+                start="2026-06-30",
+            )
+
+        self.assertEqual([item["title"] for item in calendar["month_events"]], ["june event", "july event"])
+        self.assertEqual(calendar["window"]["start"], "2026-06-30")
+        self.assertEqual(calendar["window"]["end"], "2026-07-29")
+
+    def test_market_calendar_limits_window_navigation(self) -> None:
+        calendar = dashboard_data.get_market_calendar(today=dashboard_data.date(2026, 5, 17), start="2026-11-13")
+        self.assertEqual(calendar["window"]["start"], "2026-11-13")
+        self.assertFalse(calendar["window"]["can_go_next"])
+        self.assertTrue(calendar["window"]["can_go_previous"])
+
+        calendar = dashboard_data.get_market_calendar(today=dashboard_data.date(2026, 5, 17), start="2026-01-01")
+        self.assertEqual(calendar["window"]["start"], "2026-03-18")
+        self.assertFalse(calendar["window"]["can_go_previous"])
+        self.assertTrue(calendar["window"]["can_go_next"])
+
+    def test_market_calendar_empty_window_has_no_days(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            calendar_dir = Path(temp_dir) / "calendar"
+            calendar_dir.mkdir()
+            (calendar_dir / "2026-05.json").write_text(json.dumps({"month": "2026-05", "events": []}), encoding="utf-8")
+
+            calendar = dashboard_data.get_market_calendar(
+                calendar_path=calendar_dir,
+                today=dashboard_data.date(2026, 5, 17),
+                start="2026-05-17",
+            )
+
+        self.assertEqual(calendar["window"]["days"], [])
+        self.assertEqual(calendar["stats"]["fixed_total"], 0)
 
     def test_market_calendar_hides_floating_candidates_from_calendar_page(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -407,8 +468,7 @@ class DashboardDataTests(unittest.TestCase):
 
         self.assertEqual(calendar["stats"]["floating_total"], 0)
         self.assertEqual(calendar["floating_events"], [])
-        day = next(item for item in calendar["calendar_days"] if item["date"] == "2026-05-14")
-        self.assertEqual(len(day["all_events"]), 0)
+        self.assertEqual(calendar["calendar_days"], [])
         self.assertNotIn("2026-05-14", calendar["events_by_date"])
 
     def test_market_calendar_keeps_undated_candidates_out_of_grid(self) -> None:
@@ -450,8 +510,7 @@ class DashboardDataTests(unittest.TestCase):
             )
 
         self.assertEqual(calendar["floating_events"], [])
-        day = next(item for item in calendar["calendar_days"] if item["date"] == "2026-05-12")
-        self.assertEqual(day["floating_count"], 0)
+        self.assertEqual(calendar["calendar_days"], [])
         self.assertNotIn("2026-05-12", calendar["events_by_date"])
 
     def test_write_monthly_auto_events_preserves_manual_events(self) -> None:
@@ -487,6 +546,32 @@ class DashboardDataTests(unittest.TestCase):
 
         titles = [item["title"] for item in payload["events"]]
         self.assertEqual(titles, ["manual", "new auto"])
+
+    def test_collect_census_events_tracks_selected_releases(self) -> None:
+        html = """
+        <table>
+          <tr><td><a>Advance Monthly Sales for Retail and Food Services</a></td><td>June 17, 2026</td><td>8:30 AM</td><td>May 2026</td><td>A202606170830</td></tr>
+          <tr><td><a>New Residential Construction (Building Permits, Housing Starts, and Housing Completions)</a></td><td>June 18, 2026</td><td>8:30 AM</td><td>May 2026</td><td>A202606180830</td></tr>
+          <tr><td><a>Preliminary U.S. Imports for Consumption of Steel Products</a></td><td>Suspended</td><td>10:00 AM</td><td>May 2026</td><td>A202606241000</td></tr>
+        </table>
+        """
+        with patch.object(dashboard_data.requests, "get", return_value=FakeResponse(html)):
+            events = dashboard_data._collect_census_events(2026)
+
+        self.assertEqual([event["title"] for event in events], ["미국 소매판매 - May 2026", "미국 주택착공/건축허가 - May 2026"])
+        self.assertEqual(events[0]["importance"], "high")
+        self.assertEqual(events[0]["time_kst"], "21:30")
+        self.assertEqual(events[0]["source_name"], "Census")
+
+    def test_collect_ism_events_generates_monthly_pmi_dates(self) -> None:
+        events = dashboard_data._collect_ism_events(2026)
+        january = [event for event in events if event["date"].startswith("2026-01")]
+
+        self.assertEqual(january[0]["date"], "2026-01-02")
+        self.assertEqual(january[0]["title"], "미국 ISM 제조업 PMI - January 2026")
+        self.assertEqual(january[1]["date"], "2026-01-06")
+        self.assertEqual(january[1]["title"], "미국 ISM 서비스업 PMI - January 2026")
+        self.assertEqual(len(events), 24)
 
     def test_newsdata_candidates_merge_us_and_kr_canonical_events(self) -> None:
         us_article = {

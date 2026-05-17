@@ -1,17 +1,20 @@
-# 시장 발표 달력
+# 주요 일정
 
-`/calendar`의 월간 달력에는 날짜가 공식/정형적으로 확인되는 고정 발표만 넣는다. 뉴스성 이벤트는 달력에 섞지 않고 유동 이벤트 탭에서 관리한다.
+`/calendar`는 날짜가 공식/정형적으로 확인되는 주요 일정만 30일 범위의 다가오는 일정 리스트로 보여준다. 뉴스성 유동 이벤트는 화면에 섞지 않는다.
 
 자동 수집 대상:
 
 - Federal Reserve FOMC calendar
 - BEA release schedule: GDP, Personal Income and Outlays, U.S. International Trade
+- Census Bureau Economic Indicator Release Schedule: retail sales, durable goods, housing, construction spending, advance economic indicators
+- ISM release rule: Manufacturing PMI on the first business day, Services PMI on the third business day
 
-BLS는 공식 사이트가 자동 요청을 차단할 수 있어 현재 자동 수집 대상에서 제외한다. CPI, 고용, PPI, JOLTS 등은 추후 허용 가능한 공식 캘린더 피드가 확보되면 추가한다.
+BLS는 공식 사이트와 ICS가 자동 요청을 차단할 수 있어 현재 자동 수집 대상에서 제외한다. CPI, 고용, PPI, JOLTS 등은 추후 허용 가능한 공식 캘린더 피드가 확보되면 추가한다.
 
 ## 데이터 파일
 
 - 경로: `data/web/calendar/YYYY-MM.json`
+- 원천 데이터는 월별 파일로 관리하고, 화면에서는 선택된 시작일 기준 30일 안의 일정 있는 날짜만 보여준다.
 - 형식:
 
 ```json
@@ -47,7 +50,7 @@ BLS는 공식 사이트가 자동 요청을 차단할 수 있어 현재 자동 �
 - `source_name`, `source_url`: 공식 출처 또는 거래소/회사 IR 링크
 - `why_it_matters`: 시장 영향 한 줄 설명
 
-## 미국 고정 발표
+## 미국 주요 일정
 
 `high`
 
@@ -72,7 +75,7 @@ BLS는 공식 사이트가 자동 요청을 차단할 수 있어 현재 자동 �
 - EIA 원유재고
 - 10년/30년 국채 입찰
 
-## 한국 고정 발표
+## 한국 주요 일정
 
 `high`
 

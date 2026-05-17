@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>시장 발표 달력 - StockAgent</title>
-    <link rel="stylesheet" href="../static/styles.css?v=20260510-env4">
+    <title>주요 일정 - StockAgent</title>
+    <link rel="stylesheet" href="../static/styles.css?v=20260517-window">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
-    <script src="../static/dashboard.js?v=20260510-env4" defer></script>
+    <script src="../static/dashboard.js?v=20260517-window" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -22,519 +22,267 @@
       <main class="page">
         
 <section class="hero-panel calendar-hero">
-  <div class="status-pill">2026-05-13</div>
+  <div class="status-pill">2026-05-17</div>
   <h1>Market Calendar</h1>
-  <p class="market-brief">공식 일정 기반 고정 이벤트만 월간 달력과 목록에 표시합니다.</p>
+  <p class="market-brief">앞으로 30일 동안 시장에 영향을 줄 공식 일정입니다.</p>
   <div class="calendar-stats">
-    <span>고정 이벤트 2</span>
+    <span>주요 일정 10</span>
   </div>
 </section>
 
 <section class="content-frame calendar-frame">
   <div class="indicator-header">
     <div>
-      <p class="eyebrow">Fixed Releases</p>
-      <h2>2026년 5월 발표 달력</h2>
+      <p class="eyebrow">Upcoming Schedule</p>
+      <h2>다가오는 주요 일정</h2>
+      <p class="section-note">2026.05.17 - 2026.06.15</p>
     </div>
-    <div class="calendar-month-nav" aria-label="월 이동">
-      <a href="./?month=2026-04" aria-label="이전 달">‹</a>
-      <span>셀 최대 3개 표시 · 클릭하면 전체 보기</span>
-      <a href="./?month=2026-06" aria-label="다음 달">›</a>
+    <div class="calendar-week-nav" aria-label="일정 기간 이동">
+      
+      <a href="./?start=2026-04-17" aria-label="이전 30일">‹</a>
+      
+      <span>30일 단위</span>
+      
+      <a href="./?start=2026-06-16" aria-label="다음 30일">›</a>
+      
     </div>
   </div>
-  <div class="calendar-board">
-    <div class="calendar-weekdays" aria-hidden="true">
-      <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="saturday">토</span><span class="sunday">일</span>
-    </div>
-    <div class="calendar-grid">
-      
-      <button
-        type="button"
-        class="calendar-day weekday-0 muted  "
-        data-calendar-date="2026-04-27"
-        disabled
-      >
-        <span class="calendar-day-number">27</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-1 muted  "
-        data-calendar-date="2026-04-28"
-        disabled
-      >
-        <span class="calendar-day-number">28</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-2 muted  "
-        data-calendar-date="2026-04-29"
-        disabled
-      >
-        <span class="calendar-day-number">29</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-3 muted  "
-        data-calendar-date="2026-04-30"
-        disabled
-      >
-        <span class="calendar-day-number">30</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-4   "
-        data-calendar-date="2026-05-01"
-        disabled
-      >
-        <span class="calendar-day-number">1</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-5   "
-        data-calendar-date="2026-05-02"
-        disabled
-      >
-        <span class="calendar-day-number">2</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-6   "
-        data-calendar-date="2026-05-03"
-        disabled
-      >
-        <span class="calendar-day-number">3</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-0   "
-        data-calendar-date="2026-05-04"
-        disabled
-      >
-        <span class="calendar-day-number">4</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-1   "
-        data-calendar-date="2026-05-05"
-        disabled
-      >
-        <span class="calendar-day-number">5</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-2   "
-        data-calendar-date="2026-05-06"
-        disabled
-      >
-        <span class="calendar-day-number">6</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-3   "
-        data-calendar-date="2026-05-07"
-        disabled
-      >
-        <span class="calendar-day-number">7</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-4   "
-        data-calendar-date="2026-05-08"
-        disabled
-      >
-        <span class="calendar-day-number">8</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-5   "
-        data-calendar-date="2026-05-09"
-        disabled
-      >
-        <span class="calendar-day-number">9</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-6   "
-        data-calendar-date="2026-05-10"
-        disabled
-      >
-        <span class="calendar-day-number">10</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-0   "
-        data-calendar-date="2026-05-11"
-        disabled
-      >
-        <span class="calendar-day-number">11</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-1   "
-        data-calendar-date="2026-05-12"
-        disabled
-      >
-        <span class="calendar-day-number">12</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-2  today "
-        data-calendar-date="2026-05-13"
-        disabled
-      >
-        <span class="calendar-day-number">13</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-3   "
-        data-calendar-date="2026-05-14"
-        disabled
-      >
-        <span class="calendar-day-number">14</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-4   "
-        data-calendar-date="2026-05-15"
-        disabled
-      >
-        <span class="calendar-day-number">15</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-5   "
-        data-calendar-date="2026-05-16"
-        disabled
-      >
-        <span class="calendar-day-number">16</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-6   "
-        data-calendar-date="2026-05-17"
-        disabled
-      >
-        <span class="calendar-day-number">17</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-0   "
-        data-calendar-date="2026-05-18"
-        disabled
-      >
-        <span class="calendar-day-number">18</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-1   "
-        data-calendar-date="2026-05-19"
-        disabled
-      >
-        <span class="calendar-day-number">19</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-2   "
-        data-calendar-date="2026-05-20"
-        disabled
-      >
-        <span class="calendar-day-number">20</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-3   "
-        data-calendar-date="2026-05-21"
-        disabled
-      >
-        <span class="calendar-day-number">21</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-4   "
-        data-calendar-date="2026-05-22"
-        disabled
-      >
-        <span class="calendar-day-number">22</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-5   "
-        data-calendar-date="2026-05-23"
-        disabled
-      >
-        <span class="calendar-day-number">23</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-6   "
-        data-calendar-date="2026-05-24"
-        disabled
-      >
-        <span class="calendar-day-number">24</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-0   "
-        data-calendar-date="2026-05-25"
-        disabled
-      >
-        <span class="calendar-day-number">25</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-1   "
-        data-calendar-date="2026-05-26"
-        disabled
-      >
-        <span class="calendar-day-number">26</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-2   "
-        data-calendar-date="2026-05-27"
-        disabled
-      >
-        <span class="calendar-day-number">27</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-3   has-high"
-        data-calendar-date="2026-05-28"
+
+  <div class="calendar-week-list">
+    
+    <section class="calendar-week-day weekday-3  ">
+      <div class="calendar-week-day-head">
+        <strong>목 <span>2026-05-21</span></strong>
         
-      >
-        <span class="calendar-day-number">28</span>
-        <span class="calendar-event-stack">
-          
-          <span class="calendar-event-chip importance-high market-us">
-            <span class="calendar-event-marker" aria-hidden="true"></span>
-            <span class="calendar-event-text">
-              <strong>중요</strong>미국 GDP (Second Estimate) and Corporate Profits, 1st Quarter 2026
-            </span>
-          </span>
-          
-          <span class="calendar-event-chip importance-high market-us">
-            <span class="calendar-event-marker" aria-hidden="true"></span>
-            <span class="calendar-event-text">
-              <strong>중요</strong>미국 PCE/개인소득 - Personal Income and Outlays, April 2026
-            </span>
-          </span>
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-4   "
-        data-calendar-date="2026-05-29"
-        disabled
-      >
-        <span class="calendar-day-number">29</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-5   "
-        data-calendar-date="2026-05-30"
-        disabled
-      >
-        <span class="calendar-day-number">30</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-      <button
-        type="button"
-        class="calendar-day weekday-6   "
-        data-calendar-date="2026-05-31"
-        disabled
-      >
-        <span class="calendar-day-number">31</span>
-        <span class="calendar-event-stack">
-          
-          
-        </span>
-      </button>
-      
-    </div>
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>Census</span>
+              
+            </div>
+            <h3>미국 주택착공/건축허가 - April 2026</h3>
+            <p>주택착공과 건축허가는 금리 민감 경기와 주택 관련 업종 흐름을 확인하는 지표다.</p>
+            
+            <a href="https://www.census.gov/economic-indicators/calendar-listview.html" target="_blank" rel="noreferrer">Census</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
+    <section class="calendar-week-day weekday-3  has-high">
+      <div class="calendar-week-day-head">
+        <strong>목 <span>2026-05-28</span></strong>
+        
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-high market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>BEA</span>
+              <span class="importance-label">중요</span>
+            </div>
+            <h3>미국 GDP (Second Estimate) and Corporate Profits, 1st Quarter 2026</h3>
+            <p>미국 성장률은 경기 둔화/확장 기대와 주식시장 위험선호에 직접 영향을 준다.</p>
+            
+            <a href="https://www.bea.gov/news/schedule" target="_blank" rel="noreferrer">BEA</a>
+            
+          </div>
+        </article>
+        
+        <article class="calendar-schedule-item importance-high market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>소비</span>
+              <span>BEA</span>
+              <span class="importance-label">중요</span>
+            </div>
+            <h3>미국 PCE/개인소득 - Personal Income and Outlays, April 2026</h3>
+            <p>개인소득과 PCE 물가는 소비 경기와 연준 금리 기대를 함께 움직인다.</p>
+            
+            <a href="https://www.bea.gov/news/schedule" target="_blank" rel="noreferrer">BEA</a>
+            
+          </div>
+        </article>
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>Census</span>
+              
+            </div>
+            <h3>미국 내구재 주문 - April 2026</h3>
+            <p>내구재 주문은 설비투자와 제조업 수요 방향을 보여주는 경기 선행 지표다.</p>
+            
+            <a href="https://www.census.gov/economic-indicators/calendar-listview.html" target="_blank" rel="noreferrer">Census</a>
+            
+          </div>
+        </article>
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">23:00</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>소비</span>
+              <span>Census</span>
+              
+            </div>
+            <h3>미국 신규주택판매 - April 2026</h3>
+            <p>신규주택판매는 주택 수요와 금리 부담, 소비 심리 변화를 보여준다.</p>
+            
+            <a href="https://www.census.gov/economic-indicators/calendar-listview.html" target="_blank" rel="noreferrer">Census</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
+    <section class="calendar-week-day weekday-4  ">
+      <div class="calendar-week-day-head">
+        <strong>금 <span>2026-05-29</span></strong>
+        
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>Census</span>
+              
+            </div>
+            <h3>미국 선행 경제지표(무역/재고) - April 2026</h3>
+            <p>무역, 도매, 재고 흐름은 GDP 세부 항목과 경기 모멘텀 전망에 영향을 준다.</p>
+            
+            <a href="https://www.census.gov/economic-indicators/calendar-listview.html" target="_blank" rel="noreferrer">Census</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
+    <section class="calendar-week-day weekday-0  has-high">
+      <div class="calendar-week-day-head">
+        <strong>월 <span>2026-06-01</span></strong>
+        
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-high market-us">
+          <div class="calendar-schedule-time">23:00</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>ISM</span>
+              <span class="importance-label">중요</span>
+            </div>
+            <h3>미국 ISM 제조업 PMI - June 2026</h3>
+            <p>ISM 제조업 PMI는 미국 제조업 경기와 주문/고용/가격 압력을 빠르게 보여준다.</p>
+            
+            <a href="https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/" target="_blank" rel="noreferrer">ISM</a>
+            
+          </div>
+        </article>
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">23:00</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>Census</span>
+              
+            </div>
+            <h3>미국 건설지출 - April 2026</h3>
+            <p>건설지출은 민간/공공 투자와 경기민감 업종의 수요를 해석하는 데 사용된다.</p>
+            
+            <a href="https://www.census.gov/economic-indicators/calendar-listview.html" target="_blank" rel="noreferrer">Census</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
+    <section class="calendar-week-day weekday-2  has-high">
+      <div class="calendar-week-day-head">
+        <strong>수 <span>2026-06-03</span></strong>
+        
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-high market-us">
+          <div class="calendar-schedule-time">23:00</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>ISM</span>
+              <span class="importance-label">중요</span>
+            </div>
+            <h3>미국 ISM 서비스업 PMI - June 2026</h3>
+            <p>ISM 서비스업 PMI는 미국 내수와 서비스 물가 압력, 경기 확장 여부를 확인하는 핵심 선행지표다.</p>
+            
+            <a href="https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/" target="_blank" rel="noreferrer">ISM</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
+    <section class="calendar-week-day weekday-1  ">
+      <div class="calendar-week-day-head">
+        <strong>화 <span>2026-06-09</span></strong>
+        
+      </div>
+      <div class="calendar-week-events">
+        
+        <article class="calendar-schedule-item importance-medium market-us">
+          <div class="calendar-schedule-time">21:30</div>
+          <div class="calendar-schedule-copy">
+            <div class="calendar-list-meta">
+              <span>US</span>
+              <span>성장</span>
+              <span>BEA</span>
+              
+            </div>
+            <h3>미국 무역수지 - U.S. International Trade in Goods and Services, April 2026</h3>
+            <p>무역수지는 달러, 글로벌 수요, 경기민감 섹터 해석에 영향을 준다.</p>
+            
+            <a href="https://www.bea.gov/news/schedule" target="_blank" rel="noreferrer">BEA</a>
+            
+          </div>
+        </article>
+        
+      </div>
+    </section>
+    
   </div>
 </section>
 
-<dialog class="calendar-dialog" id="calendar-day-dialog">
-  <div class="calendar-dialog-head">
-    <div>
-      <p class="eyebrow">Daily Releases</p>
-      <h2 id="calendar-dialog-title">발표 상세</h2>
-    </div>
-    <button type="button" class="calendar-dialog-close" data-calendar-close aria-label="닫기">x</button>
-  </div>
-  <div class="calendar-dialog-body" id="calendar-dialog-body"></div>
-</dialog>
-
-<script id="calendar-data" type="application/json">
-{"2026-05-28": [{"category": "\uc131\uc7a5", "date": "2026-05-28", "importance": "high", "market": "US", "short_label": "GDP", "source_name": "BEA", "source_url": "https://www.bea.gov/news/schedule", "time_kst": "21:30", "title": "\ubbf8\uad6d GDP (Second Estimate) and Corporate Profits, 1st Quarter 2026", "why_it_matters": "\ubbf8\uad6d \uc131\uc7a5\ub960\uc740 \uacbd\uae30 \ub454\ud654/\ud655\uc7a5 \uae30\ub300\uc640 \uc8fc\uc2dd\uc2dc\uc7a5 \uc704\ud5d8\uc120\ud638\uc5d0 \uc9c1\uc811 \uc601\ud5a5\uc744 \uc900\ub2e4."}, {"category": "\uc18c\ube44", "date": "2026-05-28", "importance": "high", "market": "US", "short_label": "PCE", "source_name": "BEA", "source_url": "https://www.bea.gov/news/schedule", "time_kst": "21:30", "title": "\ubbf8\uad6d PCE/\uac1c\uc778\uc18c\ub4dd - Personal Income and Outlays, April 2026", "why_it_matters": "\uac1c\uc778\uc18c\ub4dd\uacfc PCE \ubb3c\uac00\ub294 \uc18c\ube44 \uacbd\uae30\uc640 \uc5f0\uc900 \uae08\ub9ac \uae30\ub300\ub97c \ud568\uaed8 \uc6c0\uc9c1\uc778\ub2e4."}]}
-</script>
 <script id="chart-data" type="application/json">
 {"type": "calendar", "charts": {}}
 </script>

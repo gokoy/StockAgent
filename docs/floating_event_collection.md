@@ -1,6 +1,6 @@
 # 유동 이벤트 후보 수집
 
-유동 이벤트는 뉴스에서 발견되는 정책, 외교, 지정학, 수급 이벤트다. NewsData.io 자동 수집 결과는 `data/web/floating_event_candidates.json`에 저장한다. 현재 `/calendar` 화면은 고정 이벤트만 노출하므로 유동 이벤트 후보는 화면에 바로 표시하지 않는다.
+유동 이벤트는 뉴스에서 발견되는 정책, 외교, 지정학, 수급 이벤트다. NewsData.io 자동 수집 결과는 `data/web/floating_event_candidates.json`에 저장한다. 현재 `/calendar` 화면은 주요 일정만 노출하므로 유동 이벤트 후보는 화면에 바로 표시하지 않는다.
 
 ## 데이터 흐름
 

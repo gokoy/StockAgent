@@ -50,8 +50,8 @@ def sectors_page(request: Request, market: Literal["US", "KR"] = Query(default="
 
 
 @app.get("/calendar")
-def calendar_page(request: Request, month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$")):
-    calendar = get_market_calendar(month=month)
+def calendar_page(request: Request, start: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")):
+    calendar = get_market_calendar(start=start)
     return templates.TemplateResponse(
         "calendar.html",
         {

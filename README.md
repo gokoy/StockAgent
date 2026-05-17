@@ -18,8 +18,8 @@ StockAgent는 개인 투자자가 `언제 공격하고 언제 방어할지`, `�
   - 각 섹터는 최근 흐름과 5년 기준 상대강도 백분위를 제공한다.
 
 - `/calendar`
-  - 미국/한국 주식시장에 영향을 주는 공식/정형 고정 이벤트를 보여준다.
-  - 월간 달력에는 공식/정형 고정 발표만 표시하고, 하루 4개 이상이면 `+N`으로 접은 뒤 날짜 클릭 시 전체를 보여준다.
+  - 미국/한국 주식시장에 영향을 주는 다가오는 주요 일정을 보여준다.
+  - 공식/정형 일정만 앞으로 30일 범위에서 일정이 있는 날만 표시하고, 이전/다음은 30일 단위로 이동한다.
 
 ## 데이터 구조
 
@@ -32,9 +32,9 @@ StockAgent는 개인 투자자가 `언제 공격하고 언제 방어할지`, `�
   - LLM 또는 fallback 최종 정리
 
 - [data/web/calendar](/Users/young/PycharmProjects/StockAgent/data/web/calendar)
-  - 월별 고정 발표 달력 데이터
+  - 월별 주요 일정 원천 데이터
   - 파일명은 `YYYY-MM.json`
-  - 공식 발표 일정, 시장, 중요도, 출처, 시장 영향 설명
+  - FOMC, BEA, Census, ISM 기반 공식 발표 일정, 시장, 중요도, 출처, 시장 영향 설명
 
 - [data/web/floating_event_candidates.json](/Users/young/PycharmProjects/StockAgent/data/web/floating_event_candidates.json)
   - NewsData.io에서 매일 KST 07:00에 수집하는 유동 이벤트 후보

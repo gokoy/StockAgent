@@ -110,8 +110,8 @@ def build_static_site(output_dir: Path) -> None:
 def _context(static_prefix: str, **kwargs: Any) -> dict[str, Any]:
     return {
         **kwargs,
-        "static_styles_href": f"{static_prefix}/static/styles.css?v=20260510-env4",
-        "static_script_href": f"{static_prefix}/static/dashboard.js?v=20260510-env4",
+        "static_styles_href": f"{static_prefix}/static/styles.css?v=20260517-window",
+        "static_script_href": f"{static_prefix}/static/dashboard.js?v=20260517-window",
     }
 
 
