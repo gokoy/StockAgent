@@ -314,7 +314,8 @@ p {
 .content-frame,
 .flow-card,
 .leader-strip article,
-.comparison-chart-wrap {
+.comparison-chart-wrap,
+.highs-row {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -826,12 +827,161 @@ p {
 }
 
 .sector-hero {
-  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 0;
+  padding: 16px;
 }
 
 .sector-hero .segmented {
-  align-self: center;
   justify-self: end;
+}
+
+.highs-hero {
+  position: static;
+}
+
+.highs-market-switch {
+  position: static;
+}
+
+.highs-score strong {
+  color: var(--green);
+}
+
+.compact-highs-hero {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 0;
+  padding: 16px;
+}
+
+.compact-highs-hero .highs-market-switch {
+  justify-self: end;
+}
+
+.high52w-graph-frame {
+  display: grid;
+  gap: 14px;
+}
+
+.section-chips {
+  margin-bottom: 10px;
+}
+
+.section-summary {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.6;
+}
+
+.high52w-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.high52w-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.high52w-legend span::before {
+  content: "";
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--series-color);
+}
+
+.high52w-legend small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.high52w-line-wrap {
+  height: clamp(360px, 36vw, 480px);
+  padding: 12px;
+}
+
+.highs-strip article {
+  background:
+    linear-gradient(180deg, rgba(236, 253, 243, 0.64), rgba(255, 255, 255, 0.96)),
+    var(--surface);
+}
+
+.highs-chart-wrap {
+  height: clamp(300px, 28vw, 400px);
+}
+
+.highs-fallback-chart {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 18px 12px 8px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px) 0 0 / 100% 25%,
+    var(--surface);
+}
+
+.chart-js-rendered .highs-fallback-chart {
+  display: none;
+}
+
+.highs-fallback-bar {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  min-width: 0;
+  height: 100%;
+  text-align: center;
+}
+
+.highs-fallback-bar strong,
+.highs-fallback-bar small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.highs-fallback-bar span {
+  display: block;
+  width: min(48px, 100%);
+  min-height: 18px;
+  margin: 0 auto;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, var(--blue), var(--cyan));
+}
+
+.highs-list {
+  display: grid;
+  gap: 10px;
+}
+
+.highs-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.6fr) minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(112px, 0.65fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 68px;
+  padding: 13px 14px;
 }
 
 .sector-stats {
@@ -888,6 +1038,11 @@ p {
     min-width: 0;
   }
 
+  .sector-hero,
+  .compact-highs-hero {
+    justify-content: flex-start;
+  }
+
   .sector-hero .segmented {
     justify-self: start;
   }
@@ -911,6 +1066,19 @@ p {
   }
 
   .sector-trend {
+    display: none;
+  }
+
+  .highs-market-switch,
+  .compact-highs-hero .highs-market-switch {
+    justify-self: start;
+  }
+
+  .highs-row {
+    grid-template-columns: minmax(0, 1fr) minmax(96px, auto) minmax(96px, auto);
+  }
+
+  .highs-row .indicator-signal {
     display: none;
   }
 }
@@ -940,11 +1108,6 @@ p {
 
   .hero-panel h1 {
     font-size: 36px;
-  }
-
-  .sector-hero h1 {
-    font-size: 32px;
-    line-height: 1.06;
   }
 
   .hero-panel p {
@@ -980,8 +1143,24 @@ p {
     display: none;
   }
 
+  .highs-market-switch a {
+    flex: 1;
+  }
+
+  .highs-row {
+    grid-template-columns: minmax(0, 1fr) minmax(88px, auto);
+  }
+
+  .highs-row .indicator-change {
+    display: none;
+  }
+
   .comparison-chart-wrap {
     height: 330px;
     padding: 6px;
+  }
+
+  .high52w-line-wrap {
+    height: 340px;
   }
 }

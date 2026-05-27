@@ -278,6 +278,67 @@ function renderSectorComparisonChart() {
   });
 }
 
+function renderHigh52wChart() {
+  const config = dashboardData.high52w;
+  const canvas = document.getElementById("high-52w-chart");
+  if (!config || !canvas || !window.Chart) return;
+  if (renderedCharts.has("high-52w")) {
+    renderedCharts.get("high-52w")?.destroy();
+    renderedCharts.delete("high-52w");
+  }
+
+  const chart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: config.dates,
+      datasets: config.series.map((serie) => ({
+        label: serie.label,
+        data: serie.values,
+        borderColor: serie.color,
+        backgroundColor: "transparent",
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: serie.color,
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        spanGaps: false,
+        tension: 0.2,
+      })),
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      animation: {
+        duration: 650,
+        easing: "easeOutQuart",
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          displayColors: true,
+          callbacks: {
+            label: (context) => `${context.dataset.label}: ${context.parsed.y}점`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxRotation: 0, minRotation: 0, maxTicksLimit: 7 },
+        },
+        y: {
+          ticks: { precision: 0, maxTicksLimit: 6 },
+          grid: { color: "rgba(148, 163, 184, 0.18)" },
+        },
+      },
+    },
+  });
+  canvas.parentNode?.classList.add("chart-js-rendered");
+  renderedCharts.set("high-52w", chart);
+}
+
 function ensureChart(chartId) {
   if (renderedCharts.has(chartId)) return;
   const config = dashboardData.charts[chartId];
@@ -355,4 +416,8 @@ if (scoreHistoryPanel) {
 
 if (dashboardData.type === "sector") {
   renderSectorComparisonChart();
+}
+
+if (dashboardData.type === "high52w") {
+  renderHigh52wChart();
 }

@@ -22,9 +22,100 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 SNAPSHOT_PATH = ROOT_DIR / "data" / "web" / "dashboard_snapshot.json"
 MACRO_HISTORY_PATH = ROOT_DIR / "data" / "history" / "macro_history.json"
 SECTOR_HISTORY_PATH = ROOT_DIR / "data" / "history" / "sector_history.json"
+MARCAP_DATA_DIR = ROOT_DIR / "data" / "raw" / "marcap"
+PYKRX_DATA_DIR = ROOT_DIR / "data" / "raw" / "pykrx"
 MACRO_HISTORY_YEARS = 5
 SECTOR_HISTORY_YEARS = 5
 FRED_TIMEOUT_SECONDS = 60
+HIGH_52W_CHART_DAYS = 64
+HIGH_52W_MIN_OBSERVATIONS = 120
+HIGH_52W_ROLLING_DAYS = 252
+HIGH_52W_REQUIRED_COLUMNS = ("Date", "Code", "Name", "Market", "Open", "High", "Low", "Close", "Volume", "Amount")
+
+
+HIGH_52W_SCORE_PALETTE = ("#2563eb", "#079455", "#dc8a00", "#8b5cf6", "#d92d20", "#06b6d4")
+HIGH_52W_SAMPLE_STOCKS: dict[str, list[dict[str, object]]] = {
+    "KOSPI": [
+        {
+            "code": "005930",
+            "name": "삼성전자",
+            "observations": [
+                {"date": "2026-05-18", "change_pct": 1.76, "breakout_pct": 0.8, "volume_ratio": 1.6, "return_20d": 12.4, "market_return_20d": 4.2, "high_count_20d": 2},
+                {"date": "2026-05-19", "change_pct": 2.14, "breakout_pct": 1.4, "volume_ratio": 1.9, "return_20d": 14.1, "market_return_20d": 4.4, "high_count_20d": 3},
+                {"date": "2026-05-21", "change_pct": 1.62, "breakout_pct": 1.9, "volume_ratio": 1.5, "return_20d": 15.3, "market_return_20d": 4.8, "high_count_20d": 4},
+                {"date": "2026-05-26", "change_pct": 2.35, "breakout_pct": 2.6, "volume_ratio": 2.2, "return_20d": 18.7, "market_return_20d": 5.1, "high_count_20d": 5},
+            ],
+        },
+        {
+            "code": "000660",
+            "name": "SK하이닉스",
+            "observations": [
+                {"date": "2026-05-18", "change_pct": 2.33, "breakout_pct": 1.1, "volume_ratio": 2.1, "return_20d": 18.8, "market_return_20d": 4.2, "high_count_20d": 3},
+                {"date": "2026-05-20", "change_pct": 3.05, "breakout_pct": 2.2, "volume_ratio": 2.7, "return_20d": 22.4, "market_return_20d": 4.6, "high_count_20d": 4},
+                {"date": "2026-05-21", "change_pct": 1.87, "breakout_pct": 2.6, "volume_ratio": 2.0, "return_20d": 20.5, "market_return_20d": 4.8, "high_count_20d": 5},
+                {"date": "2026-05-22", "change_pct": 1.24, "breakout_pct": 2.8, "volume_ratio": 1.4, "return_20d": 19.2, "market_return_20d": 4.9, "high_count_20d": 5},
+            ],
+        },
+        {
+            "code": "064350",
+            "name": "현대로템",
+            "observations": [
+                {"date": "2026-05-19", "change_pct": 2.88, "breakout_pct": 1.6, "volume_ratio": 2.5, "return_20d": 24.8, "market_return_20d": 4.4, "high_count_20d": 2},
+                {"date": "2026-05-21", "change_pct": 3.42, "breakout_pct": 3.0, "volume_ratio": 3.1, "return_20d": 30.1, "market_return_20d": 4.8, "high_count_20d": 3},
+                {"date": "2026-05-26", "change_pct": 4.42, "breakout_pct": 4.4, "volume_ratio": 3.6, "return_20d": 38.5, "market_return_20d": 5.1, "high_count_20d": 4},
+            ],
+        },
+        {
+            "code": "329180",
+            "name": "HD현대중공업",
+            "observations": [
+                {"date": "2026-05-20", "change_pct": 2.12, "breakout_pct": 1.2, "volume_ratio": 1.8, "return_20d": 16.2, "market_return_20d": 4.6, "high_count_20d": 2},
+                {"date": "2026-05-21", "change_pct": 2.48, "breakout_pct": 2.1, "volume_ratio": 2.4, "return_20d": 19.7, "market_return_20d": 4.8, "high_count_20d": 3},
+                {"date": "2026-05-22", "change_pct": 1.95, "breakout_pct": 2.4, "volume_ratio": 2.0, "return_20d": 20.4, "market_return_20d": 4.9, "high_count_20d": 4},
+                {"date": "2026-05-26", "change_pct": 2.72, "breakout_pct": 3.2, "volume_ratio": 2.8, "return_20d": 25.6, "market_return_20d": 5.1, "high_count_20d": 5},
+            ],
+        },
+    ],
+    "KOSDAQ": [
+        {
+            "code": "196170",
+            "name": "알테오젠",
+            "observations": [
+                {"date": "2026-05-18", "change_pct": 2.69, "breakout_pct": 1.2, "volume_ratio": 1.8, "return_20d": 21.5, "market_return_20d": 6.1, "high_count_20d": 2},
+                {"date": "2026-05-21", "change_pct": 4.1, "breakout_pct": 3.4, "volume_ratio": 3.2, "return_20d": 34.2, "market_return_20d": 6.8, "high_count_20d": 3},
+                {"date": "2026-05-22", "change_pct": 2.4, "breakout_pct": 3.8, "volume_ratio": 2.1, "return_20d": 31.5, "market_return_20d": 6.4, "high_count_20d": 4},
+                {"date": "2026-05-26", "change_pct": 3.2, "breakout_pct": 4.1, "volume_ratio": 2.9, "return_20d": 36.8, "market_return_20d": 6.9, "high_count_20d": 5},
+            ],
+        },
+        {
+            "code": "095340",
+            "name": "ISC",
+            "observations": [
+                {"date": "2026-05-19", "change_pct": 2.72, "breakout_pct": 1.8, "volume_ratio": 2.4, "return_20d": 24.1, "market_return_20d": 6.3, "high_count_20d": 2},
+                {"date": "2026-05-20", "change_pct": 1.95, "breakout_pct": 2.2, "volume_ratio": 2.0, "return_20d": 22.7, "market_return_20d": 6.5, "high_count_20d": 3},
+                {"date": "2026-05-26", "change_pct": 4.12, "breakout_pct": 4.0, "volume_ratio": 3.7, "return_20d": 37.2, "market_return_20d": 6.9, "high_count_20d": 4},
+            ],
+        },
+        {
+            "code": "141080",
+            "name": "리가켐바이오",
+            "observations": [
+                {"date": "2026-05-20", "change_pct": 2.4, "breakout_pct": 1.1, "volume_ratio": 1.7, "return_20d": 19.9, "market_return_20d": 6.5, "high_count_20d": 2},
+                {"date": "2026-05-21", "change_pct": 5.18, "breakout_pct": 4.6, "volume_ratio": 3.9, "return_20d": 43.5, "market_return_20d": 6.8, "high_count_20d": 3},
+                {"date": "2026-05-22", "change_pct": 1.88, "breakout_pct": 4.9, "volume_ratio": 1.8, "return_20d": 39.2, "market_return_20d": 6.4, "high_count_20d": 4},
+            ],
+        },
+        {
+            "code": "041510",
+            "name": "에스엠",
+            "observations": [
+                {"date": "2026-05-18", "change_pct": 1.72, "breakout_pct": 0.9, "volume_ratio": 1.5, "return_20d": 15.7, "market_return_20d": 6.1, "high_count_20d": 1},
+                {"date": "2026-05-22", "change_pct": 2.11, "breakout_pct": 2.7, "volume_ratio": 2.3, "return_20d": 24.4, "market_return_20d": 6.4, "high_count_20d": 2},
+                {"date": "2026-05-26", "change_pct": 2.54, "breakout_pct": 3.0, "volume_ratio": 2.6, "return_20d": 27.1, "market_return_20d": 6.9, "high_count_20d": 3},
+            ],
+        },
+    ],
+}
 
 
 @dataclass(frozen=True)
@@ -378,6 +469,178 @@ def get_sector_dashboard(market: Literal["US", "KR"] = "US") -> dict[str, object
     return _get_sector_dashboard_live(market)
 
 
+def get_high_52w_dashboard(market: Literal["KOSPI", "KOSDAQ"] = "KOSPI") -> dict[str, object]:
+    dashboard = _get_high_52w_dashboard_from_files(market)
+    if dashboard is not None:
+        return dashboard
+    return _get_high_52w_sample_dashboard(market)
+
+
+def _get_high_52w_sample_dashboard(market: Literal["KOSPI", "KOSDAQ"] = "KOSPI") -> dict[str, object]:
+    stocks = HIGH_52W_SAMPLE_STOCKS[market]
+    dates = sorted(
+        {
+            str(observation["date"])
+            for stock in stocks
+            for observation in stock["observations"]
+            if isinstance(observation, dict)
+        }
+    )
+    series = _build_high_52w_score_series(stocks, dates)
+    latest_date = dates[-1]
+    latest_count = sum(1 for item in series if item["values"][-1] is not None)
+    return {
+        "market": market,
+        "as_of": latest_date,
+        "latest_count": latest_count,
+        "series_count": len(series),
+        "series": series,
+        "chart": {
+            "dates": dates,
+            "series": [
+                {
+                    "label": item["label"],
+                    "code": item["code"],
+                    "color": item["color"],
+                    "values": item["values"],
+                }
+                for item in series
+            ],
+        },
+        "summary": (
+            "신고가 갱신일의 돌파 강도, 거래대금, 시장 대비 성과, 지속성을 종합한 점수입니다. "
+            "해당 날짜에 52주 신고가를 갱신하지 못한 종목은 값이 비어 선이 끊깁니다."
+        ),
+    }
+
+
+@lru_cache(maxsize=2)
+def _get_high_52w_dashboard_from_files(market: Literal["KOSPI", "KOSDAQ"]) -> dict[str, object] | None:
+    prices = _load_high_52w_price_data()
+    if prices is None:
+        return None
+
+    market_prices = prices[prices["Market"] == market].copy()
+    if market_prices.empty:
+        return None
+
+    metrics = _build_high_52w_metrics(market_prices)
+    latest_date = metrics["Date"].max()
+    chart_dates = _latest_trading_dates(metrics, latest_date, HIGH_52W_CHART_DAYS)
+    latest_highs = metrics[(metrics["Date"] == latest_date) & metrics["is_52w_high"]].copy()
+    tracked_codes = latest_highs.sort_values("score", ascending=False)["Code"].tolist()
+
+    chart_frame = metrics[metrics["Date"].isin(chart_dates) & metrics["Code"].isin(tracked_codes)].copy()
+    stocks = _build_high_52w_stocks_from_metrics(chart_frame, tracked_codes)
+    series = _build_high_52w_score_series(stocks, [date.strftime("%Y-%m-%d") for date in chart_dates])
+
+    return {
+        "market": market,
+        "as_of": latest_date.strftime("%Y-%m-%d"),
+        "latest_count": len(latest_highs),
+        "series_count": len(series),
+        "series": series,
+        "chart": {
+            "dates": [date.strftime("%Y-%m-%d") for date in chart_dates],
+            "series": [
+                {
+                    "label": item["label"],
+                    "code": item["code"],
+                    "color": item["color"],
+                    "values": item["values"],
+                }
+                for item in series
+            ],
+        },
+        "summary": (
+            "실제 KOSPI/KOSDAQ 가격 데이터에서 52주 신고가 갱신일만 점수화합니다. "
+            "최신 거래일에 신고가를 찍은 종목을 그래프에 올리고, 이전 갱신일은 선으로 이어서 보여줍니다."
+        ),
+    }
+
+
+@lru_cache(maxsize=1)
+def _load_high_52w_price_data() -> pd.DataFrame | None:
+    files = [*sorted(MARCAP_DATA_DIR.glob("marcap-*.parquet")), *sorted(PYKRX_DATA_DIR.glob("ohlcv_*.parquet"))]
+    if not files:
+        return None
+
+    frames = []
+    for file_path in files:
+        frame = pd.read_parquet(file_path, columns=list(HIGH_52W_REQUIRED_COLUMNS))
+        frames.append(frame)
+    prices = pd.concat(frames, ignore_index=True)
+    prices = prices[prices["Market"].isin(["KOSPI", "KOSDAQ"])].copy()
+    prices.loc[:, "Date"] = pd.to_datetime(prices["Date"])
+    prices.loc[:, "Code"] = prices["Code"].astype(str).str.zfill(6)
+    numeric_columns = ["Open", "High", "Low", "Close", "Volume", "Amount"]
+    prices.loc[:, numeric_columns] = prices[numeric_columns].apply(pd.to_numeric, errors="coerce")
+    prices = prices[(prices[numeric_columns] > 0).all(axis=1)].copy()
+    prices = prices.drop_duplicates(["Date", "Code"], keep="last")
+    return prices.sort_values(["Market", "Code", "Date"]).reset_index(drop=True)
+
+
+def _build_high_52w_metrics(prices: pd.DataFrame) -> pd.DataFrame:
+    metrics = prices.sort_values(["Code", "Date"]).copy()
+    grouped = metrics.groupby("Code", group_keys=False)
+    metrics.loc[:, "prev_52w_high"] = grouped["High"].transform(
+        lambda series: series.shift(1).rolling(HIGH_52W_ROLLING_DAYS, min_periods=HIGH_52W_MIN_OBSERVATIONS).max()
+    )
+    metrics.loc[:, "avg_volume_20d"] = grouped["Volume"].transform(lambda series: series.shift(1).rolling(20, min_periods=5).mean())
+    metrics.loc[:, "return_20d"] = grouped["Close"].pct_change(20) * 100
+    metrics.loc[:, "is_52w_high"] = metrics["High"] > metrics["prev_52w_high"]
+    metrics.loc[:, "high_count_20d"] = grouped["is_52w_high"].transform(lambda series: series.rolling(20, min_periods=1).sum())
+
+    market_return = metrics.groupby("Date")["return_20d"].median().rename("market_return_20d")
+    metrics = metrics.join(market_return, on="Date")
+    metrics.loc[:, "breakout_pct"] = (metrics["High"] / metrics["prev_52w_high"] - 1) * 100
+    metrics.loc[:, "volume_ratio"] = metrics["Volume"] / metrics["avg_volume_20d"]
+    metrics.loc[:, "excess_return_20d"] = metrics["return_20d"] - metrics["market_return_20d"]
+    scoreable = (
+        metrics["is_52w_high"]
+        & metrics["breakout_pct"].notna()
+        & metrics["volume_ratio"].notna()
+        & metrics["excess_return_20d"].notna()
+    )
+    metrics.loc[:, "score"] = pd.NA
+    breakout_score = 35 * (metrics.loc[scoreable, "breakout_pct"].clip(lower=0) / 5).clip(upper=1)
+    volume_score = 30 * (metrics.loc[scoreable, "volume_ratio"].clip(lower=0) / 3).clip(upper=1)
+    relative_score = 25 * (metrics.loc[scoreable, "excess_return_20d"].clip(lower=0) / 15).clip(upper=1)
+    persistence_score = 10 * (metrics.loc[scoreable, "high_count_20d"].clip(lower=0) / 5).clip(upper=1)
+    metrics.loc[scoreable, "score"] = (breakout_score + volume_score + relative_score + persistence_score).round().clip(upper=100)
+    return metrics
+
+
+def _latest_trading_dates(frame: pd.DataFrame, latest_date: pd.Timestamp, count: int) -> list[pd.Timestamp]:
+    dates = sorted(frame.loc[frame["Date"] <= latest_date, "Date"].drop_duplicates().tolist())
+    return dates[-count:]
+
+
+def _build_high_52w_stocks_from_metrics(metrics: pd.DataFrame, tracked_codes: list[str]) -> list[dict[str, object]]:
+    stocks: list[dict[str, object]] = []
+    for code in tracked_codes:
+        code_frame = metrics[(metrics["Code"] == code) & metrics["is_52w_high"] & metrics["score"].notna()].copy()
+        if code_frame.empty:
+            continue
+        stocks.append(
+            {
+                "code": code,
+                "name": str(code_frame.iloc[-1]["Name"]),
+                "observations": [
+                    {
+                        "date": row.Date.strftime("%Y-%m-%d"),
+                        "breakout_pct": float(row.breakout_pct),
+                        "volume_ratio": float(row.volume_ratio),
+                        "excess_return_20d": float(row.excess_return_20d),
+                        "high_count_20d": float(row.high_count_20d),
+                    }
+                    for row in code_frame.itertuples(index=False)
+                ],
+            }
+        )
+    return stocks
+
+
 def _rebuild_macro_snapshot_decision(macro: dict[str, object]) -> dict[str, object]:
     groups = macro.get("groups")
     if not isinstance(groups, dict):
@@ -394,6 +657,76 @@ def _rebuild_macro_snapshot_decision(macro: dict[str, object]) -> dict[str, obje
     rebuilt["decision"] = decision
     rebuilt["ai_summary"] = _fallback_macro_summary(decision)
     return rebuilt
+
+
+def _build_high_52w_score_series(stocks: list[dict[str, object]], dates: list[str]) -> list[dict[str, object]]:
+    series = []
+    for index, stock in enumerate(stocks):
+        observations = {
+            str(observation["date"]): observation
+            for observation in stock["observations"]
+            if isinstance(observation, dict)
+        }
+        values = [_high_52w_strength_score(observations[date]) if date in observations else None for date in dates]
+        color = HIGH_52W_SCORE_PALETTE[index % len(HIGH_52W_SCORE_PALETTE)]
+        series.append(
+            {
+                "code": stock["code"],
+                "label": stock["name"],
+                "color": color,
+                "values": values,
+                "svg_path": _svg_line_path(values),
+                "svg_points": _svg_points(values),
+            }
+        )
+    return series
+
+
+def _high_52w_strength_score(observation: dict[str, object]) -> int:
+    breakout_score = 35 * min(max(float(observation["breakout_pct"]), 0.0) / 5.0, 1.0)
+    volume_score = 30 * min(max(float(observation["volume_ratio"]), 0.0) / 3.0, 1.0)
+    excess_return = _high_52w_excess_return(observation)
+    relative_score = 25 * min(max(excess_return, 0.0) / 15.0, 1.0)
+    persistence_score = 10 * min(max(float(observation.get("high_count_20d", 1)), 0.0) / 5.0, 1.0)
+    return min(100, round(breakout_score + volume_score + relative_score + persistence_score))
+
+
+def _high_52w_excess_return(observation: dict[str, object]) -> float:
+    if "excess_return_20d" in observation:
+        return float(observation["excess_return_20d"])
+    if "return_20d" in observation and "market_return_20d" in observation:
+        return float(observation["return_20d"]) - float(observation["market_return_20d"])
+    return 0.0
+
+
+def _svg_line_path(values: list[int | None]) -> str:
+    if not values:
+        return ""
+    max_index = max(1, len(values) - 1)
+    commands = []
+    next_command = "M"
+    for index, value in enumerate(values):
+        if value is None:
+            next_command = "M"
+            continue
+        x = round((index / max_index) * 100, 2)
+        y = round(100 - min(max(value, 0), 100), 2)
+        commands.append(f"{next_command}{x},{y}")
+        next_command = "L"
+    return " ".join(commands)
+
+
+def _svg_points(values: list[int | None]) -> list[dict[str, object]]:
+    max_index = max(1, len(values) - 1)
+    return [
+        {
+            "x": round((index / max_index) * 100, 2),
+            "y": round(100 - min(max(value, 0), 100), 2),
+            "value": value,
+        }
+        for index, value in enumerate(values)
+        if value is not None
+    ]
 
 
 def build_dashboard_snapshot(

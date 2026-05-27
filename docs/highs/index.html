@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>52주 신고가 강도 - StockAgent</title>
+    <link rel="stylesheet" href="../static/styles.css?v=20260527-highs6">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="../static/dashboard.js?v=20260527-highs6" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="../macro/">
+          <span class="brand-mark">SA</span>
+          <span>
+            <strong>StockAgent</strong>
+            <small>Market decision dashboard</small>
+          </span>
+        </a>
+        <nav class="nav">
+          <a href="../macro/" class="">매크로</a>
+          <a href="../sectors/" class="">섹터</a>
+          <a href="./" class="active">52주 신고가</a>
+        </nav>
+      </header>
+      <main class="page">
+        
+<section class="hero-panel highs-hero compact-highs-hero">
+  <div class="segmented highs-market-switch">
+    <a href="./" class="active">코스피</a>
+    <a href="kosdaq/" class="">코스닥</a>
+  </div>
+</section>
+
+<section class="content-frame high52w-graph-frame">
+  <div class="indicator-header">
+    <div>
+      <p class="eyebrow">Strength Score</p>
+      <h2>KOSPI 신고가 강도</h2>
+      <p class="section-summary">실제 KOSPI/KOSDAQ 가격 데이터에서 52주 신고가 갱신일만 점수화합니다. 최신 거래일에 신고가를 찍은 종목을 그래프에 올리고, 이전 갱신일은 선으로 이어서 보여줍니다.</p>
+    </div>
+    <span>갱신 실패 날짜는 선 끊김</span>
+  </div>
+  <div class="high52w-legend" aria-label="그래프 종목 범례">
+    
+    <span style="--series-color: #2563eb">SK네트웍스 <small>001740</small></span>
+    
+    <span style="--series-color: #079455">삼화콘덴서 <small>001820</small></span>
+    
+    <span style="--series-color: #dc8a00">LG이노텍 <small>011070</small></span>
+    
+    <span style="--series-color: #8b5cf6">한국공항 <small>005430</small></span>
+    
+    <span style="--series-color: #d92d20">삼성에스디에스 <small>018260</small></span>
+    
+    <span style="--series-color: #06b6d4">대양금속 <small>009190</small></span>
+    
+    <span style="--series-color: #2563eb">한올바이오파마 <small>009420</small></span>
+    
+    <span style="--series-color: #079455">미래산업 <small>025560</small></span>
+    
+    <span style="--series-color: #dc8a00">삼성전기 <small>009150</small></span>
+    
+    <span style="--series-color: #8b5cf6">현대오토에버 <small>307950</small></span>
+    
+    <span style="--series-color: #d92d20">대덕전자 <small>353200</small></span>
+    
+    <span style="--series-color: #06b6d4">테이팩스 <small>055490</small></span>
+    
+    <span style="--series-color: #2563eb">SK하이닉스 <small>000660</small></span>
+    
+    <span style="--series-color: #079455">대덕1우 <small>00806K</small></span>
+    
+    <span style="--series-color: #dc8a00">삼성전기우 <small>009155</small></span>
+    
+    <span style="--series-color: #8b5cf6">SK <small>034730</small></span>
+    
+    <span style="--series-color: #d92d20">티에이치엔 <small>019180</small></span>
+    
+    <span style="--series-color: #06b6d4">SK스퀘어 <small>402340</small></span>
+    
+    <span style="--series-color: #2563eb">삼성전자 <small>005930</small></span>
+    
+    <span style="--series-color: #079455">현대모비스 <small>012330</small></span>
+    
+    <span style="--series-color: #dc8a00">DB <small>012030</small></span>
+    
+    <span style="--series-color: #8b5cf6">대덕 <small>008060</small></span>
+    
+    <span style="--series-color: #d92d20">OCI홀딩스 <small>010060</small></span>
+    
+    <span style="--series-color: #06b6d4">DB하이텍 <small>000990</small></span>
+    
+    <span style="--series-color: #2563eb">코리아써키트 <small>007810</small></span>
+    
+    <span style="--series-color: #079455">한온시스템 <small>018880</small></span>
+    
+    <span style="--series-color: #dc8a00">SK우 <small>03473K</small></span>
+    
+    <span style="--series-color: #8b5cf6">삼성전자우 <small>005935</small></span>
+    
+    <span style="--series-color: #d92d20">진도 <small>088790</small></span>
+    
+    <span style="--series-color: #06b6d4">HD현대중공업 <small>329180</small></span>
+    
+  </div>
+  <div class="comparison-chart-wrap highs-chart-wrap high52w-line-wrap">
+    <canvas id="high-52w-chart"></canvas>
+  </div>
+</section>
+
+<script id="chart-data" type="application/json">
+{
+  "type": "high52w",
+  "high52w": {"dates": ["2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-04", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-26", "2026-05-27"], "series": [{"code": "001740", "color": "#2563eb", "label": "SK\ub124\ud2b8\uc6cd\uc2a4", "values": [null, 94, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 89, 94, null, null, null, null, null, 96, 98, 98, null, null, null, null, 100, 100]}, {"code": "001820", "color": "#079455", "label": "\uc0bc\ud654\ucf58\ub374\uc11c", "values": [96, 98, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 45, null, null, null, null, null, null, null, null, null, null, 94, null, null, null, null, null, null, null, null, null, null, null, null, 94, 90, 98, 100, 100]}, {"code": "011070", "color": "#dc8a00", "label": "LG\uc774\ub178\ud14d", "values": [null, null, null, 92, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 43, null, 85, null, null, 50, null, 58, 75, 63, 92, 88, 86, null, 83, null, 49, 49, 82, 52, null, 81, 71, 75, 62, 83, null, 57, null, 59, 64, 90, 98]}, {"code": "005430", "color": "#8b5cf6", "label": "\ud55c\uad6d\uacf5\ud56d", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 70, null, 65, 64, 45, null, 44, 84, 94]}, {"code": "018260", "color": "#d92d20", "label": "\uc0bc\uc131\uc5d0\uc2a4\ub514\uc5d0\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 82, null, null, null, null, null, null, 94]}, {"code": "009190", "color": "#06b6d4", "label": "\ub300\uc591\uae08\uc18d", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92]}, {"code": "009420", "color": "#2563eb", "label": "\ud55c\uc62c\ubc14\uc774\uc624\ud30c\ub9c8", "values": [82, 50, 39, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 84, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92]}, {"code": "025560", "color": "#079455", "label": "\ubbf8\ub798\uc0b0\uc5c5", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 74, null, null, null, null, null, 96, null, null, null, 98, 100, null, null, 100, null, null, 96, 87, 89]}, {"code": "009150", "color": "#dc8a00", "label": "\uc0bc\uc131\uc804\uae30", "values": [91, 72, 82, 48, null, null, null, null, null, null, null, null, null, null, null, null, null, 62, 46, null, null, null, null, null, null, null, null, null, null, null, null, 81, 43, 87, null, 67, 81, 54, 83, 50, 87, 83, null, null, null, 69, null, 74, 82, 87, null, null, null, 80, 84, null, 85, null, null, null, 84, 84, 87, 88]}, {"code": "307950", "color": "#8b5cf6", "label": "\ud604\ub300\uc624\ud1a0\uc5d0\ubc84", "values": [null, null, null, null, 54, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94, null, 96, null, null, null, null, null, null, null, null, 87]}, {"code": "353200", "color": "#d92d20", "label": "\ub300\ub355\uc804\uc790", "values": [null, null, 61, null, null, null, null, null, null, null, null, null, null, null, null, 54, 89, 85, 86, null, null, 80, 55, null, null, null, null, null, null, null, null, null, 44, 66, null, null, null, null, 52, 37, 84, 44, null, 89, null, null, null, 66, null, 79, null, null, 55, 74, 81, null, null, null, null, null, 58, 58, 87, 86]}, {"code": "055490", "color": "#06b6d4", "label": "\ud14c\uc774\ud329\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 61, 79, 61, null, 58, 85, 64, null, null, 58, 54, null, null, null, null, null, null, null, 99, null, null, null, null, null, 84]}, {"code": "000660", "color": "#2563eb", "label": "SK\ud558\uc774\ub2c9\uc2a4", "values": [61, 61, 65, 79, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 51, 52, null, null, 41, 73, 44, 67, null, 73, 48, null, null, 85, 87, 71, 55, 88, 63, 59, 49, 51, null, null, null, null, null, 76, 84]}, {"code": "00806K", "color": "#079455", "label": "\ub300\ub3551\uc6b0", "values": [null, null, 10, null, 45, null, null, null, null, null, 96, null, 57, null, null, 51, 72, 62, 59, 48, 55, 77, 70, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 90, null, null, 74, 85, null, null, null, null, null, null, null, 80, 83]}, {"code": "009155", "color": "#dc8a00", "label": "\uc0bc\uc131\uc804\uae30\uc6b0", "values": [93, 51, 84, 59, null, null, null, null, null, null, null, null, null, null, null, null, null, 49, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 85, 67, 78, 88, 80, 89, 89, 99, 83, null, null, null, 95, null, 74, 77, 84, null, null, null, null, 47, null, 86, null, null, null, null, 51, 81, 82]}, {"code": "034730", "color": "#8b5cf6", "label": "SK", "values": [70, 52, 79, 61, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 38, 55, 54, 89, 100, null, null, null, null, null, null, null, null, null, null, null, 84, 78, 82]}, {"code": "019180", "color": "#d92d20", "label": "\ud2f0\uc5d0\uc774\uce58\uc5d4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 61, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 82]}, {"code": "402340", "color": "#06b6d4", "label": "SK\uc2a4\ud018\uc5b4", "values": [51, 80, 73, 67, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 22, 33, 38, 68, 45, null, 81, null, 79, 77, 57, 70, 98, 99, null, null, 89, 68, null, null, null, null, null, null, null, null, 50, 82]}, {"code": "005930", "color": "#2563eb", "label": "\uc0bc\uc131\uc804\uc790", "values": [68, 53, 65, 80, 64, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 61, null, null, null, null, 40, 53, 90, 69, null, 78, 59, null, 69, null, null, null, null, null, 43, 46, 81]}, {"code": "012330", "color": "#079455", "label": "\ud604\ub300\ubaa8\ube44\uc2a4", "values": [null, null, null, 70, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 78, 94, 84, 98, 68, null, null, null, null, null, null, 47, 78]}, {"code": "012030", "color": "#dc8a00", "label": "DB", "values": [98, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 66, null, null, null, null, null, null, null, null, 58, 71]}, {"code": "008060", "color": "#8b5cf6", "label": "\ub300\ub355", "values": [58, 58, 55, 55, 95, null, null, null, null, null, 72, null, null, null, null, null, null, 51, 50, 47, 52, 83, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 34, 33, 62, 29, 81, 68, 65, null, null, null, null, null, 100, null, 52, 100, null, null, null, null, null, null, null, 55, 71, 69]}, {"code": "010060", "color": "#d92d20", "label": "OCI\ud640\ub529\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 80, 41, null, null, 89, 67, 87, null, null, null, null, null, null, null, null, null, 74, null, null, null, null, null, null, null, 91, 98, null, null, 81, 66, 59, 100, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 68]}, {"code": "000990", "color": "#06b6d4", "label": "DB\ud558\uc774\ud14d", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, 47, 87, 88, null, 66, null, null, 63, null, null, null, 89, null, null, null, null, null, null, null, null, null, 87, 68]}, {"code": "007810", "color": "#2563eb", "label": "\ucf54\ub9ac\uc544\uc368\ud0a4\ud2b8", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 69, 69, null, null, null, null, null, null, null, null, null, null, null, 83, null, 42, 45, null, null, 62, 49, 50, null, null, null, null, null, 71, 69, 52, null, null, null, null, null, null, null, null, null, null, 84, 62]}, {"code": "018880", "color": "#079455", "label": "\ud55c\uc628\uc2dc\uc2a4\ud15c", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 77, null, null, null, null, null, null, null, null, null, null, 60]}, {"code": "03473K", "color": "#dc8a00", "label": "SK\uc6b0", "values": [65, 59, 83, 60, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 65, 54, 96, 98, null, null, 85, 75, null, null, null, null, null, null, null, 67, 63, 52]}, {"code": "005935", "color": "#8b5cf6", "label": "\uc0bc\uc131\uc804\uc790\uc6b0", "values": [60, 51, 63, 79, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 28, 45, 74, null, 54, 57, null, 64, 59, 100, 70, null, 62, null, null, 50, null, null, null, null, null, null, null, 50]}, {"code": "088790", "color": "#d92d20", "label": "\uc9c4\ub3c4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 57, null, null, 54, 69, null, null, null, null, null, null, null, null, null, 51, null, null, null, null, null, null, null, null, null, 33, 18, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 85, null, null, null, 58, 51, 49]}, {"code": "329180", "color": "#06b6d4", "label": "HD\ud604\ub300\uc911\uacf5\uc5c5", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 49, 60, 63, null, 57, null, null, null, null, null, null, 75, null, null, null, null, null, null, null, null, 75, 47]}]},
+  "charts": {}
+}
+</script>
+
+      </main>
+    </div>
+  </body>
+</html>

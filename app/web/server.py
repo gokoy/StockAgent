@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.web.dashboard_data import get_macro_dashboard, get_sector_dashboard
+from app.web.dashboard_data import get_high_52w_dashboard, get_macro_dashboard, get_sector_dashboard
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -48,3 +48,15 @@ def sectors_page(request: Request, market: Literal["US", "KR"] = Query(default="
         },
     )
 
+
+@app.get("/highs")
+def high_52w_page(request: Request, market: Literal["KOSPI", "KOSDAQ"] = Query(default="KOSPI")):
+    dashboard = get_high_52w_dashboard(market)
+    return templates.TemplateResponse(
+        "highs.html",
+        {
+            "request": request,
+            "active_page": "highs",
+            "dashboard": dashboard,
+        },
+    )

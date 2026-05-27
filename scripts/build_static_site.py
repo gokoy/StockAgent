@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.web.dashboard_data import ROOT_DIR, get_macro_dashboard, get_sector_dashboard
+from app.web.dashboard_data import ROOT_DIR, get_high_52w_dashboard, get_macro_dashboard, get_sector_dashboard
 
 
 TEMPLATE_DIR = ROOT_DIR / "app" / "web" / "templates"
@@ -39,6 +39,8 @@ def build_static_site(output_dir: Path) -> None:
     macro_dashboard = get_macro_dashboard()
     us_dashboard = get_sector_dashboard("US")
     kr_dashboard = get_sector_dashboard("KR")
+    kospi_highs = get_high_52w_dashboard("KOSPI")
+    kosdaq_highs = get_high_52w_dashboard("KOSDAQ")
 
     _write_page(
         output_dir / "index.html",
@@ -49,6 +51,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix=".",
             macro_href="./",
             sectors_href="sectors/",
+            highs_href="highs/",
         ),
     )
     _write_page(
@@ -60,6 +63,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="..",
             macro_href="./",
             sectors_href="../sectors/",
+            highs_href="../highs/",
         ),
     )
     _write_page(
@@ -71,6 +75,7 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="..",
             macro_href="../macro/",
             sectors_href="./",
+            highs_href="../highs/",
             sector_us_href="./",
             sector_kr_href="kr/",
         ),
@@ -84,8 +89,37 @@ def build_static_site(output_dir: Path) -> None:
             static_prefix="../..",
             macro_href="../../macro/",
             sectors_href="../",
+            highs_href="../../highs/",
             sector_us_href="../",
             sector_kr_href="./",
+        ),
+    )
+    _write_page(
+        output_dir / "highs" / "index.html",
+        env.get_template("highs.html"),
+        _context(
+            active_page="highs",
+            dashboard=kospi_highs,
+            static_prefix="..",
+            macro_href="../macro/",
+            sectors_href="../sectors/",
+            highs_href="./",
+            highs_kospi_href="./",
+            highs_kosdaq_href="kosdaq/",
+        ),
+    )
+    _write_page(
+        output_dir / "highs" / "kosdaq" / "index.html",
+        env.get_template("highs.html"),
+        _context(
+            active_page="highs",
+            dashboard=kosdaq_highs,
+            static_prefix="../..",
+            macro_href="../../macro/",
+            sectors_href="../../sectors/",
+            highs_href="../",
+            highs_kospi_href="../",
+            highs_kosdaq_href="./",
         ),
     )
 
@@ -93,8 +127,8 @@ def build_static_site(output_dir: Path) -> None:
 def _context(static_prefix: str, **kwargs: Any) -> dict[str, Any]:
     return {
         **kwargs,
-        "static_styles_href": f"{static_prefix}/static/styles.css?v=20260510-env4",
-        "static_script_href": f"{static_prefix}/static/dashboard.js?v=20260510-env4",
+        "static_styles_href": f"{static_prefix}/static/styles.css?v=20260527-highs6",
+        "static_script_href": f"{static_prefix}/static/dashboard.js?v=20260527-highs6",
     }
 
 

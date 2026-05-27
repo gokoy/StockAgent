@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}52주 신고가 강도 - StockAgent{% endblock %}
+
+{% block content %}
+<section class="hero-panel highs-hero compact-highs-hero">
+  <div class="segmented highs-market-switch">
+    <a href="{{ highs_kospi_href if highs_kospi_href is defined else '/highs?market=KOSPI' }}" class="{% if dashboard.market == 'KOSPI' %}active{% endif %}">코스피</a>
+    <a href="{{ highs_kosdaq_href if highs_kosdaq_href is defined else '/highs?market=KOSDAQ' }}" class="{% if dashboard.market == 'KOSDAQ' %}active{% endif %}">코스닥</a>
+  </div>
+</section>
+
+<section class="content-frame high52w-graph-frame">
+  <div class="indicator-header">
+    <div>
+      <p class="eyebrow">Strength Score</p>
+      <h2>{{ dashboard.market }} 신고가 강도</h2>
+      <p class="section-summary">{{ dashboard.summary }}</p>
+    </div>
+    <span>갱신 실패 날짜는 선 끊김</span>
+  </div>
+  <div class="high52w-legend" aria-label="그래프 종목 범례">
+    {% for item in dashboard.series %}
+    <span style="--series-color: {{ item.color }}">{{ item.label }} <small>{{ item.code }}</small></span>
+    {% endfor %}
+  </div>
+  <div class="comparison-chart-wrap highs-chart-wrap high52w-line-wrap">
+    <canvas id="high-52w-chart"></canvas>
+  </div>
+</section>
+
+<script id="chart-data" type="application/json">
+{
+  "type": "high52w",
+  "high52w": {{ dashboard.chart|tojson }},
+  "charts": {}
+}
+</script>
+{% endblock %}

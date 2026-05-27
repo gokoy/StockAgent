@@ -5,6 +5,7 @@ requires-python = ">=3.14"
 dependencies = [
     "openai==1.107.2",
     "pandas==2.2.3",
+    "pyarrow==22.0.0",
     "requests==2.32.5",
     "yfinance==0.2.65",
     "fastapi==0.115.6",

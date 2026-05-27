@@ -1,4 +1,5 @@
 pandas==2.2.3
+pyarrow==22.0.0
 yfinance==0.2.65
 openai==1.107.2
 requests==2.32.5

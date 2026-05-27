@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>52주 신고가 강도 - StockAgent</title>
+    <link rel="stylesheet" href="../../static/styles.css?v=20260527-highs6">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="../../static/dashboard.js?v=20260527-highs6" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="../../macro/">
+          <span class="brand-mark">SA</span>
+          <span>
+            <strong>StockAgent</strong>
+            <small>Market decision dashboard</small>
+          </span>
+        </a>
+        <nav class="nav">
+          <a href="../../macro/" class="">매크로</a>
+          <a href="../../sectors/" class="">섹터</a>
+          <a href="../" class="active">52주 신고가</a>
+        </nav>
+      </header>
+      <main class="page">
+        
+<section class="hero-panel highs-hero compact-highs-hero">
+  <div class="segmented highs-market-switch">
+    <a href="../" class="">코스피</a>
+    <a href="./" class="active">코스닥</a>
+  </div>
+</section>
+
+<section class="content-frame high52w-graph-frame">
+  <div class="indicator-header">
+    <div>
+      <p class="eyebrow">Strength Score</p>
+      <h2>KOSDAQ 신고가 강도</h2>
+      <p class="section-summary">실제 KOSPI/KOSDAQ 가격 데이터에서 52주 신고가 갱신일만 점수화합니다. 최신 거래일에 신고가를 찍은 종목을 그래프에 올리고, 이전 갱신일은 선으로 이어서 보여줍니다.</p>
+    </div>
+    <span>갱신 실패 날짜는 선 끊김</span>
+  </div>
+  <div class="high52w-legend" aria-label="그래프 종목 범례">
+    
+    <span style="--series-color: #2563eb">안국약품 <small>001540</small></span>
+    
+    <span style="--series-color: #079455">피델릭스 <small>032580</small></span>
+    
+    <span style="--series-color: #dc8a00">아비코전자 <small>036010</small></span>
+    
+    <span style="--series-color: #8b5cf6">에이팩트 <small>200470</small></span>
+    
+    <span style="--series-color: #d92d20">코칩 <small>126730</small></span>
+    
+    <span style="--series-color: #06b6d4">디지아이 <small>043360</small></span>
+    
+    <span style="--series-color: #2563eb">오텍 <small>067170</small></span>
+    
+    <span style="--series-color: #079455">켄코아에어로스페이스 <small>274090</small></span>
+    
+    <span style="--series-color: #dc8a00">한켐 <small>457370</small></span>
+    
+    <span style="--series-color: #8b5cf6">아이씨티케이 <small>456010</small></span>
+    
+    <span style="--series-color: #d92d20">아모텍 <small>052710</small></span>
+    
+    <span style="--series-color: #06b6d4">포톤 <small>208710</small></span>
+    
+    <span style="--series-color: #2563eb">저스템 <small>417840</small></span>
+    
+    <span style="--series-color: #079455">프로이천 <small>321260</small></span>
+    
+    <span style="--series-color: #dc8a00">엑스게이트 <small>356680</small></span>
+    
+    <span style="--series-color: #8b5cf6">아이에스티이 <small>212710</small></span>
+    
+    <span style="--series-color: #d92d20">유니셈 <small>036200</small></span>
+    
+    <span style="--series-color: #06b6d4">한주라이트메탈 <small>198940</small></span>
+    
+    <span style="--series-color: #2563eb">티엘비 <small>356860</small></span>
+    
+    <span style="--series-color: #079455">샘씨엔에스 <small>252990</small></span>
+    
+    <span style="--series-color: #dc8a00">세보엠이씨 <small>011560</small></span>
+    
+    <span style="--series-color: #8b5cf6">네오오토 <small>212560</small></span>
+    
+    <span style="--series-color: #d92d20">한양이엔지 <small>045100</small></span>
+    
+    <span style="--series-color: #06b6d4">상보 <small>027580</small></span>
+    
+    <span style="--series-color: #2563eb">아스플로 <small>159010</small></span>
+    
+    <span style="--series-color: #079455">휴림에이텍 <small>078590</small></span>
+    
+    <span style="--series-color: #dc8a00">드림시큐리티 <small>203650</small></span>
+    
+    <span style="--series-color: #8b5cf6">네패스 <small>033640</small></span>
+    
+    <span style="--series-color: #d92d20">매일홀딩스 <small>005990</small></span>
+    
+    <span style="--series-color: #06b6d4">쎌바이오텍 <small>049960</small></span>
+    
+    <span style="--series-color: #2563eb">에스디시스템 <small>121890</small></span>
+    
+  </div>
+  <div class="comparison-chart-wrap highs-chart-wrap high52w-line-wrap">
+    <canvas id="high-52w-chart"></canvas>
+  </div>
+</section>
+
+<script id="chart-data" type="application/json">
+{
+  "type": "high52w",
+  "high52w": {"dates": ["2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-04", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-26", "2026-05-27"], "series": [{"code": "001540", "color": "#2563eb", "label": "\uc548\uad6d\uc57d\ud488", "values": [42, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94, 84, 98, null, null, null, null, 100]}, {"code": "032580", "color": "#079455", "label": "\ud53c\ub378\ub9ad\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94, 96, 98, 100, null, 96, 57, 93, 88, null, 100]}, {"code": "036010", "color": "#dc8a00", "label": "\uc544\ube44\ucf54\uc804\uc790", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 34, null, null, null, null, 85, 84, null, null, 49, 84, 67, null, null, null, null, null, null, null, null, null, null, null, null, 95, 100]}, {"code": "200470", "color": "#8b5cf6", "label": "\uc5d0\uc774\ud329\ud2b8", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 67, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 77, 44, 45, null, null, null, null, null, null, null, null, null, null, null, 98]}, {"code": "126730", "color": "#d92d20", "label": "\ucf54\uce69", "values": [92, null, 79, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94, null, null, null, null, null, null, null, null, null, null, null, null, 76, 98]}, {"code": "043360", "color": "#06b6d4", "label": "\ub514\uc9c0\uc544\uc774", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 67, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 94, 96]}, {"code": "067170", "color": "#2563eb", "label": "\uc624\ud14d", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94, null, null, null, null, null, null, null, null, null, null, 96]}, {"code": "274090", "color": "#079455", "label": "\ucf04\ucf54\uc544\uc5d0\uc5b4\ub85c\uc2a4\ud398\uc774\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 94, 96]}, {"code": "457370", "color": "#dc8a00", "label": "\ud55c\ucf10", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94]}, {"code": "456010", "color": "#8b5cf6", "label": "\uc544\uc774\uc528\ud2f0\ucf00\uc774", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 81, 94, null, 96, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, 94]}, {"code": "052710", "color": "#d92d20", "label": "\uc544\ubaa8\ud14d", "values": [77, null, 56, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 57, 73, 47, 48, null, null, 100, 89, 89, null, 76, 81, null, null, 86, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 61, 94]}, {"code": "208710", "color": "#06b6d4", "label": "\ud3ec\ud1a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92]}, {"code": "417840", "color": "#2563eb", "label": "\uc800\uc2a4\ud15c", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 73, 77, null, null, null, null, 79, null, null, 91]}, {"code": "321260", "color": "#079455", "label": "\ud504\ub85c\uc774\ucc9c", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 94, null, null, null, 96, null, null, null, null, null, null, null, null, null, null, 82, null, null, 89, null, 62, null, null, null, null, null, null, null, 82, 88]}, {"code": "356680", "color": "#dc8a00", "label": "\uc5d1\uc2a4\uac8c\uc774\ud2b8", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 64, 79, 80, 98, null, null, null, null, null, null, null, null, null, 67, null, null, null, null, 86, null, null, null, null, null, null, 90, 90, 85]}, {"code": "212710", "color": "#8b5cf6", "label": "\uc544\uc774\uc5d0\uc2a4\ud2f0\uc774", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 84]}, {"code": "036200", "color": "#d92d20", "label": "\uc720\ub2c8\uc148", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 68, null, null, null, null, 94, 72, null, null, null, null, null, null, null, null, null, null, null, null, 82]}, {"code": "198940", "color": "#06b6d4", "label": "\ud55c\uc8fc\ub77c\uc774\ud2b8\uba54\ud0c8", "values": [65, 66, 75, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 42, null, null, null, null, null, null, 91, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 78, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 84, 77]}, {"code": "356860", "color": "#2563eb", "label": "\ud2f0\uc5d8\ube44", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 59, null, null, null, null, null, null, null, null, null, null, 65, null, null, null, null, 54, null, null, null, null, null, null, null, null, null, null, 74, 53, 47, 77, 63, null, null, 66, 48, null, null, null, null, 81, 81, 74]}, {"code": "252990", "color": "#079455", "label": "\uc0d8\uc528\uc5d4\uc5d0\uc2a4", "values": [null, 66, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 44, 40, null, 79, null, null, 57, null, null, null, null, null, null, null, null, null, null, null, 84, null, 74]}, {"code": "011560", "color": "#dc8a00", "label": "\uc138\ubcf4\uc5e0\uc774\uc528", "values": [null, null, 92, 94, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 51, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 88, null, 52, 48, null, null, null, null, null, null, null, 62, 85, 66, 56, null, null, null, null, null, null, null, null, null, 67, null, null, null, 71, 56, 73]}, {"code": "212560", "color": "#8b5cf6", "label": "\ub124\uc624\uc624\ud1a0", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 63, 72]}, {"code": "045100", "color": "#d92d20", "label": "\ud55c\uc591\uc774\uc5d4\uc9c0", "values": [null, null, null, 93, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39, null, null, null, null, null, null, null, null, null, null, 72]}, {"code": "027580", "color": "#06b6d4", "label": "\uc0c1\ubcf4", "values": [66, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 71]}, {"code": "159010", "color": "#2563eb", "label": "\uc544\uc2a4\ud50c\ub85c", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, 81, null, null, null, null, 96, 69, null, null, 45, 89, null, 100, 55, 84, null, null, 57, null, null, null, null, 44, null, 73, 68]}, {"code": "078590", "color": "#079455", "label": "\ud734\ub9bc\uc5d0\uc774\ud14d", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 66]}, {"code": "203650", "color": "#dc8a00", "label": "\ub4dc\ub9bc\uc2dc\ud050\ub9ac\ud2f0", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, null, null, null, null, null, null, null, null, null, 65]}, {"code": "033640", "color": "#8b5cf6", "label": "\ub124\ud328\uc2a4", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, null, null, null, null, null, null, null, null, 90, 84, null, 95, 54, 61, null, null, 49, null, 48, null, 55, 100, null, null, null, null, null, 73, null, null, null, null, null, null, null, null, null, null, null, 55, 67, 51]}, {"code": "005990", "color": "#d92d20", "label": "\ub9e4\uc77c\ud640\ub529\uc2a4", "values": [null, 72, 41, 52, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 83, 47]}, {"code": "049960", "color": "#06b6d4", "label": "\uc38c\ubc14\uc774\uc624\ud14d", "values": [90, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 88, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 89, null, null, null, null, null, null, 79, 54, null, null, 45]}, {"code": "121890", "color": "#2563eb", "label": "\uc5d0\uc2a4\ub514\uc2dc\uc2a4\ud15c", "values": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 92, null, null, null, 65, null, null, null, null, null, 84, null, null, 56, 78, 44]}]},
+  "charts": {}
+}
+</script>
+
+      </main>
+    </div>
+  </body>
+</html>
