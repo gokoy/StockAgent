@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T23:12:49.809759+00:00",
+  "generated_at": "2026-05-29T23:08:45.583443+00:00",
   "years": 5,
   "indicators": [
     {
@@ -5024,6 +5024,10 @@
         {
           "date": "2026-05-28",
           "value": 7563.6
+        },
+        {
+          "date": "2026-05-29",
+          "value": 7580.1
         }
       ]
     },
@@ -10049,6 +10053,10 @@
         {
           "date": "2026-05-28",
           "value": 30223.9
+        },
+        {
+          "date": "2026-05-29",
+          "value": 30333.2
         }
       ]
     },
@@ -15074,6 +15082,10 @@
         {
           "date": "2026-05-28",
           "value": 0.387
+        },
+        {
+          "date": "2026-05-29",
+          "value": 0.384
         }
       ]
     },
@@ -15084,10 +15096,6 @@
       "kind": "risk_off",
       "unit": "pt",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 16.76
-        },
         {
           "date": "2021-06-01",
           "value": 17.9
@@ -20107,6 +20115,10 @@
         {
           "date": "2026-05-28",
           "value": 15.74
+        },
+        {
+          "date": "2026-05-29",
+          "value": 15.32
         }
       ]
     },
@@ -20116,18 +20128,7 @@
       "group": "금리/할인율",
       "kind": "risk_off",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
-        {
-          "date": "2021-05-26",
-          "value": 1.58
-        },
-        {
-          "date": "2021-05-27",
-          "value": 1.61
-        },
         {
           "date": "2021-05-28",
           "value": 1.58
@@ -25115,6 +25116,14 @@
         {
           "date": "2026-05-26",
           "value": 4.5
+        },
+        {
+          "date": "2026-05-27",
+          "value": 4.48
+        },
+        {
+          "date": "2026-05-28",
+          "value": 4.45
         }
       ]
     },
@@ -25124,18 +25133,7 @@
       "group": "금리/할인율",
       "kind": "risk_off",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
-        {
-          "date": "2021-05-26",
-          "value": 0.14
-        },
-        {
-          "date": "2021-05-27",
-          "value": 0.14
-        },
         {
           "date": "2021-05-28",
           "value": 0.14
@@ -30123,6 +30121,14 @@
         {
           "date": "2026-05-26",
           "value": 4.01
+        },
+        {
+          "date": "2026-05-27",
+          "value": 4.0
+        },
+        {
+          "date": "2026-05-28",
+          "value": 3.99
         }
       ]
     },
@@ -30132,14 +30138,7 @@
       "group": "금리/할인율",
       "kind": "neutral",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y2Y",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
-        {
-          "date": "2021-05-27",
-          "value": 1.47
-        },
         {
           "date": "2021-05-28",
           "value": 1.44
@@ -35131,6 +35130,10 @@
         {
           "date": "2026-05-27",
           "value": 0.48
+        },
+        {
+          "date": "2026-05-28",
+          "value": 0.46
         }
       ]
     },
@@ -35141,10 +35144,6 @@
       "kind": "risk_off",
       "unit": "%",
       "points": [
-        {
-          "date": "2023-05-29",
-          "value": 4.54
-        },
         {
           "date": "2023-05-30",
           "value": 4.58
@@ -38284,6 +38283,10 @@
         {
           "date": "2026-05-27",
           "value": 2.71
+        },
+        {
+          "date": "2026-05-28",
+          "value": 2.72
         }
       ]
     },
@@ -43309,6 +43312,10 @@
         {
           "date": "2026-05-28",
           "value": 0.734
+        },
+        {
+          "date": "2026-05-29",
+          "value": 0.734
         }
       ]
     },
@@ -43319,10 +43326,6 @@
       "kind": "risk_off",
       "unit": "pt",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 90.03
-        },
         {
           "date": "2021-06-01",
           "value": 89.83
@@ -48345,7 +48348,11 @@
         },
         {
           "date": "2026-05-28",
-          "value": 98.993
+          "value": 99.02
+        },
+        {
+          "date": "2026-05-29",
+          "value": 98.942
         }
       ]
     },
@@ -53551,6 +53558,10 @@
         {
           "date": "2026-05-28",
           "value": 1503.1
+        },
+        {
+          "date": "2026-05-29",
+          "value": 1507.1
         }
       ]
     },
@@ -53561,10 +53572,6 @@
       "kind": "neutral",
       "unit": "$",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 66.32
-        },
         {
           "date": "2021-06-01",
           "value": 67.72
@@ -58587,7 +58594,11 @@
         },
         {
           "date": "2026-05-28",
-          "value": 88.31
+          "value": 88.9
+        },
+        {
+          "date": "2026-05-29",
+          "value": 87.76
         }
       ]
     },
@@ -58598,10 +58609,6 @@
       "kind": "neutral",
       "unit": "$",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 1902.5
-        },
         {
           "date": "2021-06-01",
           "value": 1902.9
@@ -63624,7 +63631,11 @@
         },
         {
           "date": "2026-05-28",
-          "value": 4524.9
+          "value": 4499.3
+        },
+        {
+          "date": "2026-05-29",
+          "value": 4569.9
         }
       ]
     },
@@ -63635,10 +63646,6 @@
       "kind": "risk_on",
       "unit": "$",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 4.682
-        },
         {
           "date": "2021-06-01",
           "value": 4.662
@@ -68665,7 +68672,11 @@
         },
         {
           "date": "2026-05-28",
-          "value": 6.42
+          "value": 6.396
+        },
+        {
+          "date": "2026-05-29",
+          "value": 6.394
         }
       ]
     },
@@ -68676,10 +68687,6 @@
       "kind": "risk_on",
       "unit": "pt",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 3188.7
-        },
         {
           "date": "2021-05-31",
           "value": 3203.9
@@ -73559,6 +73566,10 @@
         {
           "date": "2026-05-27",
           "value": 8228.7
+        },
+        {
+          "date": "2026-05-28",
+          "value": 8185.3
         }
       ]
     },
@@ -73569,10 +73580,6 @@
       "kind": "risk_on",
       "unit": "pt",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 977.46
-        },
         {
           "date": "2021-05-31",
           "value": 981.78
@@ -78448,6 +78455,10 @@
         {
           "date": "2026-05-27",
           "value": 1133.1
+        },
+        {
+          "date": "2026-05-28",
+          "value": 1104.4
         }
       ]
     },
@@ -78458,10 +78469,6 @@
       "kind": "risk_on",
       "unit": "$",
       "points": [
-        {
-          "date": "2021-05-28",
-          "value": 35697.6
-        },
         {
           "date": "2021-05-29",
           "value": 34616.1
@@ -85764,7 +85771,11 @@
         },
         {
           "date": "2026-05-28",
-          "value": 73464.1
+          "value": 73536.6
+        },
+        {
+          "date": "2026-05-29",
+          "value": 73411.5
         }
       ]
     },
@@ -85774,9 +85785,6 @@
       "group": "정책/거시경제",
       "kind": "risk_off",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=FEDFUNDS",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
         {
           "date": "2021-04-01",
@@ -86030,9 +86038,6 @@
       "group": "정책/거시경제",
       "kind": "risk_off",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
         {
           "date": "2021-04-01",
@@ -86282,9 +86287,6 @@
       "group": "정책/거시경제",
       "kind": "neutral",
       "unit": "%",
-      "error": "404 Client Error: Not Found for url: https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE",
-      "stale": true,
-      "stale_reason": "latest_fetch_failed",
       "points": [
         {
           "date": "2021-04-01",
