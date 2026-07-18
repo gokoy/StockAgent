@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-17T22:43:32.587060+00:00",
+  "generated_at": "2026-07-18T22:43:21.521529+00:00",
   "macro": {
-    "as_of": "2026-07-17T22:43:37.544032+00:00",
+    "as_of": "2026-07-18T22:43:28.189803+00:00",
     "decision": {
       "score": 48,
       "regime_label": "기다릴 구간",
@@ -12,11 +12,11 @@
         "변동성 부담 · VIX 변동성 -0.27",
         "주식 모멘텀 부담 · KOSDAQ -0.60, KOSPI -0.29",
         "금리/정책 부담 · 미국 10년 금리 -0.56, 미국 2년 금리 -0.34",
-        "물가/성장 부담 · 미국 CPI YoY -0.25, 미국 실업률 +0.24"
+        "물가/성장 부담 · WTI 원유 -0.27, 미국 CPI YoY -0.25"
       ],
       "supportive_signals": [
         "신용 리스크 개선 · 하이일드 / 우량채 +0.43, 하이일드 스프레드 +0.13",
-        "달러/유동성 개선 · 달러/원 +0.19, 달러 인덱스 -0.13"
+        "달러/유동성 개선 · Bitcoin +0.29, 달러/원 +0.19"
       ],
       "score_up_drivers": [
         {
@@ -24,8 +24,8 @@
           "note": "신용 리스크 개선 · 하이일드 / 우량채 +0.43, 하이일드 스프레드 +0.13"
         },
         {
-          "points": 0.5,
-          "note": "달러/유동성 개선 · 달러/원 +0.19, 달러 인덱스 -0.13"
+          "points": 1.0,
+          "note": "달러/유동성 개선 · Bitcoin +0.29, 달러/원 +0.19"
         }
       ],
       "score_down_drivers": [
@@ -42,8 +42,8 @@
           "note": "금리/정책 부담 · 미국 10년 금리 -0.56, 미국 2년 금리 -0.34"
         },
         {
-          "points": -0.0,
-          "note": "물가/성장 부담 · 미국 CPI YoY -0.25, 미국 실업률 +0.24"
+          "points": -0.1,
+          "note": "물가/성장 부담 · WTI 원유 -0.27, 미국 CPI YoY -0.25"
         }
       ],
       "positive_factors": [
@@ -68,6 +68,10 @@
         {
           "label": "금리/정책",
           "text": "금리와 정책 부담이 남아 있어 성장주 무리한 추격은 조심해야 합니다."
+        },
+        {
+          "label": "물가/성장",
+          "text": "물가나 경기 부담이 커지면 주식 비중 확대의 질이 떨어질 수 있습니다."
         }
       ],
       "factor_scores": [
@@ -309,9 +313,38 @@
         {
           "id": "fx_liquidity",
           "label": "달러/유동성",
-          "score": 0.06,
-          "points": 0.5,
+          "score": 0.12,
+          "points": 1.0,
           "leaders": [
+            {
+              "id": "btc",
+              "name": "Bitcoin",
+              "score": 0.2942560838146845,
+              "momentum_score": 0.31,
+              "level_score": 0.23,
+              "windows": [
+                {
+                  "days": 1,
+                  "change": 1.285,
+                  "z_score": 0.53
+                },
+                {
+                  "days": 5,
+                  "change": 3.987,
+                  "z_score": 0.73
+                },
+                {
+                  "days": 20,
+                  "change": 8.715,
+                  "z_score": 0.8
+                },
+                {
+                  "days": 60,
+                  "change": -15.674,
+                  "z_score": -0.83
+                }
+              ]
+            },
             {
               "id": "usdkrw",
               "name": "달러/원",
@@ -340,44 +373,44 @@
                   "z_score": -0.11
                 }
               ]
-            },
-            {
-              "id": "dxy",
-              "name": "달러 인덱스",
-              "score": -0.12788553425053548,
-              "momentum_score": -0.21,
-              "level_score": 0.2,
-              "windows": [
-                {
-                  "days": 1,
-                  "change": 0.02,
-                  "z_score": -0.05
-                },
-                {
-                  "days": 5,
-                  "change": -0.218,
-                  "z_score": 0.27
-                },
-                {
-                  "days": 20,
-                  "change": 0.659,
-                  "z_score": -0.41
-                },
-                {
-                  "days": 60,
-                  "change": 2.378,
-                  "z_score": -0.84
-                }
-              ]
             }
           ]
         },
         {
           "id": "inflation_growth",
           "label": "물가/성장",
-          "score": -0.0,
-          "points": -0.0,
+          "score": -0.02,
+          "points": -0.1,
           "leaders": [
+            {
+              "id": "wti",
+              "name": "WTI 원유",
+              "score": -0.2656051827733081,
+              "momentum_score": -0.28,
+              "level_score": -0.21,
+              "windows": [
+                {
+                  "days": 1,
+                  "change": 4.484,
+                  "z_score": -0.69
+                },
+                {
+                  "days": 5,
+                  "change": 15.516,
+                  "z_score": -1.06
+                },
+                {
+                  "days": 20,
+                  "change": 7.423,
+                  "z_score": -0.25
+                },
+                {
+                  "days": 60,
+                  "change": -10.463,
+                  "z_score": 0.21
+                }
+              ]
+            },
             {
               "id": "cpi_yoy",
               "name": "미국 CPI YoY",
@@ -396,25 +429,6 @@
                   "z_score": -1.15
                 }
               ]
-            },
-            {
-              "id": "unemployment",
-              "name": "미국 실업률",
-              "score": 0.2425531791925803,
-              "momentum_score": 0.42,
-              "level_score": -0.47,
-              "windows": [
-                {
-                  "days": 1,
-                  "change": -0.1,
-                  "z_score": 0.96
-                },
-                {
-                  "days": 5,
-                  "change": -0.1,
-                  "z_score": 0.43
-                }
-              ]
             }
           ]
         }
@@ -426,28 +440,22 @@
         "섹터 리더가 방어주로만 쏠리는지 확인"
       ],
       "freshness": {
-        "latest": "2026-07-17",
+        "latest": "2026-07-18",
         "oldest": "2026-06-01"
       }
     },
     "ai_summary": {
-      "headline": "시장 불확실성 속 신중한 관망 권고",
-      "summary": "변동성과 금리 부담이 높아 단기 변동성 위험이 존재합니다. 신용 리스크와 달러 유동성 개선 신호가 있으나, 확실한 방향성 확인 후 대응하는 것이 바람직합니다.",
-      "stance": "시장 방향성이 명확해질 때까지 신규 비중 확대보다는 관망하는 자세가 필요합니다.",
+      "headline": "시장 방향성 불확실, 신중한 관망 권고",
+      "summary": "변동성 확대와 주식 모멘텀 약화로 단기 조정 가능성이 높습니다. 신용 리스크와 달러 유동성 개선 신호는 있으나, 확실한 방향성 확인 후 대응하는 것이 바람직합니다.",
+      "stance": "시장 상황을 면밀히 관찰하며 신규 비중 확대보다는 확인 후 진입하는 신중한 자세를 유지하세요.",
       "watch_points": [
-        "VIX 변동성 신호 완화 여부 확인",
-        "하이일드 스프레드 및 신용 리스크 안정성 점검",
-        "섹터별 리더 주식 흐름, 특히 방어주 쏠림 여부 관찰"
+        "VIX 변동성 및 하이일드 스프레드 안정 여부 확인",
+        "섹터 리더가 방어주 중심으로 쏠리는지 점검",
+        "주요 지수 및 성장주 모멘텀 변화 관찰"
       ],
       "source": "openai:gpt-4.1-mini"
     },
     "score_history": [
-      {
-        "date": "2021-07-17",
-        "score": 52,
-        "regime_label": "기다릴 구간",
-        "indicator_count": 1
-      },
       {
         "date": "2021-07-18",
         "score": 52,
@@ -456,7 +464,7 @@
       },
       {
         "date": "2021-07-19",
-        "score": 51,
+        "score": 53,
         "regime_label": "기다릴 구간",
         "indicator_count": 16
       },
@@ -474,7 +482,7 @@
       },
       {
         "date": "2021-07-22",
-        "score": 59,
+        "score": 58,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 16
       },
@@ -564,7 +572,7 @@
       },
       {
         "date": "2021-08-06",
-        "score": 75,
+        "score": 74,
         "regime_label": "비중 늘릴 구간",
         "indicator_count": 19
       },
@@ -678,7 +686,7 @@
       },
       {
         "date": "2021-08-25",
-        "score": 68,
+        "score": 67,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -11403,6 +11411,12 @@
         "score": 48,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
+      },
+      {
+        "date": "2026-07-18",
+        "score": 48,
+        "regime_label": "기다릴 구간",
+        "indicator_count": 20
       }
     ],
     "groups": {
@@ -20745,7 +20759,7 @@
           "kind": "risk_off",
           "unit": "pt",
           "value": 100.75,
-          "change_abs": 0.025,
+          "change_abs": 0.02,
           "change_pct": 0.02,
           "latest_date": "2026-07-17",
           "previous_date": "2026-07-16",
@@ -20754,10 +20768,6 @@
           "description": "달러 강세 여부를 보여준다. 글로벌 유동성과 신흥국 자금 흐름에 중요하다.",
           "market_impact": "달러 급등은 해외 위험자산과 원화자산에 부담이고, 달러 약세는 위험선호에 우호적이다.",
           "points": [
-            {
-              "date": "2025-07-17",
-              "value": 98.73
-            },
             {
               "date": "2025-07-18",
               "value": 98.48
@@ -22848,9 +22858,9 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 81.77,
-          "change_abs": 2.82,
-          "change_pct": 3.57,
+          "value": 82.49,
+          "change_abs": 3.54,
+          "change_pct": 4.48,
           "latest_date": "2026-07-17",
           "previous_date": "2026-07-16",
           "data_frequency": "일간",
@@ -22858,10 +22868,6 @@
           "description": "에너지 가격과 인플레이션 압력을 같이 보여준다.",
           "market_impact": "완만한 상승은 경기 수요를 뜻할 수 있지만, 급등은 물가와 마진 부담으로 시장에 부정적이다.",
           "points": [
-            {
-              "date": "2025-07-17",
-              "value": 67.54
-            },
             {
               "date": "2025-07-18",
               "value": 67.34
@@ -23864,13 +23870,13 @@
             },
             {
               "date": "2026-07-17",
-              "value": 81.77
+              "value": 82.49
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 69.4,
-            "position_label": "5년 중 상위 31% 수준",
+            "percentile": 70.9,
+            "position_label": "5년 중 상위 29% 수준",
             "zone": "장기 중립권",
             "min": 55.27,
             "max": 123.7,
@@ -23883,9 +23889,9 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 4023.0,
-          "change_abs": 37.4,
-          "change_pct": 0.94,
+          "value": 4012.7,
+          "change_abs": 27.1,
+          "change_pct": 0.68,
           "latest_date": "2026-07-17",
           "previous_date": "2026-07-16",
           "data_frequency": "일간",
@@ -23893,10 +23899,6 @@
           "description": "실질금리, 달러, 안전자산 수요를 함께 반영한다.",
           "market_impact": "금이 강하면 인플레이션 헤지나 안전자산 선호가 커졌는지 확인해야 한다.",
           "points": [
-            {
-              "date": "2025-07-17",
-              "value": 3340.1
-            },
             {
               "date": "2025-07-18",
               "value": 3353.0
@@ -24899,12 +24901,12 @@
             },
             {
               "date": "2026-07-17",
-              "value": 4023.0
+              "value": 4012.7
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 86.0,
+            "percentile": 85.8,
             "position_label": "5년 중 상위 14% 수준",
             "zone": "장기 상단 강세권",
             "min": 1623.3,
@@ -24920,9 +24922,9 @@
           "group": "원자재/경기",
           "kind": "risk_on",
           "unit": "$",
-          "value": 6.271,
-          "change_abs": -0.025,
-          "change_pct": -0.41,
+          "value": 6.22,
+          "change_abs": -0.076,
+          "change_pct": -1.21,
           "latest_date": "2026-07-17",
           "previous_date": "2026-07-16",
           "data_frequency": "일간",
@@ -24930,10 +24932,6 @@
           "description": "제조업과 인프라 수요에 민감해 경기 민감 지표로 자주 본다.",
           "market_impact": "구리 강세는 경기민감주와 산업재에 우호적이고, 약세는 수요 둔화 신호가 될 수 있다.",
           "points": [
-            {
-              "date": "2025-07-17",
-              "value": 5.486
-            },
             {
               "date": "2025-07-18",
               "value": 5.578
@@ -25936,13 +25934,13 @@
             },
             {
               "date": "2026-07-17",
-              "value": 6.271
+              "value": 6.22
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 97.9,
-            "position_label": "5년 중 상위 2% 수준",
+            "percentile": 97.3,
+            "position_label": "5년 중 상위 3% 수준",
             "zone": "장기 상단 강세권",
             "min": 3.211,
             "max": 6.649,
@@ -27973,20 +27971,16 @@
           "group": "고베타/유동성",
           "kind": "risk_on",
           "unit": "$",
-          "value": 63901.9,
-          "change_abs": 112.67,
-          "change_pct": 0.18,
-          "latest_date": "2026-07-17",
-          "previous_date": "2026-07-16",
+          "value": 64720.7,
+          "change_abs": 821.24,
+          "change_pct": 1.29,
+          "latest_date": "2026-07-18",
+          "previous_date": "2026-07-17",
           "data_frequency": "일간",
           "signal": "매수 우세",
           "description": "고베타 유동성 자산의 대표 신호다.",
           "market_impact": "강세는 투기적 위험선호 회복 신호일 수 있고, 급락은 고베타 자산 축소 압력으로 본다.",
           "points": [
-            {
-              "date": "2025-10-31",
-              "value": 109556.2
-            },
             {
               "date": "2025-11-01",
               "value": 110064.0
@@ -29021,13 +29015,17 @@
             },
             {
               "date": "2026-07-17",
-              "value": 63901.9
+              "value": 63899.5
+            },
+            {
+              "date": "2026-07-18",
+              "value": 64720.7
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 60.2,
-            "position_label": "5년 중 상위 40% 수준",
+            "percentile": 61.6,
+            "position_label": "5년 중 상위 38% 수준",
             "zone": "장기 중립권",
             "min": 15787.3,
             "max": 124752.5,
@@ -29274,7 +29272,7 @@
     "US": {
       "market": "US",
       "benchmark": "S&P 500",
-      "as_of": "2026-07-17T22:44:08.450243+00:00",
+      "as_of": "2026-07-18T22:43:49.792578+00:00",
       "leaders": [
         {
           "id": "us-healthcare",
@@ -170435,7 +170433,7 @@
     "KR": {
       "market": "KR",
       "benchmark": "KOSPI",
-      "as_of": "2026-07-17T22:44:09.681656+00:00",
+      "as_of": "2026-07-18T22:43:52.980211+00:00",
       "leaders": [
         {
           "id": "kr-bank",
