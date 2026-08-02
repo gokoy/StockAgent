@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-01T22:49:27.479146+00:00",
+  "generated_at": "2026-08-02T22:51:25.697675+00:00",
   "macro": {
-    "as_of": "2026-08-01T22:49:32.941572+00:00",
+    "as_of": "2026-08-02T22:51:31.589289+00:00",
     "decision": {
-      "score": 58,
+      "score": 59,
       "regime_label": "좋은 종목만 매수 구간",
       "action_title": "좋은 종목만 매수",
       "posture": "전체 시장 추격보다 상대강도 상위 섹터와 주도주만 선별합니다.",
@@ -14,8 +14,8 @@
       "supportive_signals": [
         "신용 리스크 개선 · 하이일드 / 우량채 +0.74, 하이일드 스프레드 -0.07",
         "변동성 개선 · VIX 변동성 +0.26",
-        "달러/유동성 개선 · 달러 인덱스 +0.40, 달러/원 +0.33",
-        "물가/성장 개선 · 구리 +0.51, 미국 CPI YoY -0.25"
+        "달러/유동성 개선 · 달러 인덱스 +0.42, 달러/원 +0.32",
+        "물가/성장 개선 · 구리 +0.63, 미국 CPI YoY -0.25"
       ],
       "score_up_drivers": [
         {
@@ -27,12 +27,12 @@
           "note": "변동성 개선 · VIX 변동성 +0.26"
         },
         {
-          "points": 1.7,
-          "note": "달러/유동성 개선 · 달러 인덱스 +0.40, 달러/원 +0.33"
+          "points": 2.2,
+          "note": "달러/유동성 개선 · 달러 인덱스 +0.42, 달러/원 +0.32"
         },
         {
-          "points": 0.4,
-          "note": "물가/성장 개선 · 구리 +0.51, 미국 CPI YoY -0.25"
+          "points": 0.6,
+          "note": "물가/성장 개선 · 구리 +0.63, 미국 CPI YoY -0.25"
         }
       ],
       "score_down_drivers": [
@@ -304,64 +304,64 @@
         {
           "id": "fx_liquidity",
           "label": "달러/유동성",
-          "score": 0.21,
-          "points": 1.7,
+          "score": 0.27,
+          "points": 2.2,
           "leaders": [
             {
               "id": "dxy",
               "name": "달러 인덱스",
-              "score": 0.40314827876281806,
-              "momentum_score": 0.43,
-              "level_score": 0.31,
+              "score": 0.4155580149810853,
+              "momentum_score": 0.44,
+              "level_score": 0.33,
               "windows": [
                 {
                   "days": 1,
-                  "change": -0.21,
-                  "z_score": 0.61
+                  "change": -0.17,
+                  "z_score": 0.5
                 },
                 {
                   "days": 5,
-                  "change": -1.646,
-                  "z_score": 2.14
+                  "change": -1.852,
+                  "z_score": 2.41
                 },
                 {
                   "days": 20,
-                  "change": -1.051,
-                  "z_score": 0.68
+                  "change": -1.21,
+                  "z_score": 0.79
                 },
                 {
                   "days": 60,
-                  "change": 1.34,
-                  "z_score": -0.5
+                  "change": 1.643,
+                  "z_score": -0.62
                 }
               ]
             },
             {
               "id": "usdkrw",
               "name": "달러/원",
-              "score": 0.3272744511051051,
-              "momentum_score": 0.56,
-              "level_score": -0.6,
+              "score": 0.3219666324965118,
+              "momentum_score": 0.55,
+              "level_score": -0.61,
               "windows": [
                 {
                   "days": 1,
-                  "change": 1.126,
-                  "z_score": -1.81
+                  "change": 1.169,
+                  "z_score": -1.87
                 },
                 {
                   "days": 5,
-                  "change": -1.468,
-                  "z_score": 1.05
+                  "change": -1.427,
+                  "z_score": 1.02
                 },
                 {
                   "days": 20,
-                  "change": -6.166,
-                  "z_score": 2.21
+                  "change": -6.127,
+                  "z_score": 2.2
                 },
                 {
                   "days": 60,
-                  "change": -1.643,
-                  "z_score": 0.34
+                  "change": -1.602,
+                  "z_score": 0.33
                 }
               ]
             }
@@ -370,35 +370,35 @@
         {
           "id": "inflation_growth",
           "label": "물가/성장",
-          "score": 0.07,
-          "points": 0.4,
+          "score": 0.1,
+          "points": 0.6,
           "leaders": [
             {
               "id": "copper",
               "name": "구리",
-              "score": 0.512001897331458,
-              "momentum_score": 0.4,
-              "level_score": 0.98,
+              "score": 0.6317495002970561,
+              "momentum_score": 0.54,
+              "level_score": 1.0,
               "windows": [
                 {
                   "days": 1,
-                  "change": -0.124,
-                  "z_score": -0.07
+                  "change": 1.818,
+                  "z_score": 1.04
                 },
                 {
                   "days": 5,
-                  "change": 1.835,
-                  "z_score": 0.47
+                  "change": 3.376,
+                  "z_score": 0.86
                 },
                 {
                   "days": 20,
-                  "change": 5.249,
-                  "z_score": 0.67
+                  "change": 6.07,
+                  "z_score": 0.77
                 },
                 {
                   "days": 60,
-                  "change": 8.295,
-                  "z_score": 0.61
+                  "change": 6.796,
+                  "z_score": 0.5
                 }
               ]
             },
@@ -431,211 +431,205 @@
         "매도 우세 신호가 2개 이상 추가되면 신규 비중 확대 보류"
       ],
       "freshness": {
-        "latest": "2026-08-01",
+        "latest": "2026-08-02",
         "oldest": "2026-06-01"
       }
     },
     "ai_summary": {
-      "headline": "일부 강한 섹터 중심 매수 유효, 주식 모멘텀은 부담",
-      "summary": "시장 전체는 혼재된 모습이나 신용 리스크와 변동성 개선으로 일부 강한 자산에 자금이 집중되고 있습니다. 주식 모멘텀 약화로 광범위한 추격은 신중해야 하며, 강한 섹터와 주도주 위주로 접근하는 것이 바람직합니다.",
-      "stance": "상대강도 높은 섹터와 주도주만 선별 매수하며 광범위한 시장 추격은 자제합니다.",
+      "headline": "일부 강한 종목 중심 매수 유효, 전체 시장은 선별적 접근 필요",
+      "summary": "시장 전체가 강하지는 않으나 신용 리스크와 변동성 개선으로 일부 강한 자산에 자금이 집중되고 있습니다. 주식 모멘텀 부담으로 광범위한 추격은 어려워 상대강도 상위 섹터와 주도주 위주로 접근하는 것이 바람직합니다.",
+      "stance": "강한 섹터와 주도주 중심으로 선별 매수하며 전체 시장 추격은 자제합니다.",
       "watch_points": [
         "S&P 500과 Nasdaq 100의 동반 상승 여부 확인",
-        "주식 모멘텀 약화 지속 여부 점검",
-        "매도 신호 다수 발생 시 신규 비중 확대 보류"
+        "주요 지수와 성장주의 모멘텀 변화 추적",
+        "매도 신호가 2개 이상 발생 시 신규 비중 확대 보류"
       ],
       "source": "openai:gpt-4.1-mini"
     },
     "score_history": [
       {
-        "date": "2021-08-01",
-        "score": 49,
-        "regime_label": "기다릴 구간",
-        "indicator_count": 4
-      },
-      {
         "date": "2021-08-02",
-        "score": 52,
+        "score": 53,
         "regime_label": "기다릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-03",
-        "score": 51,
+        "score": 54,
         "regime_label": "기다릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-04",
         "score": 47,
         "regime_label": "기다릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-05",
         "score": 83,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-06",
-        "score": 76,
+        "score": 78,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-07",
-        "score": 76,
+        "score": 78,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-08",
-        "score": 76,
+        "score": 77,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-09",
-        "score": 70,
+        "score": 71,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-10",
-        "score": 63,
+        "score": 64,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-11",
-        "score": 66,
+        "score": 67,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-12",
-        "score": 61,
+        "score": 62,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-13",
-        "score": 45,
+        "score": 46,
         "regime_label": "기다릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-14",
-        "score": 43,
+        "score": 44,
         "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-15",
-        "score": 44,
-        "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "score": 45,
+        "regime_label": "기다릴 구간",
+        "indicator_count": 16
       },
       {
         "date": "2021-08-16",
-        "score": 42,
+        "score": 43,
         "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-17",
         "score": 23,
         "regime_label": "현금 지킬 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-18",
-        "score": 15,
+        "score": 16,
         "regime_label": "현금 지킬 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-19",
         "score": 16,
         "regime_label": "현금 지킬 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-20",
-        "score": 33,
+        "score": 34,
         "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-21",
         "score": 34,
         "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-22",
-        "score": 34,
+        "score": 35,
         "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-23",
         "score": 53,
         "regime_label": "기다릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-24",
-        "score": 64,
+        "score": 65,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-25",
-        "score": 78,
+        "score": 79,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-26",
         "score": 64,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-27",
-        "score": 78,
+        "score": 79,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-28",
-        "score": 77,
+        "score": 79,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-29",
-        "score": 77,
+        "score": 79,
         "regime_label": "비중 늘릴 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-30",
-        "score": 69,
+        "score": 70,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-08-31",
-        "score": 67,
+        "score": 68,
         "regime_label": "좋은 종목만 매수 구간",
-        "indicator_count": 19
+        "indicator_count": 16
       },
       {
         "date": "2021-09-01",
-        "score": 69,
+        "score": 68,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -659,13 +653,13 @@
       },
       {
         "date": "2021-09-05",
-        "score": 67,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-06",
-        "score": 67,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -677,7 +671,7 @@
       },
       {
         "date": "2021-09-08",
-        "score": 49,
+        "score": 48,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -689,13 +683,13 @@
       },
       {
         "date": "2021-09-10",
-        "score": 34,
+        "score": 33,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-11",
-        "score": 34,
+        "score": 33,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -707,13 +701,13 @@
       },
       {
         "date": "2021-09-13",
-        "score": 39,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-14",
-        "score": 36,
+        "score": 35,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -731,7 +725,7 @@
       },
       {
         "date": "2021-09-17",
-        "score": 57,
+        "score": 56,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -743,7 +737,7 @@
       },
       {
         "date": "2021-09-19",
-        "score": 57,
+        "score": 56,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -761,19 +755,19 @@
       },
       {
         "date": "2021-09-22",
-        "score": 35,
+        "score": 34,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-23",
-        "score": 50,
+        "score": 49,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-24",
-        "score": 53,
+        "score": 52,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -785,37 +779,37 @@
       },
       {
         "date": "2021-09-26",
-        "score": 54,
+        "score": 53,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-27",
-        "score": 49,
+        "score": 48,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-28",
-        "score": 41,
+        "score": 40,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-09-29",
-        "score": 39,
-        "regime_label": "비중 줄일 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2021-09-30",
         "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
-        "date": "2021-10-01",
+        "date": "2021-09-30",
         "score": 37,
+        "regime_label": "비중 줄일 구간",
+        "indicator_count": 19
+      },
+      {
+        "date": "2021-10-01",
+        "score": 36,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -827,7 +821,7 @@
       },
       {
         "date": "2021-10-03",
-        "score": 37,
+        "score": 36,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -857,7 +851,7 @@
       },
       {
         "date": "2021-10-08",
-        "score": 51,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -911,7 +905,7 @@
       },
       {
         "date": "2021-10-17",
-        "score": 60,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -935,7 +929,7 @@
       },
       {
         "date": "2021-10-21",
-        "score": 67,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -971,7 +965,7 @@
       },
       {
         "date": "2021-10-27",
-        "score": 43,
+        "score": 42,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -983,7 +977,7 @@
       },
       {
         "date": "2021-10-29",
-        "score": 50,
+        "score": 49,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1007,7 +1001,7 @@
       },
       {
         "date": "2021-11-02",
-        "score": 54,
+        "score": 53,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1037,7 +1031,7 @@
       },
       {
         "date": "2021-11-07",
-        "score": 51,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1055,8 +1049,8 @@
       },
       {
         "date": "2021-11-10",
-        "score": 45,
-        "regime_label": "기다릴 구간",
+        "score": 44,
+        "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
@@ -1067,7 +1061,7 @@
       },
       {
         "date": "2021-11-12",
-        "score": 57,
+        "score": 56,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1091,7 +1085,7 @@
       },
       {
         "date": "2021-11-16",
-        "score": 60,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -1139,8 +1133,8 @@
       },
       {
         "date": "2021-11-24",
-        "score": 45,
-        "regime_label": "기다릴 구간",
+        "score": 44,
+        "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
@@ -1187,7 +1181,7 @@
       },
       {
         "date": "2021-12-02",
-        "score": 26,
+        "score": 25,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
@@ -1217,7 +1211,7 @@
       },
       {
         "date": "2021-12-07",
-        "score": 47,
+        "score": 46,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1265,7 +1259,7 @@
       },
       {
         "date": "2021-12-15",
-        "score": 43,
+        "score": 42,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -1313,13 +1307,13 @@
       },
       {
         "date": "2021-12-23",
-        "score": 58,
-        "regime_label": "좋은 종목만 매수 구간",
+        "score": 57,
+        "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2021-12-24",
-        "score": 60,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -1349,7 +1343,7 @@
       },
       {
         "date": "2021-12-29",
-        "score": 67,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -1367,188 +1361,188 @@
       },
       {
         "date": "2022-01-01",
-        "score": 61,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-02",
-        "score": 61,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-03",
-        "score": 68,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-04",
-        "score": 60,
+        "score": 58,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-05",
-        "score": 43,
+        "score": 41,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-06",
-        "score": 42,
+        "score": 40,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-07",
-        "score": 47,
+        "score": 46,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-08",
-        "score": 48,
+        "score": 46,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-09",
-        "score": 48,
+        "score": 46,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-10",
-        "score": 40,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-11",
-        "score": 49,
+        "score": 47,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-12",
-        "score": 60,
+        "score": 58,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-13",
-        "score": 43,
+        "score": 41,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-14",
-        "score": 50,
-        "regime_label": "기다릴 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2022-01-15",
-        "score": 50,
-        "regime_label": "기다릴 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2022-01-16",
-        "score": 50,
-        "regime_label": "기다릴 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2022-01-17",
         "score": 49,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
+        "date": "2022-01-15",
+        "score": 49,
+        "regime_label": "기다릴 구간",
+        "indicator_count": 19
+      },
+      {
+        "date": "2022-01-16",
+        "score": 48,
+        "regime_label": "기다릴 구간",
+        "indicator_count": 19
+      },
+      {
+        "date": "2022-01-17",
+        "score": 47,
+        "regime_label": "기다릴 구간",
+        "indicator_count": 19
+      },
+      {
         "date": "2022-01-18",
-        "score": 40,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-19",
-        "score": 36,
+        "score": 34,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-20",
-        "score": 31,
+        "score": 29,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-21",
-        "score": 24,
+        "score": 22,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-22",
-        "score": 24,
+        "score": 22,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-23",
-        "score": 25,
-        "regime_label": "현금 지킬 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2022-01-24",
-        "score": 25,
-        "regime_label": "현금 지킬 구간",
-        "indicator_count": 19
-      },
-      {
-        "date": "2022-01-25",
         "score": 23,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
-        "date": "2022-01-26",
+        "date": "2022-01-24",
         "score": 24,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
+        "date": "2022-01-25",
+        "score": 21,
+        "regime_label": "현금 지킬 구간",
+        "indicator_count": 19
+      },
+      {
+        "date": "2022-01-26",
+        "score": 22,
+        "regime_label": "현금 지킬 구간",
+        "indicator_count": 19
+      },
+      {
         "date": "2022-01-27",
-        "score": 17,
+        "score": 16,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-28",
-        "score": 29,
+        "score": 28,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-29",
-        "score": 29,
+        "score": 28,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-30",
-        "score": 29,
+        "score": 27,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-01-31",
-        "score": 32,
-        "regime_label": "비중 줄일 구간",
+        "score": 30,
+        "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
@@ -1565,7 +1559,7 @@
       },
       {
         "date": "2022-02-03",
-        "score": 37,
+        "score": 36,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -1601,7 +1595,7 @@
       },
       {
         "date": "2022-02-09",
-        "score": 48,
+        "score": 47,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1691,7 +1685,7 @@
       },
       {
         "date": "2022-02-24",
-        "score": 39,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -1703,7 +1697,7 @@
       },
       {
         "date": "2022-02-26",
-        "score": 51,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -1823,7 +1817,7 @@
       },
       {
         "date": "2022-03-18",
-        "score": 54,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -2015,7 +2009,7 @@
       },
       {
         "date": "2022-04-19",
-        "score": 56,
+        "score": 57,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -2129,7 +2123,7 @@
       },
       {
         "date": "2022-05-08",
-        "score": 34,
+        "score": 35,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -2231,7 +2225,7 @@
       },
       {
         "date": "2022-05-25",
-        "score": 42,
+        "score": 43,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -2579,7 +2573,7 @@
       },
       {
         "date": "2022-07-22",
-        "score": 49,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -2627,7 +2621,7 @@
       },
       {
         "date": "2022-07-30",
-        "score": 60,
+        "score": 61,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -2903,7 +2897,7 @@
       },
       {
         "date": "2022-09-14",
-        "score": 32,
+        "score": 33,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
@@ -2975,14 +2969,14 @@
       },
       {
         "date": "2022-09-26",
-        "score": 24,
+        "score": 25,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-09-27",
-        "score": 31,
-        "regime_label": "현금 지킬 구간",
+        "score": 32,
+        "regime_label": "비중 줄일 구간",
         "indicator_count": 19
       },
       {
@@ -3209,13 +3203,13 @@
       },
       {
         "date": "2022-11-04",
-        "score": 52,
+        "score": 51,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2022-11-05",
-        "score": 52,
+        "score": 51,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -3593,7 +3587,7 @@
       },
       {
         "date": "2023-01-07",
-        "score": 56,
+        "score": 57,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -3761,7 +3755,7 @@
       },
       {
         "date": "2023-02-04",
-        "score": 63,
+        "score": 62,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -3845,19 +3839,19 @@
       },
       {
         "date": "2023-02-18",
-        "score": 56,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2023-02-19",
-        "score": 56,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
       {
         "date": "2023-02-20",
-        "score": 57,
+        "score": 56,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -3911,7 +3905,7 @@
       },
       {
         "date": "2023-03-01",
-        "score": 53,
+        "score": 54,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -4151,7 +4145,7 @@
       },
       {
         "date": "2023-04-10",
-        "score": 52,
+        "score": 53,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -4193,7 +4187,7 @@
       },
       {
         "date": "2023-04-17",
-        "score": 67,
+        "score": 68,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -4271,7 +4265,7 @@
       },
       {
         "date": "2023-04-30",
-        "score": 51,
+        "score": 52,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -4391,7 +4385,7 @@
       },
       {
         "date": "2023-05-20",
-        "score": 55,
+        "score": 54,
         "regime_label": "기다릴 구간",
         "indicator_count": 19
       },
@@ -4775,7 +4769,7 @@
       },
       {
         "date": "2023-07-23",
-        "score": 60,
+        "score": 61,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -4823,7 +4817,7 @@
       },
       {
         "date": "2023-07-31",
-        "score": 65,
+        "score": 66,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 19
       },
@@ -4979,7 +4973,7 @@
       },
       {
         "date": "2023-08-26",
-        "score": 51,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -5309,7 +5303,7 @@
       },
       {
         "date": "2023-10-20",
-        "score": 29,
+        "score": 28,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 20
       },
@@ -5627,7 +5621,7 @@
       },
       {
         "date": "2023-12-12",
-        "score": 66,
+        "score": 65,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -6005,7 +5999,7 @@
       },
       {
         "date": "2024-02-13",
-        "score": 56,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -6179,7 +6173,7 @@
       },
       {
         "date": "2024-03-13",
-        "score": 70,
+        "score": 69,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -6365,7 +6359,7 @@
       },
       {
         "date": "2024-04-13",
-        "score": 39,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 20
       },
@@ -6431,7 +6425,7 @@
       },
       {
         "date": "2024-04-24",
-        "score": 55,
+        "score": 54,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -6767,13 +6761,13 @@
       },
       {
         "date": "2024-06-19",
-        "score": 52,
+        "score": 51,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
       {
         "date": "2024-06-20",
-        "score": 46,
+        "score": 45,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -6803,7 +6797,7 @@
       },
       {
         "date": "2024-06-25",
-        "score": 52,
+        "score": 51,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -6917,7 +6911,7 @@
       },
       {
         "date": "2024-07-14",
-        "score": 64,
+        "score": 63,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -7157,7 +7151,7 @@
       },
       {
         "date": "2024-08-23",
-        "score": 60,
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -7187,13 +7181,13 @@
       },
       {
         "date": "2024-08-28",
-        "score": 51,
+        "score": 50,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
       {
         "date": "2024-08-29",
-        "score": 61,
+        "score": 60,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -7295,7 +7289,7 @@
       },
       {
         "date": "2024-09-15",
-        "score": 56,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -7409,7 +7403,7 @@
       },
       {
         "date": "2024-10-04",
-        "score": 59,
+        "score": 58,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -7499,7 +7493,7 @@
       },
       {
         "date": "2024-10-19",
-        "score": 61,
+        "score": 60,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -7907,7 +7901,7 @@
       },
       {
         "date": "2024-12-26",
-        "score": 54,
+        "score": 53,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -8087,7 +8081,7 @@
       },
       {
         "date": "2025-01-25",
-        "score": 69,
+        "score": 68,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -8519,13 +8513,13 @@
       },
       {
         "date": "2025-04-07",
-        "score": 21,
+        "score": 20,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 20
       },
       {
         "date": "2025-04-08",
-        "score": 21,
+        "score": 20,
         "regime_label": "현금 지킬 구간",
         "indicator_count": 20
       },
@@ -8561,7 +8555,7 @@
       },
       {
         "date": "2025-04-14",
-        "score": 48,
+        "score": 47,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -8585,7 +8579,7 @@
       },
       {
         "date": "2025-04-18",
-        "score": 47,
+        "score": 46,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -8837,7 +8831,7 @@
       },
       {
         "date": "2025-05-30",
-        "score": 63,
+        "score": 62,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -8873,7 +8867,7 @@
       },
       {
         "date": "2025-06-05",
-        "score": 68,
+        "score": 67,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -8885,14 +8879,14 @@
       },
       {
         "date": "2025-06-07",
-        "score": 72,
-        "regime_label": "비중 늘릴 구간",
+        "score": 71,
+        "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
       {
         "date": "2025-06-08",
-        "score": 72,
-        "regime_label": "비중 늘릴 구간",
+        "score": 71,
+        "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
       {
@@ -9149,7 +9143,7 @@
       },
       {
         "date": "2025-07-21",
-        "score": 68,
+        "score": 67,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -9191,7 +9185,7 @@
       },
       {
         "date": "2025-07-28",
-        "score": 65,
+        "score": 64,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -9377,7 +9371,7 @@
       },
       {
         "date": "2025-08-28",
-        "score": 70,
+        "score": 69,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -9701,7 +9695,7 @@
       },
       {
         "date": "2025-10-21",
-        "score": 56,
+        "score": 55,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -9791,7 +9785,7 @@
       },
       {
         "date": "2025-11-05",
-        "score": 53,
+        "score": 52,
         "regime_label": "기다릴 구간",
         "indicator_count": 20
       },
@@ -9887,7 +9881,7 @@
       },
       {
         "date": "2025-11-21",
-        "score": 39,
+        "score": 38,
         "regime_label": "비중 줄일 구간",
         "indicator_count": 20
       },
@@ -10127,7 +10121,7 @@
       },
       {
         "date": "2025-12-31",
-        "score": 63,
+        "score": 62,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       },
@@ -11405,7 +11399,13 @@
       },
       {
         "date": "2026-08-01",
-        "score": 58,
+        "score": 59,
+        "regime_label": "좋은 종목만 매수 구간",
+        "indicator_count": 20
+      },
+      {
+        "date": "2026-08-02",
+        "score": 59,
         "regime_label": "좋은 종목만 매수 구간",
         "indicator_count": 20
       }
@@ -20749,20 +20749,16 @@
           "group": "환율/글로벌 자금",
           "kind": "risk_off",
           "unit": "pt",
-          "value": 99.8,
-          "change_abs": -0.21,
-          "change_pct": -0.21,
-          "latest_date": "2026-07-31",
-          "previous_date": "2026-07-30",
+          "value": 99.63,
+          "change_abs": -0.17,
+          "change_pct": -0.17,
+          "latest_date": "2026-08-02",
+          "previous_date": "2026-07-31",
           "data_frequency": "일간",
           "signal": "매수 부담 감소",
           "description": "달러 강세 여부를 보여준다. 글로벌 유동성과 신흥국 자금 흐름에 중요하다.",
           "market_impact": "달러 급등은 해외 위험자산과 원화자산에 부담이고, 달러 약세는 위험선호에 우호적이다.",
           "points": [
-            {
-              "date": "2025-08-01",
-              "value": 98.69
-            },
             {
               "date": "2025-08-04",
               "value": 98.78
@@ -21762,16 +21758,20 @@
             {
               "date": "2026-07-31",
               "value": 99.8
+            },
+            {
+              "date": "2026-08-02",
+              "value": 99.63
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 34.7,
-            "position_label": "5년 중 하위 35% 수준",
+            "percentile": 33.5,
+            "position_label": "5년 중 하위 33% 수준",
             "zone": "장기 중립권",
             "min": 92.04,
             "max": 114.11,
-            "observations": 1257
+            "observations": 1258
           }
         },
         {
@@ -21780,10 +21780,10 @@
           "group": "환율/글로벌 자금",
           "kind": "risk_off",
           "unit": "KRW",
-          "value": 1436.6,
-          "change_abs": 16.0,
-          "change_pct": 1.13,
-          "latest_date": "2026-08-01",
+          "value": 1437.2,
+          "change_abs": 16.62,
+          "change_pct": 1.17,
+          "latest_date": "2026-08-02",
           "previous_date": "2026-07-31",
           "data_frequency": "일간",
           "signal": "매수 부담 증가",
@@ -22827,13 +22827,13 @@
               "value": 1420.6
             },
             {
-              "date": "2026-08-01",
-              "value": 1436.6
+              "date": "2026-08-02",
+              "value": 1437.2
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 80.2,
+            "percentile": 80.3,
             "position_label": "5년 중 상위 20% 수준",
             "zone": "장기 상단 위험권",
             "min": 1143.1,
@@ -22849,20 +22849,16 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 84.67,
-          "change_abs": 1.08,
-          "change_pct": 1.29,
-          "latest_date": "2026-07-31",
-          "previous_date": "2026-07-30",
+          "value": 80.7,
+          "change_abs": -3.97,
+          "change_pct": -4.69,
+          "latest_date": "2026-08-02",
+          "previous_date": "2026-07-31",
           "data_frequency": "일간",
-          "signal": "가격 상승",
+          "signal": "가격 하락",
           "description": "에너지 가격과 인플레이션 압력을 같이 보여준다.",
           "market_impact": "완만한 상승은 경기 수요를 뜻할 수 있지만, 급등은 물가와 마진 부담으로 시장에 부정적이다.",
           "points": [
-            {
-              "date": "2025-08-01",
-              "value": 67.33
-            },
             {
               "date": "2025-08-04",
               "value": 66.29
@@ -23862,16 +23858,20 @@
             {
               "date": "2026-07-31",
               "value": 84.67
+            },
+            {
+              "date": "2026-08-02",
+              "value": 80.7
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 75.3,
-            "position_label": "5년 중 상위 25% 수준",
+            "percentile": 64.9,
+            "position_label": "5년 중 상위 35% 수준",
             "zone": "장기 중립권",
             "min": 55.27,
             "max": 123.7,
-            "observations": 1257
+            "observations": 1258
           }
         },
         {
@@ -23880,20 +23880,16 @@
           "group": "원자재/인플레이션",
           "kind": "neutral",
           "unit": "$",
-          "value": 4049.1,
-          "change_abs": -51.0,
-          "change_pct": -1.24,
-          "latest_date": "2026-07-31",
-          "previous_date": "2026-07-30",
+          "value": 4123.6,
+          "change_abs": 74.5,
+          "change_pct": 1.84,
+          "latest_date": "2026-08-02",
+          "previous_date": "2026-07-31",
           "data_frequency": "일간",
-          "signal": "가격 하락",
+          "signal": "가격 상승",
           "description": "실질금리, 달러, 안전자산 수요를 함께 반영한다.",
           "market_impact": "금이 강하면 인플레이션 헤지나 안전자산 선호가 커졌는지 확인해야 한다.",
           "points": [
-            {
-              "date": "2025-08-01",
-              "value": 3347.7
-            },
             {
               "date": "2025-08-04",
               "value": 3374.4
@@ -24893,16 +24889,20 @@
             {
               "date": "2026-07-31",
               "value": 4049.1
+            },
+            {
+              "date": "2026-08-02",
+              "value": 4123.6
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 85.9,
-            "position_label": "5년 중 상위 14% 수준",
+            "percentile": 87.8,
+            "position_label": "5년 중 상위 12% 수준",
             "zone": "장기 상단 강세권",
             "min": 1623.3,
             "max": 5318.4,
-            "observations": 1257
+            "observations": 1258
           }
         }
       ],
@@ -24913,20 +24913,16 @@
           "group": "원자재/경기",
           "kind": "risk_on",
           "unit": "$",
-          "value": 6.436,
-          "change_abs": -0.009,
-          "change_pct": -0.13,
-          "latest_date": "2026-07-31",
-          "previous_date": "2026-07-30",
+          "value": 6.553,
+          "change_abs": 0.117,
+          "change_pct": 1.82,
+          "latest_date": "2026-08-02",
+          "previous_date": "2026-07-31",
           "data_frequency": "일간",
-          "signal": "관망",
+          "signal": "매수 우세",
           "description": "제조업과 인프라 수요에 민감해 경기 민감 지표로 자주 본다.",
           "market_impact": "구리 강세는 경기민감주와 산업재에 우호적이고, 약세는 수요 둔화 신호가 될 수 있다.",
           "points": [
-            {
-              "date": "2025-08-01",
-              "value": 4.412
-            },
             {
               "date": "2025-08-04",
               "value": 4.415
@@ -25926,16 +25922,20 @@
             {
               "date": "2026-07-31",
               "value": 6.436
+            },
+            {
+              "date": "2026-08-02",
+              "value": 6.553
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 99.0,
+            "percentile": 99.8,
             "position_label": "5년 중 상위 1% 수준",
             "zone": "장기 상단 강세권",
             "min": 3.211,
             "max": 6.649,
-            "observations": 1258
+            "observations": 1259
           }
         }
       ],
@@ -27954,20 +27954,16 @@
           "group": "고베타/유동성",
           "kind": "risk_on",
           "unit": "$",
-          "value": 62793.9,
-          "change_abs": -19.797,
-          "change_pct": -0.03,
-          "latest_date": "2026-08-01",
-          "previous_date": "2026-07-31",
+          "value": 63372.0,
+          "change_abs": 608.7,
+          "change_pct": 0.97,
+          "latest_date": "2026-08-02",
+          "previous_date": "2026-08-01",
           "data_frequency": "일간",
-          "signal": "매도 우세",
+          "signal": "매수 우세",
           "description": "고베타 유동성 자산의 대표 신호다.",
           "market_impact": "강세는 투기적 위험선호 회복 신호일 수 있고, 급락은 고베타 자산 축소 압력으로 본다.",
           "points": [
-            {
-              "date": "2025-11-15",
-              "value": 95549.1
-            },
             {
               "date": "2025-11-16",
               "value": 94177.1
@@ -29002,13 +28998,17 @@
             },
             {
               "date": "2026-08-01",
-              "value": 62793.9
+              "value": 62763.3
+            },
+            {
+              "date": "2026-08-02",
+              "value": 63372.0
             }
           ],
           "history_stats": {
             "lookback_years": 5,
-            "percentile": 56.7,
-            "position_label": "5년 중 상위 43% 수준",
+            "percentile": 58.2,
+            "position_label": "5년 중 상위 42% 수준",
             "zone": "장기 중립권",
             "min": 15787.3,
             "max": 124752.5,
@@ -29255,7 +29255,7 @@
     "US": {
       "market": "US",
       "benchmark": "S&P 500",
-      "as_of": "2026-08-01T22:50:00.147854+00:00",
+      "as_of": "2026-08-02T22:52:02.970375+00:00",
       "leaders": [
         {
           "id": "us-energy",
@@ -151515,7 +151515,7 @@
     "KR": {
       "market": "KR",
       "benchmark": "KOSPI",
-      "as_of": "2026-08-01T22:50:02.036608+00:00",
+      "as_of": "2026-08-02T22:52:04.331504+00:00",
       "leaders": [
         {
           "id": "kr-bank",
